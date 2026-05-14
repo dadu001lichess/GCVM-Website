@@ -3,101 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <title>GC(V)M - Homepage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* STAP 1: De basis van de pagina */
         body {
-            font-family: 'Open Sans', sans-serif;
+            font-family: 'Open Sans', sans-serif; /* Het officiële Google font */
             margin: 0;
-            display: flex; /* Zet de zijbalk en de inhoud NAAST elkaar */
-            background-color: #f0f0f0;
+            display: flex;
+            background-color: white;
         }
 
-        /* STAP 2: De Zijbalk (het menu) */
+        /* De Zijbalk */
         aside {
             width: 260px;
-            background-color: #1e1e1e; /* De donkere kleur */
-            height: 100vh; /* Maakt de balk net zo hoog als je scherm */
-            position: fixed; /* Zorgt dat de balk blijft staan als je scrollt */
+            background-color: #1e1e1e;
+            height: 100vh;
+            position: fixed;
             padding: 30px 20px;
-            box-sizing: border-box; /* Zorgt dat de padding de balk niet breder maakt */
+            box-sizing: border-box;
         }
 
-        .logo { color: white; font-size: 32px; margin-bottom: 50px; font-weight: bold; }
-        
-        /* De links in je menu */
-        nav a { 
-            display: block; 
-            color: #ccc; 
-            text-decoration: none; 
-            padding: 10px 0; 
-            font-size: 18px; 
-        }
-        nav a.active { color: #5bb7eb; } /* De blauwe kleur voor 'Homepage' */
+        .logo { color: white; font-size: 28px; margin-bottom: 40px; font-weight: 300; }
+        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 16px; }
+        nav a.active { color: #8ab4f8; } /* Dat zachte Google blauw */
 
-        /* STAP 3: De Rechterkant (de 'Main' area) */
+        /* De Rechterkant */
         main {
-            margin-left: 260px; /* Schuif alles naar rechts om plek te maken voor de zijbalk */
-            width: 100%;
-            background-color: white; /* De witte achtergrond van je pagina */
+            margin-left: 260px;
+            width: calc(100% - 260px);
             min-height: 100vh;
         }
 
-        /* STAP 4: De Banner (de grote foto bovenin) */
         .banner {
             height: 400px;
-            /* We leggen een donker 'masker' over de foto (0.6 zwart) zodat de witte letters opvallen */
-            background-image: 
-                linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                url('Banner.png'); 
-            background-size: cover; /* Zorg dat de foto het hele vak vult */
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('Banner.png');
+            background-size: cover;
             background-position: center;
             display: flex;
-            align-items: center; /* Tekst verticaal in het midden */
-            justify-content: center; /* Tekst horizontaal in het midden */
-            color: white;
+            align-items: center;
+            justify-content: center;
         }
 
-        .banner h1 { font-size: 50px; text-shadow: 2px 4px 10px rgba(0,0,0,0.5); }
+        .banner h1 { 
+            color: white; 
+            font-size: 48px; 
+            font-weight: 400; 
+            text-align: center;
+            margin: 0;
+        }
 
-      /* STAP 5: De Content (De tekst onder de foto) */
-.content {
-    padding: 60px 10%; /* Ruimte aan de zijkanten */
-    max-width: 900px;
-    margin: 0 auto;
-    color: #3c4043; /* De typische Google tekstkleur (donkergrijs) */
-}
+        /* DE TEKST STYLING (Google Look) */
+        .content {
+            padding: 60px 8%; /* Veel ruimte aan de zijkanten */
+            max-width: 850px;
+            margin: 0 auto;
+        }
 
-/* De "About us:" kop */
-.content h2 {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 28px; /* Precieze grootte van Google koppen */
-    font-weight: 400; /* Niet te dik, heel strak */
-    color: #202124; /* Iets donkerder dan de gewone tekst */
-    margin-top: 40px;
-    margin-bottom: 16px;
-}
+        .content h2 {
+            font-size: 28px;
+            font-weight: 400; /* Niet dik gedrukt, maar 'clean' */
+            color: #202124; /* Google's diepzwarte kleur */
+            margin-bottom: 20px;
+        }
 
-/* De gewone tekst alinea's */
-.content p {
-    font-size: 16px;
-    line-height: 1.5; /* De afstand tussen regels voor fijn lezen */
-    margin-bottom: 24px;
-}
-
-/* De blauwe linkjes */
-.content a {
-    color: #1a73e8; /* Het specifieke Google-blauw */
-    text-decoration: none;
-}
-
-.content a:hover {
-    text-decoration: underline; /* Alleen een streepje als je eroverheen gaat */
-}
+        .content p {
+            font-size: 16px;
+            line-height: 1.6; /* Ruimte tussen de regels */
+            color: #3c4043; /* Iets zachter grijs voor de tekst */
+            margin-bottom: 25px;
         }
     </style>
 </head>
 <body>
-
     <aside>
         <div class="logo">GC(V)M</div>
         <nav>
@@ -111,12 +87,11 @@
         <div class="banner">
             <h1>Growing Chess (Variants) Masters</h1>
         </div>
-
         <div class="content">
+            <p><strong>Homepage updating soon!</strong></p>
             <h2>About us:</h2>
-            <p>Hier komt je tekst...</p>
+            <p>We are a Lichess team, who's main goal is to coach low-rated players to become better at chess! We also host (practise) tournaments and simuls, and we of course have fun! We also have features, like Member of The Month (MoTM), Co-leaders of the month, and more. This is our official website, and I hope you like it!</p>
         </div>
     </main>
-
 </body>
 </html>
