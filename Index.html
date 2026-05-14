@@ -54,23 +54,22 @@
             width: calc(100% - 280px);
             min-height: 100vh;
         }
-
+        
         .banner {
-            height: 400px;
-            background-size: cover;
-            background-position: center;
+            height: 300px; 
+            background-color: #f1f3f4;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            border-bottom: 1px solid #dadce0;
         }
 
         .banner h1 {
-            font-size: 48px;
+            font-size: 42px;
             font-weight: 400;
             margin: 0;
             text-align: center;
-            color: gray;
+            color: #3c4043;
         }
 
         .content {
@@ -97,6 +96,29 @@
             color: #1a73e8;
             text-decoration: none;
         }
+summary {
+    list-style: none;
+    color: #bdc1c6;
+    padding: 12px 0;
+    font-size: 15px;
+    cursor: pointer;
+    outline: none;
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+.sub-menu {
+    padding-left: 20px; 
+    border-left: 1px solid #3c4043; 
+    margin-bottom: 10px;
+}
+
+.sub-menu a {
+    font-size: 14px; 
+    padding: 8px 0;
+}
     </style>
 </head>
 <body>
@@ -107,7 +129,12 @@
             <a href="Index.html">Homepage</a>
             <a href="Training.html">Training</a>
             <a href="Coaches.html">Coaches</a>
-            <a href="Shards.html">Shards currency</a>
+            <details>
+        <summary>Shards currency ⌵</summary>
+        <div class="sub-menu">
+            <a href="Daily puzzle">Daily puzzle</a>
+        </div>
+    </details>
             <a href="Leaders.html">Leaders</a>
             <a href="Current games.html">Current games</a>
             <a href="MoTM.html">MoTM</a>
