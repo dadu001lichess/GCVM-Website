@@ -82,26 +82,28 @@
             width: calc(100% - 260px);
         }
 
-      .banner {
-    height: 400px; /* Je kunt dit getal veranderen om de banner hoger of lager te maken */
-    background-image: url('Banner.png');
-    background-size: contain; /* 'contain' zorgt dat de hele afbeelding zichtbaar is zonder bijsnijden */
-    background-repeat: no-repeat; /* Voorkomt dat de afbeelding zich herhaalt */
-    background-position: center; /* Zet het logo netjes in het midden */
-    background-color: #222; /* Geeft een mooie donkere achtergrond aan de zijkanten als de foto niet schermvullend is */
+  .banner {
+    height: 400px;
+    /* De 'linear-gradient' hieronder maakt de foto donkerder (0.6 is de sterkte van het zwart) */
+    background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+        url('Banner.png');
+    background-size: cover; /* Gebruik 'cover' voor een beeldvullend effect zoals Google Sites */
+    background-position: center;
+    background-repeat: no-repeat;
     display: flex;
-    align-items: flex-end; /* Zet de tekst aan de onderkant van de banner in plaats van er bovenop */
-    justify-content: center;
-    padding-bottom: 20px;
+    align-items: center; /* Tekst verticaal in het midden */
+    justify-content: center; /* Tekst horizontaal in het midden */
+    color: white;
+    text-align: center;
 }
 
 .banner h1 {
-    font-size: 36px;
-    color: white;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-    background-color: rgba(0,0,0,0.4); /* Een licht zwart waasje achter de tekst voor betere leesbaarheid */
-    padding: 10px 20px;
-    border-radius: 10px;
+    font-size: 52px; /* Iets groter voor die 'Masters' look */
+    margin: 0;
+    padding: 0 20px;
+    text-shadow: 2px 4px 10px rgba(0,0,0,0.5);
+    font-weight: bold;
 }
         }
 
