@@ -83,6 +83,58 @@
    </style>
 </head>
     <body>
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* We verwijderen de flexbox van de body om scrollbars te voorkomen */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #FFFFFF; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; /* Dit dwingt de scrollbar weg */
+        }
+        
+        .game-container {
+            text-align: center;
+            background-color: #f9f9f9;
+            padding: 15px; /* Iets minder padding om ruimte te besparen */
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 10px auto; /* Centreert horizontaal en geeft wat ruimte boven */
+            width: fit-content; /* Zorgt dat de box niet breder is dan de inhoud */
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2rem; /* Iets kleiner voor betere fit */
+            font-weight: 500;
+            color: #333333;
+        }
+
+        iframe {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: block; /* Voorkomt witruimte onder de iframe */
+        }
+    </style>
+</head>
+    <div class="game-container">
+        <h2> -Top Rated Lichess Game- </h2>
+        
+        <iframe 
+            src="https://lichess.org/tv/frame?theme=brown&bg=gray" 
+            width="400" 
+            height="444" 
+            allowtransparency="true" 
+            frameborder="0"
+            title="Lichess TV">
+        </iframe>
+    </div>
     <aside>
         <div class="logo">GC(V)M</div>
         <nav>
