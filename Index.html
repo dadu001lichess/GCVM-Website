@@ -82,21 +82,27 @@
             width: calc(100% - 260px);
         }
 
-        .banner {
-            height: 380px;
-            background: #333 url('Banner.png') no-repeat center center;
-            background-size: cover;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-        }
+      .banner {
+    height: 400px; /* Je kunt dit getal veranderen om de banner hoger of lager te maken */
+    background-image: url('Banner.png');
+    background-size: contain; /* 'contain' zorgt dat de hele afbeelding zichtbaar is zonder bijsnijden */
+    background-repeat: no-repeat; /* Voorkomt dat de afbeelding zich herhaalt */
+    background-position: center; /* Zet het logo netjes in het midden */
+    background-color: #222; /* Geeft een mooie donkere achtergrond aan de zijkanten als de foto niet schermvullend is */
+    display: flex;
+    align-items: flex-end; /* Zet de tekst aan de onderkant van de banner in plaats van er bovenop */
+    justify-content: center;
+    padding-bottom: 20px;
+}
 
-        .banner h1 {
-            font-size: 55px;
-            max-width: 800px;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+.banner h1 {
+    font-size: 36px;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+    background-color: rgba(0,0,0,0.4); /* Een licht zwart waasje achter de tekst voor betere leesbaarheid */
+    padding: 10px 20px;
+    border-radius: 10px;
+}
         }
 
         .content {
