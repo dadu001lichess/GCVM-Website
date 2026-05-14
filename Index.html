@@ -1,10 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 <head>
-    <title>Homepage GCVM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growing Chess Variants Masters</title>
+    <style>
+        /* Basis styling die lijkt op je Google Site */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a; /* Donkere achtergrond */
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* Navigatiebalk */
+        nav {
+            background-color: #2c3e50;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-around;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Hero Sectie (De bovenkant van je homepage) */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1529692236671-f1f63c460db3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        /* Content secties */
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        section {
+            background-color: #252525;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            color: #f1c40f; /* Goud-achtige kleur voor titels */
+            border-bottom: 2px solid #f1c40f;
+            padding-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
-    <h1>Homepage</h1>
-    <p>This is a testpage for the future GCVM's website re-location to GitHub!</p>
+
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">Tournaments</a>
+        <a href="#">Puzzles</a>
+        <a href="#">About</a>
+    </nav>
+
+    <div class="hero">
+        <h1>Growing Chess Variants Masters</h1>
+        <p>The place for unique chess challenges and variations.</p>
+    </div>
+
+    <div class="container">
+        <section>
+            <h2>Welkom bij GCVM</h2>
+            <p>Op deze site vind je alles over onze schaakvarianten, dagelijkse puzzels en toernooien. We zijn verhuisd van Google Sites naar GitHub voor meer vrijheid en betere functies!</p>
+        </section>
+
+        <section>
+            <h2>Nieuws</h2>
+            <p>Blijf op de hoogte van de nieuwste updates in de wereld van Chess Variants.</p>
+        </section>
+    </div>
+
+    <footer>
+        &copy; 2026 Growing Chess Variants Masters
+    </footer>
+
 </body>
 </html>
