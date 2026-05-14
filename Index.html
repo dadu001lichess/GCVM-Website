@@ -8,74 +8,106 @@
         body {
             font-family: 'Open Sans', Arial, sans-serif;
             margin: 0;
-            display: flex; /* Zorgt voor de zijbalk layout */
-            background-color: #f0f0f0;
+            display: flex;
+            background-color: white;
             color: #333;
         }
 
-        /* Zijbalk (Linkermenu) */
+        /* De Zijbalk (gebaseerd op je screenshot) */
         aside {
-            width: 250px;
-            background-color: #1a1a1a;
-            color: #888;
+            width: 260px;
+            background-color: #1e1e1e; /* De specifieke donkergrijze/zwarte kleur */
             height: 100vh;
             position: fixed;
-            padding: 20px;
+            padding: 30px 20px;
             box-sizing: border-box;
+            overflow-y: auto;
         }
 
         .logo {
-            color: #d4af37; /* Goudkleurige letters zoals GC(V)M */
-            font-size: 24px;
-            margin-bottom: 30px;
-            font-weight: bold;
+            color: white;
+            font-size: 32px;
+            margin-bottom: 50px;
+            letter-spacing: 1px;
         }
 
         nav a {
             display: block;
-            color: #aaa;
+            color: white;
             text-decoration: none;
-            padding: 10px 0;
-            font-size: 14px;
+            padding: 12px 0;
+            font-size: 18px;
+            transition: 0.2s;
         }
 
-        nav a:hover { color: #fff; }
-        nav a.active { color: #4285f4; } /* Blauw accent zoals 'Homepage' */
+        /* De blauwe kleur voor de actieve pagina */
+        nav a.active {
+            color: #5bb7eb; 
+        }
 
-        /* Hoofdsectie rechts */
+        /* De koppen met pijltjes (Shards & Updates) */
+        .nav-category {
+            color: white;
+            font-size: 18px;
+            padding: 15px 0 10px 0;
+            display: flex;
+            align-items: center;
+            cursor: default;
+        }
+
+        .nav-category::before {
+            content: '⌵'; /* Het pijltje */
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        /* De sub-items (Leaders, MoTM, etc.) */
+        .sub-menu {
+            padding-left: 25px; /* Inspringing zoals in je screenshot */
+        }
+
+        .sub-menu a {
+            font-size: 16px;
+            color: #efefef;
+            padding: 8px 0;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        /* Rechterkant van de site */
         main {
-            margin-left: 250px; /* Ruimte maken voor de zijbalk */
-            width: 100%;
-            background-color: white;
-            min-height: 100vh;
+            margin-left: 260px;
+            width: calc(100% - 260px);
         }
 
-        /* Banner */
         .banner {
-            height: 350px;
-            background-color: #333;
-            background-image: url('banner.jpg'); /* Hier komt je eigen foto! */
+            height: 380px;
+            background: #333 url('banner.jpg') no-repeat center center;
             background-size: cover;
-            background-position: center;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
+            text-align: center;
         }
 
-        .banner h1 { font-size: 48px; text-align: center; max-width: 800px; }
+        .banner h1 {
+            font-size: 55px;
+            max-width: 800px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
 
-        /* Tekstinhoud */
         .content {
-            padding: 40px 60px;
+            padding: 50px 80px;
             max-width: 900px;
+            line-height: 1.7;
         }
 
-        .content h2 { font-weight: normal; margin-top: 30px; }
-        .content p { line-height: 1.6; color: #555; }
-        .content a { color: #0066cc; text-decoration: none; }
-        .content a:hover { text-decoration: underline; }
+        .content h2 { font-weight: 400; font-size: 30px; margin-top: 40px; }
+        .content a { color: #07c; text-decoration: none; border-bottom: 1px solid transparent; }
+        .content a:hover { border-bottom: 1px solid #07c; }
     </style>
 </head>
 <body>
@@ -83,13 +115,23 @@
     <aside>
         <div class="logo">GC(V)M</div>
         <nav>
-            <a href="#" class="active">Homepage</a>
+            <a href="index.html" class="active">Homepage</a>
             <a href="#">Training</a>
             <a href="#">Coaches</a>
-            <p style="font-size: 12px; margin-top: 20px;">▾ SHARDS CURRENCY</p>
-            <a href="#">Leaders</a>
-            <a href="#">Current games</a>
-            <a href="#">MoTM</a>
+
+            <div class="nav-category">Shards currency</div>
+            <div class="sub-menu">
+                <a href="#">Leaders</a>
+                <a href="#">Current games</a>
+                <a href="#">MoTM</a>
+                <a href="#">Game of the month</a>
+                <a href="#">Special mentions/Jobs</a>
+            </div>
+
+            <div class="nav-category">Updates</div>
+            <div class="sub-menu">
+                <a href="#">Contact</a>
+            </div>
         </nav>
     </aside>
 
@@ -102,7 +144,7 @@
             <p><strong>Homepage updating soon!</strong></p>
             
             <h2>About us:</h2>
-            <p>We are a <a href="https://lichess.org/team/growing-chess-variants-masters" target="_blank">Lichess team</a>, who's main goal is to coach low rated players to become better at chess! We also host (practise) tournaments and simuls, and we ofcourse have fun! We also have features, like Member of The Month (MoTM), Co-leaders of the month, and more. This is our official website, and I hope you like it!</p>
+            <p>We are a <a href="https://lichess.org/team/growing-chess-variants-masters" target="_blank">Lichess team</a>, who's main goal is to coach low-rated players to become better at chess! We also host (practise) tournaments and simuls, and we of course have fun! We also have features, like Member of The Month (MoTM), Co-leaders of the month, and more. This is our official website, and I hope you like it!</p>
 
             <p>We also inspired people like <a href="#">GatoChess89</a> to also make a <a href="#">coaching team</a>, with which we've created an "alliance", and we both help each other to make our teams better! He has had great ideas, and we even "stole" some of his, of course, with his knowing.</p>
         </div>
