@@ -1,1 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Shards puzzle!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body { 
+            font-family: 'Open Sans', sans-serif;
+            text-align: center; 
+            background-color: white; 
+            color: #3c4043; 
+            padding: 20px;
+            margin-left: 280px;
+        }
+
+        aside {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background-color: #202124;
+            padding: 40px 24px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-sizing: border-box;
+            text-align: left;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 300;
+            color: white;
+            margin-bottom: 40px;
+            letter-spacing: 0.5px;
+        }
+
+        nav a, nav summary {
+            display: block;
+            color: #bdc1c6;
+            text-decoration: none;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        nav a:hover, nav a.active, nav summary:hover {
+            color: #8ab4f8;
+        }
+
+        nav details {
+            margin: 0;
+        }
+
+        nav summary {
+            list-style: none;
+            outline: none;
+        }
+
+        nav summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .sub-menu {
+            padding-left: 20px;
+            border-left: 1px solid #3c4043;
+            margin-bottom: 10px;
+        }
+
+        .sub-menu a {
+            font-size: 14px;
+            padding: 8px 0;
+        }
