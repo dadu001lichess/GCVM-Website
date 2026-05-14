@@ -1,138 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GC(V)M - Homepage</title>
-    <style>
-        body {
-            font-family: 'Open Sans', Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            background-color: white;
-            color: #333;
-        }
+   <style>
+    body {
+        font-family: 'Open Sans', Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        background-color: #f0f0f0; /* De basis achtergrond buiten de main */
+    }
 
-        /* De Zijbalk (gebaseerd op je screenshot) */
-        aside {
-            width: 260px;
-            background-color: #1e1e1e; /* De specifieke donkergrijze/zwarte kleur */
-            height: 100vh;
-            position: fixed;
-            padding: 30px 20px;
-            box-sizing: border-box;
-            overflow-y: auto;
-        }
+    /* Zijbalk */
+    aside {
+        width: 260px;
+        background-color: #1e1e1e;
+        height: 100vh;
+        position: fixed;
+        padding: 30px 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+    }
 
-        .logo {
-            color: white;
-            font-size: 32px;
-            margin-bottom: 50px;
-            letter-spacing: 1px;
-        }
+    .logo { color: white; font-size: 32px; margin-bottom: 50px; }
 
-        nav a {
-            display: block;
-            color: white;
-            text-decoration: none;
-            padding: 12px 0;
-            font-size: 18px;
-            transition: 0.2s;
-        }
+    nav a { display: block; color: white; text-decoration: none; padding: 10px 0; font-size: 18px; }
+    nav a.active { color: #5bb7eb; }
+    .nav-category { color: white; font-size: 18px; padding: 15px 0 5px 0; }
+    .sub-menu { padding-left: 20px; }
+    .sub-menu a { font-size: 16px; color: #ccc; }
 
-        /* De blauwe kleur voor de actieve pagina */
-        nav a.active {
-            color: #5bb7eb; 
-        }
+    /* RECHTERKANT - De Main Content */
+    main {
+        margin-left: 260px; /* Ruimte voor zijbalk */
+        width: calc(100% - 260px);
+        background-color: white; /* Maakt alles wit */
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
 
-        /* De koppen met pijltjes (Shards & Updates) */
-        .nav-category {
-            color: white;
-            font-size: 18px;
-            padding: 15px 0 10px 0;
-            display: flex;
-            align-items: center;
-            cursor: default;
-        }
+    /* De Donkere Banner */
+    .banner {
+        height: 400px;
+        background-image: 
+            linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+            url('Banner.png');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
 
-        .nav-category::before {
-            content: '⌵'; /* Het pijltje */
-            margin-right: 10px;
-            font-weight: bold;
-        }
+    .banner h1 { font-size: 52px; margin: 0; text-shadow: 2px 4px 10px rgba(0,0,0,0.5); }
 
-        /* De sub-items (Leaders, MoTM, etc.) */
-        .sub-menu {
-            padding-left: 25px; /* Inspringing zoals in je screenshot */
-        }
+    /* DE TEKST RUIMTE (PADDING) */
+    .content {
+        padding: 60px 10%; /* 10% zorgt dat het mooi in het midden blijft op elk scherm */
+        max-width: 900px;
+        line-height: 1.6;
+    }
 
-        .sub-menu a {
-            font-size: 16px;
-            color: #efefef;
-            padding: 8px 0;
-        }
-
-        nav a:hover {
-            opacity: 0.8;
-        }
-
-        /* Rechterkant van de site */
-        main {
-            margin-left: 260px;
-            width: calc(100% - 260px);
-        }
-
-  .banner {
-    height: 400px;
-    /* De 'linear-gradient' hieronder maakt de foto donkerder (0.6 is de sterkte van het zwart) */
-    background-image: 
-        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-        url('Banner.png');
-    background-size: cover; /* Gebruik 'cover' voor een beeldvullend effect zoals Google Sites */
-    background-position: center;
-    background-repeat: no-repeat;
-    display: flex;
-    align-items: center; /* Tekst verticaal in het midden */
-    justify-content: center; /* Tekst horizontaal in het midden */
-    color: white;
-    text-align: center;
-}
-
-.banner h1 {
-    font-size: 52px; /* Iets groter voor die 'Masters' look */
-    margin: 0;
-    padding: 0 20px;
-    text-shadow: 2px 4px 10px rgba(0,0,0,0.5);
-    font-weight: bold;
-}
-
-       /* Dit zorgt dat het rechtergedeelte van de site er professioneel uitziet */
-main {
-    margin-left: 260px; /* Houdt ruimte vrij voor de zijbalk */
-    width: calc(100% - 260px);
-    background-color: white; /* Zorgt dat de hele rechterkant wit is */
-    min-height: 100vh; /* Zorgt dat het wit helemaal tot onderaan de pagina loopt */
-}
-
-.content {
-    max-width: 800px; /* Voorkomt dat tekstregels te lang worden (leest onprettig) */
-    margin: 0 auto; /* Centreert de tekstinhoud in het witte vlak */
-    padding: 60px 40px; /* Geeft die nodige 'lucht' aan de boven-, onder- en zijkanten */
-}
-
-.content h2 {
-    font-size: 32px;
-    font-weight: 400;
-    margin-top: 40px;
-    color: #202124;
-}
-
-.content p {
-    font-size: 16px;
-    line-height: 1.6; /* Zorgt voor een fijne afstand tussen de regels tekst */
-    margin-bottom: 20px;
-}
-    </style>
+    .content h2 { font-size: 30px; font-weight: normal; margin-top: 30px; }
+</style>
 </head>
 <body>
 
