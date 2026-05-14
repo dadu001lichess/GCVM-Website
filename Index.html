@@ -1,118 +1,112 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Growing Chess Variants Masters</title>
+    <title>GC(V)M - Homepage</title>
     <style>
-        /* Schoon en licht ontwerp zoals de standaard Google Sites */
         body {
             font-family: 'Open Sans', Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #ffffff; /* Wit in plaats van zwart */
-            color: #3c4043; /* Donkergrijs voor tekst (beter leesbaar) */
+            display: flex; /* Zorgt voor de zijbalk layout */
+            background-color: #f0f0f0;
+            color: #333;
         }
 
-        /* Header met titel links en menu RECHTS */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 40px;
-            border-bottom: 1px solid #e0e0e0;
+        /* Zijbalk (Linkermenu) */
+        aside {
+            width: 250px;
+            background-color: #1a1a1a;
+            color: #888;
+            height: 100vh;
+            position: fixed;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        .site-title {
-            font-size: 20px;
-            font-weight: 500;
-            color: #5f6368;
-        }
-
-        nav {
-            display: flex;
-            gap: 20px;
+        .logo {
+            color: #d4af37; /* Goudkleurige letters zoals GC(V)M */
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: bold;
         }
 
         nav a {
+            display: block;
+            color: #aaa;
             text-decoration: none;
-            color: #5f6368;
+            padding: 10px 0;
             font-size: 14px;
-            padding: 8px 12px;
-            border-radius: 4px;
-            transition: background 0.2s;
         }
 
-        nav a:hover {
-            background-color: #f1f3f4;
-            color: #202124;
+        nav a:hover { color: #fff; }
+        nav a.active { color: #4285f4; } /* Blauw accent zoals 'Homepage' */
+
+        /* Hoofdsectie rechts */
+        main {
+            margin-left: 250px; /* Ruimte maken voor de zijbalk */
+            width: 100%;
+            background-color: white;
+            min-height: 100vh;
         }
 
-        /* De grote banner bovenin */
+        /* Banner */
         .banner {
-            background-color: #f8f9fa;
-            text-align: center;
-            padding: 80px 20px;
-            border-bottom: 1px solid #e0e0e0;
+            height: 350px;
+            background-color: #333;
+            background-image: url('banner.jpg'); /* Hier komt je eigen foto! */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
         }
 
-        .banner h1 {
-            font-size: 40px;
-            margin: 0;
-            color: #202124;
+        .banner h1 { font-size: 48px; text-align: center; max-width: 800px; }
+
+        /* Tekstinhoud */
+        .content {
+            padding: 40px 60px;
+            max-width: 900px;
         }
 
-        /* Content sectie */
-        .main-content {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 40px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        h2 {
-            font-size: 28px;
-            font-weight: 400;
-            color: #202124;
-            margin-bottom: 16px;
-        }
-
-        p {
-            font-size: 16px;
-            line-height: 1.6;
-        }
+        .content h2 { font-weight: normal; margin-top: 30px; }
+        .content p { line-height: 1.6; color: #555; }
+        .content a { color: #0066cc; text-decoration: none; }
+        .content a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="site-title">Growing Chess Variants Masters</div>
+    <aside>
+        <div class="logo">GC(V)M</div>
         <nav>
-            <a href="index.html">Home</a>
-            <a href="#">Daily Puzzles</a>
-            <a href="#">Tournaments</a>
-            <a href="#">Contact</a>
+            <a href="#" class="active">Homepage</a>
+            <a href="#">Training</a>
+            <a href="#">Coaches</a>
+            <p style="font-size: 12px; margin-top: 20px;">▾ SHARDS CURRENCY</p>
+            <a href="#">Leaders</a>
+            <a href="#">Current games</a>
+            <a href="#">MoTM</a>
         </nav>
-    </header>
+    </aside>
 
-    <div class="banner">
-        <h1>Growing Chess Variants Masters</h1>
-    </div>
-
-    <div class="main-content">
-        <div class="section">
-            <h2>Welkom op de nieuwe homepage</h2>
-            <p>Hier komt de tekst die je momenteel op je Google Sites homepage hebt staan. Je kunt deze tekst direct aanpassen in de code tussen de &lt;p&gt; tags.</p>
+    <main>
+        <div class="banner">
+            <h1>Growing Chess (Variants) Masters</h1>
         </div>
 
-        <div class="section">
-            <h2>Onze missie</h2>
-            <p>Wij brengen schakers samen die houden van variatie en uitdaging. Van varianten tot complexe puzzels.</p>
+        <div class="content">
+            <p><strong>Homepage updating soon!</strong></p>
+            
+            <h2>About us:</h2>
+            <p>We are a <a href="https://lichess.org/team/growing-chess-variants-masters" target="_blank">Lichess team</a>, who's main goal is to coach low rated players to become better at chess! We also host (practise) tournaments and simuls, and we ofcourse have fun! We also have features, like Member of The Month (MoTM), Co-leaders of the month, and more. This is our official website, and I hope you like it!</p>
+
+            <p>We also inspired people like <a href="#">GatoChess89</a> to also make a <a href="#">coaching team</a>, with which we've created an "alliance", and we both help each other to make our teams better! He has had great ideas, and we even "stole" some of his, of course, with his knowing.</p>
         </div>
-    </div>
+    </main>
 
 </body>
 </html>
