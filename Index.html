@@ -77,14 +77,45 @@
 </style>
 </head>
 <body>
-    <aside>
-        <div class="logo">GC(V)M</div>
-        <nav>
-            <a href="#" class="active">Homepage</a>
-            <a href="#">Training</a>
-            <a href="#">Coaches</a>
-        </nav>
-    </aside>
+   /* De 'container' van de zijbalk */
+<aside> {
+    width: 280px;
+    background-color: #202124; /* Google's donkergrijze kleur */
+    height: 100vh;
+    position: fixed;
+    padding: 40px 24px; /* Ruimte aan de binnenkant */
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+/* Het logo bovenin */
+.logo {
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 300; /* Maakt de letters dun en chic */
+    margin-bottom: 40px;
+    letter-spacing: 0.5px;
+}
+
+/* De navigatie links */
+ a {
+    display: block;
+    color: #bdc1c6; /* De zachte grijze kleur voor tekst */
+    text-decoration: none; /* Geen lelijk streepje onder de tekst */
+    padding: 12px 0;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    transition: color 0.2s; /* Zorgt dat de kleur zachtjes verandert als je eroverheen gaat */
+}
+
+/* De kleur als je op een link klikt of er met je muis op staat */
+nav a:hover, nav a.active {
+    color: #8ab4f8; /* Het bekende Google-blauw */
+}
+</aside>
 
     <main>
         <div class="banner">
