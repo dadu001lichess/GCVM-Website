@@ -1,96 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
-    <style>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GC(V)M - Homepage</title>
-   <style>
-    body {
-        font-family: 'Open Sans', Arial, sans-serif;
-        margin: 0;
-        display: flex;
-        background-color: #f0f0f0; /* De basis achtergrond buiten de main */
-    }
+    <style>
+        /* STAP 1: De basis van de pagina */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            display: flex; /* Zet de zijbalk en de inhoud NAAST elkaar */
+            background-color: #f0f0f0;
+        }
 
-    /* Zijbalk */
-    aside {
-        width: 260px;
-        background-color: #1e1e1e;
-        height: 100vh;
-        position: fixed;
-        padding: 30px 20px;
-        box-sizing: border-box;
-        overflow-y: auto;
-    }
+        /* STAP 2: De Zijbalk (het menu) */
+        aside {
+            width: 260px;
+            background-color: #1e1e1e; /* De donkere kleur */
+            height: 100vh; /* Maakt de balk net zo hoog als je scherm */
+            position: fixed; /* Zorgt dat de balk blijft staan als je scrollt */
+            padding: 30px 20px;
+            box-sizing: border-box; /* Zorgt dat de padding de balk niet breder maakt */
+        }
 
-    .logo { color: white; font-size: 32px; margin-bottom: 50px; }
+        .logo { color: white; font-size: 32px; margin-bottom: 50px; font-weight: bold; }
+        
+        /* De links in je menu */
+        nav a { 
+            display: block; 
+            color: #ccc; 
+            text-decoration: none; 
+            padding: 10px 0; 
+            font-size: 18px; 
+        }
+        nav a.active { color: #5bb7eb; } /* De blauwe kleur voor 'Homepage' */
 
-    nav a { display: block; color: white; text-decoration: none; padding: 10px 0; font-size: 18px; }
-    nav a.active { color: #5bb7eb; }
-    .nav-category { color: white; font-size: 18px; padding: 15px 0 5px 0; }
-    .sub-menu { padding-left: 20px; }
-    .sub-menu a { font-size: 16px; color: #ccc; }
+        /* STAP 3: De Rechterkant (de 'Main' area) */
+        main {
+            margin-left: 260px; /* Schuif alles naar rechts om plek te maken voor de zijbalk */
+            width: 100%;
+            background-color: white; /* De witte achtergrond van je pagina */
+            min-height: 100vh;
+        }
 
-    /* RECHTERKANT - De Main Content */
-    main {
-        margin-left: 260px; /* Ruimte voor zijbalk */
-        width: calc(100% - 260px);
-        background-color: white; /* Maakt alles wit */
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
+        /* STAP 4: De Banner (de grote foto bovenin) */
+        .banner {
+            height: 400px;
+            /* We leggen een donker 'masker' over de foto (0.6 zwart) zodat de witte letters opvallen */
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                url('Banner.png'); 
+            background-size: cover; /* Zorg dat de foto het hele vak vult */
+            background-position: center;
+            display: flex;
+            align-items: center; /* Tekst verticaal in het midden */
+            justify-content: center; /* Tekst horizontaal in het midden */
+            color: white;
+        }
 
-    /* De Donkere Banner */
-    .banner {
-        height: 400px;
-        background-image: 
-            linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-            url('Banner.png');
-        background-size: cover;
-        background-position: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        text-align: center;
-    }
+        .banner h1 { font-size: 50px; text-shadow: 2px 4px 10px rgba(0,0,0,0.5); }
 
-    .banner h1 { font-size: 52px; margin: 0; text-shadow: 2px 4px 10px rgba(0,0,0,0.5); }
-
-    /* DE TEKST RUIMTE (PADDING) */
-    .content {
-        padding: 60px 10%; /* 10% zorgt dat het mooi in het midden blijft op elk scherm */
-        max-width: 900px;
-        line-height: 1.6;
-    }
-
-    .content h2 { font-size: 30px; font-weight: normal; margin-top: 30px; }
-</style>
+        /* STAP 5: De Content (de tekst onder de foto) */
+        .content {
+            /* Dit is de 'ademruimte' waar we het over hadden */
+            padding: 60px 10%; /* 60px boven/onder, 10% van de breedte aan de zijkanten */
+            line-height: 1.8; /* Zorgt voor ruimte tussen de regels tekst */
+            max-width: 1000px; /* Voorkomt dat de tekst te breed wordt op grote schermen */
+        }
+    </style>
 </head>
 <body>
 
     <aside>
         <div class="logo">GC(V)M</div>
         <nav>
-            <a href="index.html" class="active">Homepage</a>
+            <a href="#" class="active">Homepage</a>
             <a href="#">Training</a>
             <a href="#">Coaches</a>
-
-            <div class="nav-category">Shards currency</div>
-            <div class="sub-menu">
-                <a href="#">Leaders</a>
-                <a href="#">Current games</a>
-                <a href="#">MoTM</a>
-                <a href="#">Game of the month</a>
-                <a href="#">Special mentions/Jobs</a>
-            </div>
-
-            <div class="nav-category">Updates</div>
-            <div class="sub-menu">
-                <a href="#">Contact</a>
-            </div>
         </nav>
     </aside>
 
@@ -100,12 +85,8 @@
         </div>
 
         <div class="content">
-            <p><strong>Homepage updating soon!</strong></p>
-            
             <h2>About us:</h2>
-            <p>We are a <a href="https://lichess.org/team/growing-chess-variants-masters" target="_blank">Lichess team</a>, who's main goal is to coach low-rated players to become better at chess! We also host (practise) tournaments and simuls, and we of course have fun! We also have features, like Member of The Month (MoTM), Co-leaders of the month, and more. This is our official website, and I hope you like it!</p>
-
-            <p>We also inspired people like <a href="#">GatoChess89</a> to also make a <a href="#">coaching team</a>, with which we've created an "alliance", and we both help each other to make our teams better! He has had great ideas, and we even "stole" some of his, of course, with his knowing.</p>
+            <p>Hier komt je tekst...</p>
         </div>
     </main>
 
