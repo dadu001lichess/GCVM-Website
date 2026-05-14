@@ -18,62 +18,45 @@
         button:hover { background-color: #27ae60; }
         button:disabled { background-color: #95a5a6; cursor: not-allowed; opacity: 0.7; }
 		
-		aside {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 200px;
-    height: 100vh;
-    background-color: #202124;
-    padding: 20px;
-    overflow-y: auto;
-    z-index: 1000;
-}
+        aside {
+            width: 280px;
+            background-color: #202124; 
+            height: 100vh;
+            position: fixed;
+            padding: 40px 24px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            left: 0;
+            top: 0;
+        }
 
-body {
-    margin-left: 200px; /* Make room for sidebar */
-}
+        .logo {
+            color: white;
+            font-size: 22px;
+            font-weight: 300;
+            margin-bottom: 40px;
+            letter-spacing: 0.5px;
+        }
 
-.logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 30px;
-    text-align: left;
-}
+        nav a {
+            display: block;
+            color: #bdc1c6;
+            text-decoration: none;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
 
-nav a, nav summary {
-    display: block;
-    color: #ecf0f1;
-    text-decoration: none;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
+        nav a:hover, nav a.active {
+            color: #8ab4f8;
+        }
 
-nav a:hover, nav summary:hover {
-    background-color: #34495e;
-}
-
-nav details {
-    margin: 10px 0;
-}
-
-nav summary {
-    list-style: none;
-}
-
-.sub-menu {
-    padding-left: 15px;
-    margin-top: 5px;
-}
-
-.sub-menu a {
-    padding: 8px;
-    font-size: 14px;
-}
+        main {
+            margin-left: 280px; 
+            width: calc(100% - 280px);
+            min-height: 100vh;
+        }
     </style>
 </head>
 <body>
