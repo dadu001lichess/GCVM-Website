@@ -17,9 +17,95 @@
         button { padding: 10px 20px; border-radius: 5px; border: none; margin: 5px; background-color: #2ecc71; color: white; font-weight: bold; cursor: pointer; transition: background 0.3s; }
         button:hover { background-color: #27ae60; }
         button:disabled { background-color: #95a5a6; cursor: not-allowed; opacity: 0.7; }
+		
+		aside {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 200px;
+    height: 100vh;
+    background-color: #2c3e50;
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+body {
+    margin-left: 200px; /* Make room for sidebar */
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+nav a, nav summary {
+    display: block;
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+nav a:hover, nav summary:hover {
+    background-color: #34495e;
+}
+
+nav details {
+    margin: 10px 0;
+}
+
+nav summary {
+    list-style: none;
+}
+
+.sub-menu {
+    padding-left: 15px;
+    margin-top: 5px;
+}
+
+.sub-menu a {
+    padding: 8px;
+    font-size: 14px;
+}
     </style>
 </head>
 <body>
+		<aside>
+        <div class="logo">GC(V)M</div>
+        <nav>
+            <a href="index.html">Homepage</a>
+            <a href="Training.html">Training</a>
+            <a href="Coaches.html">Coaches</a>
+            <details>
+              <summary>Shards currency ⌵</summary>
+              <div class="sub-menu">
+                <a href="Shardsintro.html">How to get Shards?</a>
+                <a href="Daily puzzle.html">Daily puzzle</a>
+                <a href="Shards Shop.html">Shards Shop</a>
+              </div>
+            </details>
+            <a href="Leaders.html">Leaders</a>
+            <a href="Current games.html">Current games</a>
+            <a href="MoTM.html">MoTM</a>
+            <a href="GoTM.html">Game of the month</a>
+            <a href="Jobs.html">Special mentions/Jobs</a>
+            <details>
+              <summary>Updates/News ⌵</summary>
+              <div class="sub-menu">
+                <a href="Updates.html">Updates</a>
+                <a href="News.html">Newspaper</a>
+              </div>    
+            </details>
+            <a href="Contact.html">Contact</a>
+        </nav>
+    </aside>
 
     <h1>Daily puzzle for Shards 14-05-2026</h1>
     <p id="instruction">Black to move! Deliver mate in 5.</p>
@@ -161,34 +247,5 @@
 				
 		
     </script>
-	<aside>
-        <div class="logo">GC(V)M</div>
-        <nav>
-            <a href="index.html">Homepage</a>
-            <a href="Training.html">Training</a>
-            <a href="Coaches.html">Coaches</a>
-            <details>
-              <summary>Shards currency ⌵</summary>
-              <div class="sub-menu">
-                <a href="Shardsintro.html">How to get Shards?</a>
-                <a href="Daily puzzle.html">Daily puzzle</a>
-                <a href="Shards Shop.html">Shards Shop</a>
-              </div>
-            </details>
-            <a href="Leaders.html">Leaders</a>
-            <a href="Current games.html">Current games</a>
-            <a href="MoTM.html">MoTM</a>
-            <a href="GoTM.html">Game of the month</a>
-            <a href="Jobs.html">Special mentions/Jobs</a>
-            <details>
-              <summary>Updates/News ⌵</summary>
-              <div class="sub-menu">
-                <a href="Updates.html">Updates</a>
-                <a href="News.html">Newspaper</a>
-              </div>    
-            </details>
-            <a href="Contact.html">Contact</a>
-        </nav>
-    </aside>
 </body>
 </html>
