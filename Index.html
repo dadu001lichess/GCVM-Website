@@ -105,17 +105,33 @@
     text-shadow: 2px 4px 10px rgba(0,0,0,0.5);
     font-weight: bold;
 }
-        }
 
-        .content {
-            padding: 50px 80px;
-            max-width: 900px;
-            line-height: 1.7;
-        }
+       /* Dit zorgt dat het rechtergedeelte van de site er professioneel uitziet */
+main {
+    margin-left: 260px; /* Houdt ruimte vrij voor de zijbalk */
+    width: calc(100% - 260px);
+    background-color: white; /* Zorgt dat de hele rechterkant wit is */
+    min-height: 100vh; /* Zorgt dat het wit helemaal tot onderaan de pagina loopt */
+}
 
-        .content h2 { font-weight: 400; font-size: 30px; margin-top: 40px; }
-        .content a { color: #07c; text-decoration: none; border-bottom: 1px solid transparent; }
-        .content a:hover { border-bottom: 1px solid #07c; }
+.content {
+    max-width: 800px; /* Voorkomt dat tekstregels te lang worden (leest onprettig) */
+    margin: 0 auto; /* Centreert de tekstinhoud in het witte vlak */
+    padding: 60px 40px; /* Geeft die nodige 'lucht' aan de boven-, onder- en zijkanten */
+}
+
+.content h2 {
+    font-size: 32px;
+    font-weight: 400;
+    margin-top: 40px;
+    color: #202124;
+}
+
+.content p {
+    font-size: 16px;
+    line-height: 1.6; /* Zorgt voor een fijne afstand tussen de regels tekst */
+    margin-bottom: 20px;
+}
     </style>
 </head>
 <body>
