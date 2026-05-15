@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Current games</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
@@ -14,6 +13,7 @@
 
         body { 
             font-family: 'Open Sans', sans-serif;
+            text-align: center; 
             background-color: white; 
             color: #3c4043; 
             padding: 20px;
@@ -80,33 +80,9 @@
             font-size: 14px;
             padding: 8px 0;
         }
-
-        .game-container {
-            text-align: center;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin: 10px auto;
-            width: fit-content;
-        }
-
-        h2 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: #333333;
-        }
-
-        iframe {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            display: block;
-        }
-    </style>
+   </style>
 </head>
-<body>
+    <body>
     <aside>
         <div class="logo">GC(V)M</div>
         <nav>
@@ -136,17 +112,4 @@
             <a href="Contact.html">Contact</a>
         </nav>
     </aside>
-
-    <div class="game-container">
-        <h2>-Top Rated Lichess Game-</h2>
-        <iframe 
-            src="https://lichess.org/tv/frame?theme=brown&bg=gray" 
-            width="400" 
-            height="444" 
-            allowtransparency="true" 
-            frameborder="0"
-            title="Lichess TV">
-        </iframe>
-    </div>
-</body>
-</html>
+    </body>
