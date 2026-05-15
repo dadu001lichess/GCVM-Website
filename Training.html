@@ -2,135 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Training — GC(V)M</title>
+    <title>Daily Shards puzzle!</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root{
-            --sidebar-width: 280px;
-            --bg: #ffffff;
-            --muted: #6b6f73;
-            --accent: #8ab4f8;
-            --panel: #f6f7f8;
-            --dark: #202124;
-            --text: #2b2e31;
-        }
-
-        *{box-sizing: border-box}
-        body{
-            font-family: 'Open Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-            color: var(--text);
-            background: var(--bg);
+        * {
             margin: 0;
-            line-height: 1.45;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Skip link for keyboard users */
-        .skip-link{
-            position: absolute;
-            left: -999px;
-            top: auto;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-        }
-        .skip-link:focus{
-            left: 12px;
-            top: 12px;
-            width: auto;
-            height: auto;
-            padding: 8px 12px;
-            background: var(--dark);
-            color: white;
-            z-index: 9999;
-            border-radius: 4px;
+        body { 
+            font-family: 'Open Sans', sans-serif;
+            text-align: center; 
+            background-color: white; 
+            color: #3c4043; 
+            padding: 20px;
+            margin-left: 280px;
         }
 
-        aside{
+        aside {
             position: fixed;
             left: 0;
             top: 0;
-            width: var(--sidebar-width);
+            width: 280px;
             height: 100vh;
-            background: var(--dark);
-            color: #fff;
-            padding: 32px 20px;
+            background-color: #202124;
+            padding: 40px 24px;
             overflow-y: auto;
+            z-index: 1000;
+            box-sizing: border-box;
+            text-align: left;
         }
 
-        .logo{
-            font-size: 20px;
-            font-weight: 600;
-            letter-spacing: 0.6px;
-            margin-bottom: 18px;
+        .logo {
+            font-size: 22px;
+            font-weight: 300;
+            color: white;
+            margin-bottom: 40px;
+            letter-spacing: 0.5px;
         }
 
-        nav{margin-top: 8px}
-        nav a, nav summary{
+        nav a, nav summary {
             display: block;
-            color: #c7cacf;
+            color: #bdc1c6;
             text-decoration: none;
-            padding: 10px 0;
+            padding: 12px 0;
             font-size: 15px;
             font-weight: 400;
-            transition: color .15s ease, transform .08s ease;
-        }
-        nav a:hover, nav summary:hover, nav a.active{color: var(--accent)}
-
-        nav details{margin-bottom:12px}
-        .sub-menu{padding-left: 12px; border-left: 1px solid rgba(255,255,255,0.06); margin-top:8px}
-        .sub-menu a{font-size:14px; padding:6px 0; color:#d1d4d6}
-
-        /* Page content */
-        .page{
-            margin-left: var(--sidebar-width);
-            padding: 40px;
-            min-height: 100vh;
+            cursor: pointer;
+            transition: color 0.2s;
         }
 
-        header.page-header{display:flex;align-items:flex-start;gap:18px}
-        header h1{font-size:28px;margin:0;font-weight:600}
-        header p{margin:6px 0 0;color:var(--muted)}
-
-        .grid{
-            display:grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 28px;
-            margin-top: 24px;
+        nav a:hover, nav a.active, nav summary:hover {
+            color: #8ab4f8;
         }
 
-        .card{background:var(--panel);padding:18px;border-radius:10px}
-        .card h2{margin-top:0;font-size:18px}
-        .card p{color:var(--muted)}
-
-        ul.resources{list-style:none;padding-left:0}
-        ul.resources li{margin:10px 0}
-        a.btn{display:inline-block;background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none}
-
-        footer{margin-top:36px;color:var(--muted);font-size:14px}
-
-        /* Responsive: move sidebar to top on small screens */
-        @media (max-width: 900px){
-            aside{position:relative;width:100%;height:auto;padding:18px 16px}
-            .page{margin-left:0;padding:20px}
-            .grid{grid-template-columns:1fr}
-            .logo{display:inline-block}
+        nav details {
+            margin: 0;
         }
 
-        /* Small tweaks for very small screens */
-        @media (max-width:480px){
-            header h1{font-size:22px}
+        nav summary {
+            list-style: none;
+            outline: none;
         }
-    </style>
+
+        nav summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .sub-menu {
+            padding-left: 20px;
+            border-left: 1px solid #3c4043;
+            margin-bottom: 10px;
+        }
+
+        .sub-menu a {
+            font-size: 14px;
+            padding: 8px 0;
+        }
+   </style>
 </head>
-<body>
-    <a class="skip-link" href="#main">Skip to main content</a>
-
-    <aside aria-label="Primary navigation">
+    <body>
+    <aside>
         <div class="logo">GC(V)M</div>
         <nav>
             <a href="index.html">Homepage</a>
-            <a href="Training.html" class="active" aria-current="page">Training</a>
+            <a href="Training.html">Training</a>
             <a href="Coaches.html">Coaches</a>
             <details>
               <summary>Shards currency ⌵</summary>
@@ -155,79 +112,4 @@
             <a href="Contact.html">Contact</a>
         </nav>
     </aside>
-
-    <main id="main" class="page" tabindex="-1">
-        <header class="page-header">
-            <div>
-                <h1>Training</h1>
-                <p>Daily puzzles, study plans and drills to help you improve consistently.</p>
-            </div>
-        </header>
-
-        <section class="grid">
-            <article class="card">
-                <h2>Daily Shards Puzzle</h2>
-                <p>Try the Daily Puzzle to earn Shards and practise key tactical motifs. Puzzles are curated to be short, instructive and fun.</p>
-                <p style="margin-top:12px"><a class="btn" href="Daily puzzle.html">Open today's puzzle</a></p>
-
-                <hr style="margin:18px 0;border:none;border-top:1px solid #e6e7e8">
-
-                <h2>Training Drills</h2>
-                <ul class="resources">
-                    <li><strong>Tactics:</strong> 20 minutes of mixed tactics focusing on forks, pins and discovered attacks.</li>
-                    <li><strong>Endgames:</strong> Study one basic endgame (king and pawn, rook vs. pawn) and practice 10 positions.</li>
-                    <li><strong>Openings:</strong> Review one opening line and the common plans for both sides.</li>
-                </ul>
-
-                <h2 style="margin-top:12px">Weekly plan</h2>
-                <ol style="padding-left:18px;color:var(--muted)">
-                    <li>Mon — Tactics & 5 rapid games</li>
-                    <li>Tue — Endgames & review</li>
-                    <li>Wed — Opening study & annotated game</li>
-                    <li>Thu — Tactics & training game</li>
-                    <li>Fri — Review mistakes & coach feedback</li>
-                </ol>
-
-            </article>
-
-            <aside class="card" aria-label="Helpful links">
-                <h2>Resources</h2>
-                <ul class="resources">
-                    <li><a href="Coaches.html">Find a coach</a></li>
-                    <li><a href="Shardsintro.html">How Shards work</a></li>
-                    <li><a href="Leaders.html">Leaderboards</a></li>
-                    <li><a href="Contact.html">Ask for personalized plan</a></li>
-                </ul>
-
-                <h2 style="margin-top:16px">Tips</h2>
-                <p style="color:var(--muted)">Short, focused sessions beat long random practice. Track progress and review mistakes — it's where the learning happens.</p>
-
-                <h2 style="margin-top:14px">Share</h2>
-                <p style="margin:8px 0"><a class="btn" href="Contact.html">Suggest a puzzle</a></p>
-            </aside>
-        </section>
-
-        <footer>
-            <p>Made by GC(V)M — good luck and have fun practicing. If you have suggestions for the Training page, please <a href="Contact.html">contact us</a>.</p>
-        </footer>
-    </main>
-
-    <script>
-        // Small script to keep active nav link in sync if filenames/paths vary.
-        (function(){
-            try{
-                var links = document.querySelectorAll('nav a');
-                var path = location.pathname.split('/').pop() || 'index.html';
-                links.forEach(function(a){
-                    var href = a.getAttribute('href');
-                    if(!href) return;
-                    if(href.replace('./','') === path){
-                        a.classList.add('active');
-                        a.setAttribute('aria-current','page');
-                    }
-                });
-            }catch(e){/* silent */}
-        })();
-    </script>
-</body>
-</html>
+    </body>
