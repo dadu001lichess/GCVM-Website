@@ -88,7 +88,7 @@
             min-height: 100vh;
         }
 
-        /* Banner (copied from index.html styling) */
+        /* Banner styling (added to match index.html but kept inside the page area so sidebar remains visible) */
         .banner{
             height: 300px;
             background-color: #f1f3f4;
@@ -96,8 +96,9 @@
             align-items: center;
             justify-content: center;
             border-bottom: 1px solid #dadce0;
-            /* make the banner stretch to the edges of the page padding */
-            margin: -40px -40px 24px;
+            margin: 0 0 24px; /* keep inside the main content so the fixed sidebar is not overlapped */
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .banner h1{
@@ -135,11 +136,14 @@
             .page{margin-left:0;padding:20px}
             .grid{grid-template-columns:1fr}
             .logo{display:inline-block}
+            /* When sidebar becomes part of flow, allow the banner to reach page edges like on index.html */
+            .banner{margin:-20px -20px 24px}
         }
 
         /* Small tweaks for very small screens */
         @media (max-width:480px){
             header h1{font-size:22px}
+            .banner h1{font-size:28px}
         }
     </style>
 </head>
@@ -177,7 +181,6 @@
     </aside>
 
     <main id="main" class="page" tabindex="-1">
-        <!-- Banner added to match index.html -->
         <div class="banner">
             <h1>Training</h1>
         </div>
