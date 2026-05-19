@@ -128,9 +128,12 @@
             padding: 8px 0;
         }
         
-    .button-container {
-      text-align: center;
-      margin-top: 20px;
+.button-container {
+      display: flex;
+      flex-direction: column; /* Zet de knoppen recht onder elkaar */
+      align-items: center;    /* Centreert de knoppen in het midden */
+      gap: 15px;              /* Dit zorgt voor een mooie ruimte TUSSEN de knoppen */
+      margin-top: 10px;       /* FORCEERT de kleine ruimte tussen de tekst en de eerste knop */
     }
 
     .chess-link {
@@ -211,9 +214,8 @@
                  Universal Standard Chess Training Tips
               </button>
            </a>
-        </div>
-        <div class="button-container">
-           <a href="https://script.google.com/macros/s/AKfycbwkXHdS3cyMRSJ6ljOQEWiUVZGW7fwWLPvZZwFm14iduVHKTvo1pNNfuXULbpZCDP5Z/exec" target="_blank" rel="noopener noreferrer" class="chess-link">
+
+           <a href="LINK_NAAR_HORDE_TRAINING" target="_blank" rel="noopener noreferrer" class="chess-link">
               <button type="button" class="chess-btn">
                  Horde variant training tips
               </button>
