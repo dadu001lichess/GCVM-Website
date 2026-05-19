@@ -133,7 +133,7 @@
       flex-direction: column; /* Zet de knoppen recht onder elkaar */
       align-items: center;    /* Centreert de knoppen in het midden */
       gap: 15px;              /* Dit zorgt voor een mooie ruimte TUSSEN de knoppen */
-      margin-top: 10px;       /* FORCEERT de kleine ruimte tussen de tekst en de eerste knop */
+      margin-top: 5px; !important      /* FORCEERT de kleine ruimte tussen de tekst en de eerste knop */
     }
 
     .chess-link {
@@ -152,6 +152,8 @@
       cursor: pointer;           /* Shows a pointer hand icon on hover */
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
       transition: all 0.3s ease; /* Makes hover animations smooth */
+      width: 320px; 
+      max-width: 100%;
     }
 
     .chess-btn:hover {
