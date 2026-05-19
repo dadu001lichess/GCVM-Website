@@ -129,41 +129,41 @@
         }
         
         .button-container {
-      display: flex;
-      flex-direction: column; /* Zet de knoppen recht onder elkaar */
-      align-items: center;    /* Centreert de knoppen in het midden */
-      gap: 15px;              /* Dit zorgt voor een mooie ruimte TUSSEN de knoppen */
-      margin-top: 5px; !important      /* FORCEERT de kleine ruimte tussen de tekst en de eerste knop */
-    }
+            display: flex;
+            flex-direction: column; /* buttons stacked */
+            align-items: center;    /* centered */
+            gap: 12px;              /* space between the buttons */
+            margin-top: 8px !important; /* reduce space above the buttons */
+        }
 
-    .chess-link {
-      text-decoration: none;
-    }
+        .chess-link {
+            text-decoration: none;
+        }
 
-    .chess-btn {
-      background-color: #2c3e50; /* Elegant dark slate color */
-      color: #ffffff;            /* Crisp white text */
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 16px;           /* Readable text size */
-      font-weight: 600;          /* Semi-bold text */
-      padding: 12px 24px;        /* Spacing inside the button */
-      border: none;              /* Removes the ugly default border */
-      border-radius: 6px;        /* Smooth rounded corners */
-      cursor: pointer;           /* Shows a pointer hand icon on hover */
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-      transition: all 0.3s ease; /* Makes hover animations smooth */
-    }
+        .chess-btn {
+            background-color: #2c3e50; /* Elegant dark slate color */
+            color: #ffffff;            /* Crisp white text */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;           /* Readable text size */
+            font-weight: 600;          /* Semi-bold text */
+            padding: 12px 24px;        /* Spacing inside the button */
+            border: none;              /* Removes the ugly default border */
+            border-radius: 6px;        /* Smooth rounded corners */
+            cursor: pointer;           /* Shows a pointer hand icon on hover */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            transition: all 0.3s ease; /* Makes hover animations smooth */
+        }
 
-    .chess-btn:hover {
-      background-color: #34495e; /* Slightly lighter shade on hover */
-      transform: translateY(-2px); /* Lifts the button up slightly */
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Deepens the shadow */
-    }
+        .chess-btn:hover {
+            background-color: #34495e; /* Slightly lighter shade on hover */
+            transform: translateY(-2px); /* Lifts the button up slightly */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Deepens the shadow */
+        }
 
-    .chess-btn:active {
-      transform: translateY(0);  /* Pushes it back down */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shrinks the shadow */
-    }
+        .chess-btn:active {
+            transform: translateY(0);  /* Pushes it back down */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shrinks the shadow */
+        }
         
    </style>
 </head>
@@ -205,21 +205,22 @@
 
         <div class="content">
             <p><strong>Welcome to our (beta) training feature!</strong></p>
-            <p>Here you can learn basics about chess, strategies, tips, etc. without the need of coaches! You can buy passwords of some locked sections <a href="Shards shop.html">here</a> with Shards!</p>
+            <p>Here you can learn basics about chess, strategies, tips, etc. without the need of coaches! You can buy passwords of some locked sections <a href="Shards shop.html">here</a> with Shards![...]</p>
             <p><strong>Locked sections:</strong></p>
-        </div>
-        <div class="button-container">
-           <a href="https://script.google.com/macros/s/AKfycbxb7JuQgINZp9hX8J6DBFRJM0g2upYwx9h4NoL-d1PZSLOc44yb4Zn4MEVNGkVMNGLYZA/exec" target="_blank" rel="noopener noreferrer" class="chess-link">
-              <button type="button" class="chess-btn">
-                 Universal Standard Chess Training Tips
-              </button>
-           </a>
 
-           <a href="LINK_NAAR_HORDE_TRAINING" target="_blank" rel="noopener noreferrer" class="chess-link">
-              <button type="button" class="chess-btn">
-                 Horde variant training tips
-              </button>
-           </a>
+            <div class="button-container">
+               <a href="https://script.google.com/macros/s/AKfycbxb7JuQgINZp9hX8J6DBFRJM0g2upYwx9h4NoL-d1PZSLOc44yb4Zn4MEVNGkVMNGLYZA/exec" target="_blank" rel="noopener noreferrer" class="chess-link">
+                  <button type="button" class="chess-btn">
+                     Universal Standard Chess Training Tips
+                  </button>
+               </a>
+
+               <a href="LINK_NAAR_HORDE_TRAINING" target="_blank" rel="noopener noreferrer" class="chess-link">
+                  <button type="button" class="chess-btn">
+                     Horde variant training tips
+                  </button>
+               </a>
+            </div>
         </div>
     </main>
     </body>
