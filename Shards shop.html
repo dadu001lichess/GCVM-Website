@@ -212,6 +212,25 @@
                                 <span style="color: #959da5;">1000 Shards</span>
                             </button>
                         </div>
+                                            <details style="width: 100%;"> 
+                        <summary style="font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; list-style: none;">
+                            <span>Promotions</span>
+                            <span style="color: #959da5; font-size: 0.8em;">▼</span>
+                        </summary>
+
+                        <div style="width: 100%; padding: 10px 0 0 20px; display: flex; flex-direction: column; gap: 8px;">
+                            <button onclick="buyItem('Study promotion', 100)" style="font-family: 'Inter', -apple-system, sans-serif; background: #1f2328; color: #e1e4e8; padding: 12px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; width: 100%;">
+                                <span>Study promotion</span>
+                                <span style="color: #959da5;">100 Shards</span>
+                            </button>
+                        </div>
+                                                <div style="width: 100%; padding: 10px 0 0 20px; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="width: 100%; padding: 10px 0 0 20px; display: flex; flex-direction: column; gap: 8px;">
+                            <button onclick="buyItem('Blog promotion', 100)" style="font-family: 'Inter', -apple-system, sans-serif; background: #1f2328; color: #e1e4e8; padding: 12px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; width: 100%;">
+                                <span>Blog promotion</span>
+                                <span style="color: #959da5;">100 Shards</span>
+                            </button>
+                        </div>
                     </details>
                 </div>
 
@@ -221,7 +240,6 @@
     </main>
 
     <script>
-    // --- CONFIGURATION ---
     const scriptURL = "https://script.google.com/macros/s/AKfycbyULPDUd_5admFfsVefPZsCvQVTkhryaoj-Q1s80Nt0MkXcR4uK0sQ6yPoNwVbTUeub/exec";
     const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm7tdaXaidF8Cm2yQS0hwOCJhjnnLT1JdGr79IJU0HkER-MigtjsLKCEiQIlY9fIGUGkSli07zeS3R/pub?gid=2015825906&single=true&output=csv";
 
@@ -260,7 +278,7 @@
 
         if(!member) {
             status.style.color = "#f85149";
-            status.innerText = "⚠️ Please enter your username first.";
+            status.innerText = "Please enter your Lichess username first.";
             return;
         }
 
@@ -271,13 +289,13 @@
 
         if (userBalance === null || userBalance === "error") {
             status.style.color = "#f85149";
-            status.innerText = "❌ User not found in Ledger.";
+            status.innerText = "User not found in team-list.";
             return;
         }
 
         if (userBalance < itemPrice) {
             status.style.color = "#f85149";
-            status.innerText = `❌ Insufficient Shards (You have ${userBalance}).`;
+            status.innerText = `Insufficient Shards (You have ${userBalance}).`;
             return;
         }
 
@@ -290,7 +308,7 @@
         });
 
         status.style.color = "#79c0ff";
-        status.innerText = "✅ Order successful! Admin will update your balance shortly.";
+        status.innerText = "Order successful! System/Admin will update your balance shortly.";
         userField.value = ""; 
         document.getElementById('balanceDisplay').innerText = "";
     }
