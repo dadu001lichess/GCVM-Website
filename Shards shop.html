@@ -167,7 +167,7 @@
         <div class="content">
             <div style="background: #24292e; padding: 30px; border-radius: 8px; color: #d1d5da; font-family: 'Inter', -apple-system, sans-serif; border: 1px solid #444d56; max-width: 450px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
                 
-                <h2 style="color: #ffffff; margin-top: 0; font-weight: 600; letter-spacing: -0.5px; border-bottom: 1px solid #444d56; padding-bottom: 15px; font-size: 24px;">Study Shop</h2>
+                <h2 style="color: #ffffff; margin-top: 0; font-weight: 600; letter-spacing: -0.5px; border-bottom: 1px solid #444d56; padding-bottom: 15px; font-size: 24px; text-align: center;">Shards Shop</h2>
                 
                 <div style="margin: 20px 0; text-align: left;">
                     <label style="display: block; margin-bottom: 8px; font-size: 0.85em; color: #959da5; text-transform: uppercase; font-weight: bold;">Lichess Username</label>
@@ -179,10 +179,40 @@
                 </div>
 
                 <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <button onclick="buyItem('Nothing, this is a test.', 10)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
-                        <span>Nothing, this is a test.</span>
-                        <span style="color: #959da5;">10 Shards</span>
+                    
+                    <button onclick="buyItem('Daily 5 free Shards', 0)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
+                        <span>Daily 5 free Shards</span>
+                        <span style="color: #959da5;">0 Shards</span>
                     </button>
+
+                    <button onclick="buyItem('Tournament Perms for one day', 200)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
+                        <span>Tournament Perms for one day</span>
+                        <span style="color: #959da5;">200 Shards</span>
+                    </button>
+                    
+                    <button onclick="buyItem('Analysis Session', 100)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
+                        <span>Analysis Session</span>
+                        <span style="color: #959da5;">100 Shards</span>
+                    </button>
+
+                    <button onclick="buyItem('Team Message', 500)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
+                        <span>Team Message</span>
+                        <span style="color: #959da5;">500 Shards</span>
+                    </button>
+
+                    <details style="width: 100%;"> 
+                        <summary style="font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; list-style: none;">
+                            <span>Training Passwords</span>
+                            <span style="color: #959da5; font-size: 0.8em;">▼</span>
+                        </summary>
+
+                        <div style="width: 100%; padding: 10px 0 0 20px; display: flex; flex-direction: column; gap: 8px;">
+                            <button onclick="buyItem('Universal training password', 1000)" style="font-family: 'Inter', -apple-system, sans-serif; background: #1f2328; color: #e1e4e8; padding: 12px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; width: 100%;">
+                                <span>Universal Training Password</span>
+                                <span style="color: #959da5;">1000 Shards</span>
+                            </button>
+                        </div>
+                    </details>
                 </div>
 
                 <div id="statusMessage" style="margin-top: 20px; font-size: 0.9em; min-height: 24px; color: #959da5; line-height: 1.4; text-align: left;"></div>
@@ -192,7 +222,7 @@
 
     <script>
     // --- CONFIGURATION ---
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwK-SCXwAZ0eouXjm0h7gKmzFl5v2WNmEO_cEYK5jSoA1kcXxMV68eIhpktlpD2Ojvt/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyULPDUd_5admFfsVefPZsCvQVTkhryaoj-Q1s80Nt0MkXcR4uK0sQ6yPoNwVbTUeub/exec";
     const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm7tdaXaidF8Cm2yQS0hwOCJhjnnLT1JdGr79IJU0HkER-MigtjsLKCEiQIlY9fIGUGkSli07zeS3R/pub?gid=2015825906&single=true&output=csv";
 
     async function getBalance(username) {
