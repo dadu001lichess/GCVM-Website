@@ -128,7 +128,7 @@
         }
    </style>
 </head>
-    <body>
+<body>
     <aside>
         <div class="logo">GC(V)M</div>
         <nav>
@@ -159,15 +159,111 @@
         </nav>
     </aside>
         
-        <main>
+    <main>
         <div class="banner">
             <h1>GCVM - Shards shop</h1>
         </div>
 
         <div class="content">
-            <p><strong>Content coming soon!</strong></p>
+            <div style="background: #24292e; padding: 30px; border-radius: 8px; color: #d1d5da; font-family: 'Inter', -apple-system, sans-serif; border: 1px solid #444d56; max-width: 450px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+                
+                <h2 style="color: #ffffff; margin-top: 0; font-weight: 600; letter-spacing: -0.5px; border-bottom: 1px solid #444d56; padding-bottom: 15px; font-size: 24px;">Study Shop</h2>
+                
+                <div style="margin: 20px 0; text-align: left;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 0.85em; color: #959da5; text-transform: uppercase; font-weight: bold;">Lichess Username</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="usernameInput" placeholder="Enter Lichess username..." style="flex-grow: 1; padding: 12px; border-radius: 6px; border: 1px solid #444d56; background: #1f2328; color: white; outline: none; transition: border 0.3s;">
+                        <button onclick="checkBalance()" style="background: #444d56; color: #eeeeee; border: none; border-radius: 6px; padding: 0 15px; cursor: pointer; font-size: 0.8em; white-space: nowrap; transition: background 0.2s;">Check Balance</button>
+                    </div>
+                    <div id="balanceDisplay" style="margin-top: 10px; font-weight: bold; color: #c9d1d9; font-size: 0.9em;"></div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <button onclick="buyItem('Nothing, this is a test.', 10)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
+                        <span>Nothing, this is a test.</span>
+                        <span style="color: #959da5;">10 Shards</span>
+                    </button>
+                </div>
+
+                <div id="statusMessage" style="margin-top: 20px; font-size: 0.9em; min-height: 24px; color: #959da5; line-height: 1.4; text-align: left;"></div>
+            </div>
         </div>
     </main>
+
+    <script>
+    // --- CONFIGURATION ---
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwK-SCXwAZ0eouXjm0h7gKmzFl5v2WNmEO_cEYK5jSoA1kcXxMV68eIhpktlpD2Ojvt/exec";
+    const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm7tdaXaidF8Cm2yQS0hwOCJhjnnLT1JdGr79IJU0HkER-MigtjsLKCEiQIlY9fIGUGkSli07zeS3R/pub?gid=2015825906&single=true&output=csv";
+
+    async function getBalance(username) {
+        try {
+            const response = await fetch(csvURL);
+            const text = await response.text();
+            const rows = text.split(/\r?\n/).map(row => row.split(','));
+            
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i][0] && rows[i][0].replace(/"/g, "").trim().toLowerCase() === username.toLowerCase()) {
+                    return parseInt(rows[i][1]);
+                }
+            }
+            return null;
+        } catch (e) { return "error"; }
+    }
+
+    async function checkBalance() {
+        const name = document.getElementById('usernameInput').value.trim();
+        const display = document.getElementById('balanceDisplay');
+        if(!name) { display.innerText = "Enter a name first!"; return; }
         
-    </body>
+        display.innerText = "Searching...";
+        const balance = await getBalance(name);
+        
+        if(balance === "error") display.innerText = "Error connecting.";
+        else if(balance === null) display.innerText = "User not found.";
+        else display.innerText = `Current Balance: ${balance} Shards`;
+    }
+
+    async function buyItem(itemName, itemPrice) {
+        const userField = document.getElementById('usernameInput');
+        const status = document.getElementById('statusMessage');
+        const member = userField.value.trim();
+
+        if(!member) {
+            status.style.color = "#f85149";
+            status.innerText = "⚠️ Please enter your username first.";
+            return;
+        }
+
+        status.style.color = "#d1d5da";
+        status.innerText = "Verifying...";
+
+        const userBalance = await getBalance(member);
+
+        if (userBalance === null || userBalance === "error") {
+            status.style.color = "#f85149";
+            status.innerText = "❌ User not found in Ledger.";
+            return;
+        }
+
+        if (userBalance < itemPrice) {
+            status.style.color = "#f85149";
+            status.innerText = `❌ Insufficient Shards (You have ${userBalance}).`;
+            return;
+        }
+
+        status.innerText = "Processing order...";
+        await fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({username: member, item: itemName, price: itemPrice})
+        });
+
+        status.style.color = "#79c0ff";
+        status.innerText = "✅ Order successful! Admin will update your balance shortly.";
+        userField.value = ""; 
+        document.getElementById('balanceDisplay').innerText = "";
+    }
+    </script>
+</body>
 </html>
