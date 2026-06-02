@@ -230,9 +230,9 @@
 
         const solution = [
             "6-4 to 4-6",
-            "4-6 to 4-0",
-            "4-0 to 7-0",
-            "7-5 to 6-4"
+            "6-4 to 0-4",
+            "0-4 to 0-7",
+            "5-7 to 4-6"
         ]; 
 
         let currentStep = 0;
@@ -274,11 +274,11 @@
         function playWhiteResponse(step) {
             setTimeout(() => {
                 if (step === 1) { 
-                    puzzleData[5][3] = ''; puzzleData[6][4] = 'bB'; 
+                    puzzleData[3][5] = ''; puzzleData[4][6] = 'bB'; 
                 } else if (step === 2) { 
-                    puzzleData[6][0] = ''; puzzleData[7][1] = 'bK'; 
+                    puzzleData[0][6] = ''; puzzleData[1][7] = 'bK'; 
                 } else if (step === 3) { 
-                    puzzleData[7][1] = ''; puzzleData[7][0] = 'bK'; 
+                    puzzleData[1][7] = ''; puzzleData[0][7] = 'bK'; 
                 }
                 drawBoard();
             }, 600);
