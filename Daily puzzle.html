@@ -218,22 +218,21 @@
 
     <script>
         let puzzleData = [
-            ['wK','','wR','','wQ','wB','','wR'],
-            ['','wP','','wB','wN','','wP','wP'], 
-            ['','','','wP','','wN','',''], 
-            ['','bP','','bP','wP','wP','',''],
-            ['','','','','bP','','',''],
-            ['','','','bB','','bP','',''],
-            ['','bP','bP','','','','bP','bP'],
-            ['','','','bK','bQ','','bN','bR']  
+            ['','','','','','','bK','bR'],
+            ['bP','','bP','','','bP','bP',''], 
+            ['','','','','','','bQ',''], 
+            ['','','','','','bB','',''],
+            ['','','','','','','bN',''],
+            ['','wP','wN','','','','','wP'],
+            ['wP','','','wB','wB','wP','wP','wK'],
+            ['','','','wR','wR','','','']  
         ];
 
         const solution = [
-            "7-4 to 3-0",
-            "3-1 to 2-1",
-            "3-3 to 2-2",
-            "3-0 to 1-0",
-            "1-0 to 0-0" 
+            "4-6 to 6-4",
+            "4-6 to 4-0",
+            "4-0 to 7-0",
+            "7-5 to 6-4"
         ]; 
 
         let currentStep = 0;
@@ -275,21 +274,18 @@
         function playWhiteResponse(step) {
             setTimeout(() => {
                 if (step === 1) { 
-                    puzzleData[0][0] = ''; puzzleData[0][1] = 'wK'; 
+                    puzzleData[5][3] = ''; puzzleData[6][4] = 'bB'; 
                 } else if (step === 2) { 
-                    puzzleData[1][4] = ''; puzzleData[2][2] = 'wN'; 
+                    puzzleData[6][0] = ''; puzzleData[7][1] = 'bK'; 
                 } else if (step === 3) { 
-                    puzzleData[0][2] = ''; puzzleData[2][2] = 'wR'; 
-                } else if (step === 4) { 
-                    puzzleData[0][1] = ''; puzzleData[0][2] = 'wK'; 
-                }
+                    puzzleData[7][1] = ''; puzzleData[7][0] = 'bK'; 
                 drawBoard();
             }, 600);
         }
 
         function handleSquareClick(r, c) {
             if (!selectedSquare) {
-                if (puzzleData[r][c] !== '' && puzzleData[r][c].startsWith('b')) {
+                if (puzzleData[r][c] !== '' && puzzleData[r][c].startsWith('w')) {
                     selectedSquare = { r, c };
                     drawBoard();
                 }
