@@ -31,15 +31,37 @@
             color: white;
             font-size: 22px;
             font-weight: 300;
-            margin-bottom: 20px; /* Iets verlaagd om ruimte te maken voor de inlogstatus */
+            margin-bottom: 25px; /* Aangepast voor een mooie balans */
             letter-spacing: 0.5px;
         }
 
-        /* Stijlen voor de Lichess inlog- en profielomgeving */
+        /* Stijlen voor de lokale profiel/inlogomgeving in de zijbalk */
         .auth-container {
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 1px solid #3c4043;
+        }
+
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #3c4043;
+            border-radius: 4px;
+            background-color: #303134;
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .auth-input::placeholder {
+            color: #80868b;
         }
 
         .auth-btn {
@@ -170,8 +192,7 @@
             font-size: 14px; 
             padding: 8px 0;
         }
-        
-        /* Handige hulpklasse om elementen te verbergen */
+
         .hidden {
             display: none !important;
         }
@@ -183,15 +204,16 @@
         <div class="logo">GC(V)M</div>
         
         <div class="auth-container">
-            <div id="login-section">
-                <button class="auth-btn" onclick="startLichessLogin()">Inloggen met Lichess</button>
+            <div id="login-section" class="auth-input-group">
+                <input type="text" id="username-input" class="auth-input" placeholder="Lichess username..." aria-label="Lichess username">
+                <button class="auth-btn" onclick="saveUsername()">Save Name</button>
             </div>
             
             <div id="profile-section" class="hidden">
                 <div class="user-info">
-                    Ingelogd als:<br>
-                    <strong id="lichess-username">...</strong><br>
-                    <span class="logout-link" onclick="logout()">Uitloggen</span>
+                    Logged in as:<br>
+                    <strong id="displayed-username">...</strong><br>
+                    <span class="logout-link" onclick="deleteUsername()">Log out</span>
                 </div>
             </div>
         </div>
@@ -242,93 +264,47 @@
     </main>
 
     <script>
-        const CLIENT_ID = 'gcvm-team-website'; 
-        const REDIRECT_URI = 'https://growingchessvariantsmasters.org/'; 
+        // Zodra de pagina laadt, kijken we meteen of er al een naam in het geheugen staat
+        window.onload = function() {
+            // Mocht er nog een oude '?code=' in de link staan van je vorige tests, halen we die netjes weg
+            if (window.location.search.includes('code=')) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
 
-        // Deze functie start automatisch op zodra iemand de pagina opent
-        window.onload = async function() {
-            const opgeslagenNaam = localStorage.getItem('lichess_username');
-            
-            if (opgeslagenNaam) {
-                // Er is al een naam in het geheugen! Toon direct de naam i.p.v. de knop
-                toonIngelogd(opgeslagenNaam);
-            } else {
-                // Als de gebruiker net terugkomt van Lichess, staat er '?code=...' in de URLbalk
-                const urlParams = new URLSearchParams(window.location.search);
-                const code = urlParams.get('code');
-                if (code) {
-                    await verwerkLichessCode(code);
-                }
+            const savedName = localStorage.getItem('gcvm_user');
+            if (savedName) {
+                showLoggedInStyle(savedName);
             }
         };
 
-        // Stap 1: Stuur de gebruiker veilig naar Lichess toe
-        async function startLichessLogin() {
-            const verifier = Math.random().toString(36).substring(2, 128);
-            localStorage.setItem('code_verifier', verifier);
+        // Functie die de ingetypte naam opslaat in de browser
+        function saveUsername() {
+            const inputField = document.getElementById('username-input');
+            const username = inputField.value.trim();
 
-            const encoder = new TextEncoder();
-            const data = encoder.encode(verifier);
-            const digest = await window.crypto.subtle.digest('SHA-256', data);
-            const challenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
-                .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-
-            const lichessUrl = `https://lichess.org/oauth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&code_challenge=${challenge}&code_challenge_method=S256&scope=`;
-            window.location.href = lichessUrl;
-        }
-
-        // Stap 2: Vang de gebruiker op als ze terugkomen en wissel de code in voor hun naam
-        async function verwerkLichessCode(code) {
-            const verifier = localStorage.getItem('code_verifier');
-
-            try {
-                const response = await fetch('https://lichess.org/api/token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({
-                        grant_type: 'authorization_code',
-                        code: code,
-                        redirect_uri: REDIRECT_URI,
-                        client_id: CLIENT_ID,
-                        code_verifier: verifier
-                    })
-                });
-
-                const tokenData = await response.json();
-                
-                if (tokenData.access_token) {
-                    // We hebben een geldige toegang tot het profiel, vraag nu de gebruikersnaam op
-                    const userResponse = await fetch('https://lichess.org/api/account', {
-                        headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
-                    });
-                    const userData = await userResponse.json();
-                    
-                    // Sla de naam op in de browser voor de volgende keer
-                    localStorage.setItem('lichess_username', userData.username);
-                    
-                    // Schoon de adresbalk op zodat '?code=...' verdwijnt
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    
-                    // Update de zijbalk
-                    toonIngelogd(userData.username);
-                }
-            } catch (error) {
-                console.error("Er ging iets mis tijdens het inloggen:", error);
+            if (username === "") {
+                alert("Please enter a valid username!");
+                return;
             }
+
+            // Sla het op in het permanente apparaatgeheugen
+            localStorage.setItem('gcvm_user', username);
+            
+            // Pas direct de interface aan
+            showLoggedInStyle(username);
         }
 
-        // Functie die de knop verbergt en de gebruikersnaam laat zien
-        function toonIngelogd(username) {
+        // Wissel de invoerbox om voor de ingelogde status tekst
+        function showLoggedInStyle(username) {
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('profile-section').classList.remove('hidden');
-            document.getElementById('lichess-username').innerText = username;
+            document.getElementById('displayed-username').innerText = username;
         }
 
-        // Functie voor het uitloggen
-        function logout() {
-            localStorage.removeItem('lichess_username');
-            localStorage.removeItem('code_verifier');
-            window.location.reload(); // Herlaad de pagina om de inlogknop weer te tonen
+        // Functie voor als men op 'Log out' klikt
+        function deleteUsername() {
+            localStorage.removeItem('gcvm_user');
+            window.location.reload(); // Herlaad de pagina om het invoerveld weer schoon te tonen
         }
     </script>
 </body>
