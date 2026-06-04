@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCVM - Training</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         main {
             margin-left: 280px; 
@@ -90,157 +93,157 @@
         }
 
         /* Strakke styling voor de loginbox conform originele lay-out */
-.auth-container {
-    margin-bottom: 25px;
-}
+        .auth-container {
+            margin-bottom: 25px;
+        }
 
-.auth-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-.auth-input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #3c4043;
-    border-radius: 4px;
-    background-color: #303134;
-    color: white;
-    font-size: 13px;
-    box-sizing: border-box;
-    outline: none;
-}
+        .auth-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #3c4043;
+            border-radius: 4px;
+            background-color: #303134;
+            color: white;
+            font-size: 13px;
+            box-sizing: border-box;
+            outline: none;
+        }
 
-.auth-input::placeholder {
-    color: #80868b;
-}
+        .auth-input::placeholder {
+            color: #80868b;
+        }
 
-.auth-btn-container {
-    display: flex;
-    gap: 6px;
-    margin-top: 4px;
-}
+        .auth-btn-container {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
 
-.auth-btn {
-    flex: 1;
-    padding: 10px;
-    background-color: #1a73e8;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    text-align: center;
-    transition: background-color 0.2s;
-}
+        .auth-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
 
-.auth-btn:hover {
-    background-color: #1557b0;
-}
+        .auth-btn:hover {
+            background-color: #1557b0;
+        }
 
-.auth-btn.secondary {
-    background-color: #3c4043;
-    color: #bdc1c6;
-}
+        .auth-btn.secondary {
+            background-color: #3c4043;
+            color: #bdc1c6;
+        }
 
-.auth-btn.secondary:hover {
-    background-color: #4f5357;
-    color: white;
-}
+        .auth-btn.secondary:hover {
+            background-color: #4f5357;
+            color: white;
+        }
 
-.user-info {
-    color: #bdc1c6;
-    font-size: 14px;
-    line-height: 1.4;
-}
+        .user-info {
+            color: #bdc1c6;
+            font-size: 14px;
+            line-height: 1.4;
+        }
 
-.user-info strong {
-    color: #8ab4f8;
-    font-size: 15px;
-}
+        .user-info strong {
+            color: #8ab4f8;
+            font-size: 15px;
+        }
 
-.badge {
-    display: inline-block;
-    font-size: 10px;
-    padding: 2px 6px;
-    background-color: #34a853;
-    color: white;
-    border-radius: 10px;
-    margin-left: 6px;
-    vertical-align: middle;
-}
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 6px;
+            background-color: #34a853;
+            color: white;
+            border-radius: 10px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
 
-.admin-action-btn {
-    display: block;
-    width: 100%;
-    padding: 8px;
-    margin-top: 10px;
-    background-color: #d93025;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-}
+        .admin-action-btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            background-color: #d93025;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
 
-.admin-action-btn:hover {
-    background-color: #b31412;
-}
+        .admin-action-btn:hover {
+            background-color: #b31412;
+        }
 
-.logout-link {
-    display: inline-block;
-    color: #f28b82;
-    text-decoration: none;
-    font-size: 12px;
-    margin-top: 8px;
-    cursor: pointer;
-}
+        .logout-link {
+            display: inline-block;
+            color: #f28b82;
+            text-decoration: none;
+            font-size: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
 
-.logout-link:hover {
-    text-decoration: underline;
-}
+        .logout-link:hover {
+            text-decoration: underline;
+        }
 
-nav {
-    border-top: 1px solid #3c4043;
-    padding-top: 15px;
-}
+        nav {
+            border-top: 1px solid #3c4043;
+            padding-top: 15px;
+        }
 
-/* Centraal Admin Panel */
-.admin-panel-box {
-    background-color: #f8f9fa;
-    border: 1px solid #dadce0;
-    padding: 24px;
-    border-radius: 8px;
-    margin: 30px 0;
-}
+        /* Centraal Admin Panel (Enkel gebruikt voor opmaak-consistentie) */
+        .admin-panel-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dadce0;
+            padding: 24px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
 
-.user-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-    font-size: 15px;
-}
+        .user-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
 
-.ban-btn {
-    background-color: #d93025;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-}
+        .ban-btn {
+            background-color: #d93025;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
 
-.hidden {
-    display: none !important;
-}
+        .hidden {
+            display: none !important;
+        }
 
         nav a, nav summary {
             display: block;
@@ -320,8 +323,8 @@ nav {
         
    </style>
 </head>
-    <body>
-<aside>
+<body>
+    <aside>
         <div class="logo">GC(V)M</div>
         
         <div class="auth-container">
@@ -346,7 +349,7 @@ nav {
 
         <nav>
             <a href="index.html">Homepage</a>
-            <a href="Training.html">Training</a>
+            <a href="Training.html" class="active">Training</a>
             <a href="Coaches.html">Coaches</a>
             <details>
               <summary>Shards currency ⌵</summary>
@@ -372,7 +375,7 @@ nav {
         </nav>
     </aside>
         
-        <main>
+    <main>
         <div class="banner">                
             <h1>GCVM - Training</h1>
         </div>
@@ -385,134 +388,133 @@ nav {
             <div class="button-container">
                <a href="https://script.google.com/macros/s/AKfycbxb7JuQgINZp9hX8J6DBFRJM0g2upYwx9h4NoL-d1PZSLOc44yb4Zn4MEVNGkVMNGLYZA/exec" target="_blank" rel="noopener noreferrer" class="chess-link">
                   <button type="button" class="chess-btn">
-                     Universal Standard Chess Training Tips
+                      Universal Standard Chess Training Tips
                   </button>
                </a>
 
                <a href="LINK_NAAR_HORDE_TRAINING" target="_blank" rel="noopener noreferrer" class="chess-link">
                   <button type="button" class="chess-btn">
-                     Horde variant training tips
+                      Horde variant training tips
                   </button>
                </a>
             </div>
         </div>
     </main>
-        <script>
-    // Zorg dat de database altijd ingeladen is
-    if (!localStorage.getItem('gcvm_local_db')) {
-        const initialDatabase = [
-            { username: 'GCVM', password: 'JeAdminWachtwoord123', role: 'admin' }
-        ];
-        localStorage.setItem('gcvm_local_db', JSON.stringify(initialDatabase));
-    }
 
-    // Controleer bij het laden van de pagina of iemand al ingelogd is
-    window.onload = function() {
-        const currentSession = localStorage.getItem('gcvm_active_session');
-        const currentRole = localStorage.getItem('gcvm_active_role');
-        if (currentSession) {
-            showStyle(currentSession, currentRole);
-        }
-    };
+    <script>
+        // JOUW SUPABASE PROJECT GEGEVENS
+        const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
 
-    function registerUser() {
-        const username = document.getElementById('username-input').value.trim();
-        const password = document.getElementById('password-input').value.trim();
+        // Verbinding opstarten via de unieke variabele om crashes te voorkomen
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        if (!username || !password) {
-            alert("Please fill in both fields!");
-            return;
-        }
+        // Bij het laden controleren of de browser de actieve sessie heeft onthouden
+        window.onload = function() {
+            const currentSession = localStorage.getItem('gcvm_db_session');
+            const currentRole = localStorage.getItem('gcvm_db_role');
+            if (currentSession) {
+                showStyle(currentSession, currentRole);
+            }
+        };
 
-        let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
-        const exists = db.some(user => user.username.toLowerCase() === username.toLowerCase());
-        if (exists) {
-            alert("This username is already registered!");
-            return;
-        }
+        // REGISTREREN IN DE ONLINE DATABASE
+        async function registerUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
 
-        db.push({ username: username, password: password, role: 'user' });
-        localStorage.setItem('gcvm_local_db', JSON.stringify(db));
+            if (!username || !password) {
+                alert("Please fill in both fields!");
+                return;
+            }
 
-        alert("Account created successfully! You can now log in.");
-        document.getElementById('password-input').value = "";
-    }
+            try {
+                // Check of de gebruiker al online bestaat
+                const { data: existingUser } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('username')
+                    .eq('username', username)
+                    .maybeSingle();
 
-    function loginUser() {
-        const username = document.getElementById('username-input').value.trim();
-        const password = document.getElementById('password-input').value.trim();
+                if (existingUser) {
+                    alert("This username is already registered online!");
+                    return;
+                }
 
-        let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
-        const user = db.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+                // Voeg toe aan de online tabel
+                const { error } = await supabaseClient
+                    .from('gcvm_users')
+                    .insert([{ username: username, password: password, role: 'user' }]);
 
-        if (!user) {
-            alert("Invalid username or password!");
-            return;
-        }
+                if (error) throw error;
 
-        localStorage.setItem('gcvm_active_session', user.username);
-        localStorage.setItem('gcvm_active_role', user.role);
-
-        showStyle(user.username, user.role);
-    }
-
-    function showStyle(username, role) {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('profile-section').classList.remove('hidden');
-        document.getElementById('displayed-username').innerText = username;
-
-        if (role === 'admin') {
-            document.getElementById('admin-badge').classList.remove('hidden');
-            document.getElementById('admin-view-btn').classList.remove('hidden');
-            if(document.getElementById('user-list-container')) {
-                loadUserList();
+                alert("Account created successfully in the cloud! You can now log in.");
+                document.getElementById('password-input').value = "";
+            } catch (err) {
+                alert("Database error during registration: " + err.message);
             }
         }
-    }
 
-    function loadUserList() {
-        let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
-        const container = document.getElementById('user-list-container');
-        if(!container) return;
-        container.innerHTML = "";
+        // INLOGGEN VIA ONLINE DATABASE
+        async function loginUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
 
-        db.forEach(user => {
-            if (user.role === 'admin') return;
+            if (!username || !password) {
+                alert("Please fill in both fields!");
+                return;
+            }
 
-            const div = document.createElement('div');
-            div.className = "user-list-item";
-            div.innerHTML = `
-                <span><strong>${user.username}</strong> (Password: ${user.password})</span>
-                <button class="ban-btn" onclick="banUser('${user.username}')">Delete/Ban</button>
-            `;
-            container.appendChild(div);
-        });
-    }
+            try {
+                const { data: user, error } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .maybeSingle();
 
-    function banUser(targetUsername) {
-        if (confirm(`Are you sure you want to delete and ban ${targetUsername}?`)) {
-            let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
-            db = db.filter(user => user.username !== targetUsername);
-            localStorage.setItem('gcvm_local_db', JSON.stringify(db));
-            loadUserList();
-            alert(`${targetUsername} has been removed.`);
+                if (error || !user) {
+                    alert("Invalid online username or password!");
+                    return;
+                }
+
+                if (user.is_banned) {
+                    alert("This account has been banned from the website.");
+                    return;
+                }
+
+                // Sla de sessie-informatie op in de browser
+                localStorage.setItem('gcvm_db_session', user.username);
+                localStorage.setItem('gcvm_db_role', user.role);
+
+                showStyle(user.username, user.role);
+            } catch (err) {
+                alert("Database error during login: " + err.message);
+            }
         }
-    }
 
-    function toggleAdminPanel() {
-        const panel = document.getElementById('admin-panel');
-        if(panel) {
-            panel.classList.toggle('hidden');
-        } else {
-            alert("Admin panel details are only viewable on the main homepage dashboard.");
+        function showStyle(username, role) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('profile-section').classList.remove('hidden');
+            document.getElementById('displayed-username').innerText = username;
+
+            if (role === 'admin') {
+                document.getElementById('admin-badge').classList.remove('hidden');
+                document.getElementById('admin-view-btn').classList.remove('hidden');
+            }
         }
-    }
 
-    function logoutUser() {
-        localStorage.removeItem('gcvm_active_session');
-        localStorage.removeItem('gcvm_active_role');
-        window.location.reload();
-    }
-</script>
-    </body>
+        function toggleAdminPanel() {
+            // Aangezien de gebruikerstabel fysiek enkel op de homepage staat, sturen we de admin door
+            alert("Redirecting you to the main Homepage Dashboard to manage users.");
+            window.location.href = "index.html";
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('gcvm_db_session');
+            localStorage.removeItem('gcvm_db_role');
+            window.location.reload();
+        }
+    </script>
+</body>
 </html>
