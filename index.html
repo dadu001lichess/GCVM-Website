@@ -47,6 +47,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            margin-bottom: 10px;
         }
 
         .auth-input {
@@ -294,13 +295,12 @@
     </main>
 
     <script>
-        // Jouw unieke Supabase URL (Automatisch opgebouwd uit je Project ID)
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
-        // PLAK HIERONDER JOUW LANGE PUBLISHABLE KEY TUSSEN DE STREEPJES!
+        // PLAK HIERONDER JOUW ECHTE LANGE SLESSEL (sb_publishable...)!
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u';
 
-        // Initialiseer verbinding met Supabase
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Initialiseer verbinding met de juiste Supabase aanroep
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         window.onload = function() {
             const savedUser = localStorage.getItem('gcvm_db_user');
@@ -312,67 +312,80 @@
 
         // REGISTREREN
         async function register() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
+            try {
+                const username = document.getElementById('username-input').value.trim();
+                const password = document.getElementById('password-input').value.trim();
 
-            if (!username || !password) {
-                alert("Please fill in both fields!");
-                return;
-            }
+                if (!username || !password) {
+                    alert("Please fill in both fields!");
+                    return;
+                }
 
-            // Controleer of de gebruiker al bestaat
-            const { data: existingUser } = await supabase
-                .from('gcvm_users')
-                .select('username')
-                .eq('username', username)
-                .maybeSingle();
+                // Controleer of de gebruiker al bestaat
+                const { data: existingUser, error: checkError } = await supabase
+                    .from('gcvm_users')
+                    .select('username')
+                    .eq('username', username)
+                    .maybeSingle();
 
-            if (existingUser) {
-                alert("This username is already registered!");
-                return;
-            }
+                if (existingUser) {
+                    alert("This username is already registered!");
+                    return;
+                }
 
-            // Voeg de nieuwe gebruiker toe aan de database
-            const { error } = await supabase
-                .from('gcvm_users')
-                .insert([{ username: username, password: password }]);
+                // Voeg de nieuwe gebruiker toe
+                const { error: insertError } = await supabase
+                    .from('gcvm_users')
+                    .insert([{ username: username, password: password }]);
 
-            if (error) {
-                alert("Registration failed: " + error.message);
-            } else {
-                alert("Account created successfully! You can now login.");
-                document.getElementById('password-input').value = "";
+                if (insertError) {
+                    alert("Registration failed: " + insertError.message);
+                } else {
+                    alert("Account created successfully! You can now login.");
+                    document.getElementById('password-input').value = "";
+                }
+            } catch (err) {
+                alert("An error occurred during registration. Make sure your API key is correctly pasted.");
+                console.error(err);
             }
         }
 
         // INLOGGEN
         async function login() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
+            try {
+                const username = document.getElementById('username-input').value.trim();
+                const password = document.getElementById('password-input').value.trim();
 
-            const { data: user, error } = await supabase
-                .from('gcvm_users')
-                .select('*')
-                .eq('username', username)
-                .eq('password', password)
-                .maybeSingle();
+                if (!username || !password) {
+                    alert("Please fill in both fields!");
+                    return;
+                }
 
-            if (error || !user) {
-                alert("Invalid username or password!");
-                return;
+                const { data: user, error } = await supabase
+                    .from('gcvm_users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .maybeSingle();
+
+                if (error || !user) {
+                    alert("Invalid username or password!");
+                    return;
+                }
+
+                if (user.is_banned) {
+                    alert("This account has been banned from the website.");
+                    return;
+                }
+
+                localStorage.setItem('gcvm_db_user', user.username);
+                localStorage.setItem('gcvm_db_role', user.role);
+
+                showLoggedInStyle(user.username, user.role);
+            } catch (err) {
+                alert("An error occurred during login. Make sure your API key is correctly pasted.");
+                console.error(err);
             }
-
-            // VEILIGHEIDSCHECK: Is de gebruiker verbannen?
-            if (user.is_banned) {
-                alert("This account has been banned from the website.");
-                return;
-            }
-
-            // Sla inlogsessie op op het apparaat
-            localStorage.setItem('gcvm_db_user', user.username);
-            localStorage.setItem('gcvm_db_role', user.role);
-
-            showLoggedInStyle(user.username, user.role);
         }
 
         function showLoggedInStyle(username, role) {
