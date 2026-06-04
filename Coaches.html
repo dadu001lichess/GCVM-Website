@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCVM - Coaches</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     
@@ -13,6 +12,12 @@
             margin-left: 280px; 
             width: calc(100% - 280px);
             min-height: 100vh;
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid #dadce0;
+            margin: 20px 0;
         }
         
         .banner {
@@ -33,6 +38,8 @@
         }
 
         .content {
+            font-size: 16px;
+            text-align: left;
             max-width: 800px;
             margin: 0 auto; 
             padding: 60px 40px;
@@ -313,125 +320,15 @@
             <h1>GCVM - Coaches</h1>
         </div>
         <div class="content">
-            <p><strong>Under construction!</strong></p>
+            <h2>Under construction!</h2>
             <p>We are searching for high rated variants/standard players who want to give free lessons to our team members! If you want to do this, contact us via the contact form on this website or send a dm on Lichess to: <a href="https://lichess.org/@/dadu001lichess">dadu001lichess</a> !</p>
+            <hr>
+            <h2>Current coaches:</h2>
+            <p>None yet!</p>
         </div>
     </main>
 
     <script>
         // JOUW SUPABASE PROJECT GEGEVENS
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
-
-        // Verbinding opstarten via de unieke variabele om crashes te voorkomen
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Bij het laden controleren of de browser de actieve sessie heeft onthouden
-        window.onload = function() {
-            const currentSession = localStorage.getItem('gcvm_db_session');
-            const currentRole = localStorage.getItem('gcvm_db_role');
-            if (currentSession) {
-                showStyle(currentSession, currentRole);
-            }
-        };
-
-        // REGISTREREN IN DE ONLINE DATABASE
-        async function registerUser() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
-
-            if (!username || !password) {
-                alert("Please fill in both fields!");
-                return;
-            }
-
-            try {
-                // Check of de gebruiker al online bestaat
-                const { data: existingUser } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('username')
-                    .eq('username', username)
-                    .maybeSingle();
-
-                if (existingUser) {
-                    alert("This username is already registered online!");
-                    return;
-                }
-
-                // Voeg toe aan de online tabel
-                const { error } = await supabaseClient
-                    .from('gcvm_users')
-                    .insert([{ username: username, password: password, role: 'user' }]);
-
-                if (error) throw error;
-
-                alert("Account created successfully in the cloud! You can now log in.");
-                document.getElementById('password-input').value = "";
-            } catch (err) {
-                alert("Database error during registration: " + err.message);
-            }
-        }
-
-        // INLOGGEN VIA ONLINE DATABASE
-        async function loginUser() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
-
-            if (!username || !password) {
-                alert("Please fill in both fields!");
-                return;
-            }
-
-            try {
-                const { data: user, error } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('*')
-                    .eq('username', username)
-                    .eq('password', password)
-                    .maybeSingle();
-
-                if (error || !user) {
-                    alert("Invalid online username or password!");
-                    return;
-                }
-
-                if (user.is_banned) {
-                    alert("This account has been banned from the website.");
-                    return;
-                }
-
-                // Sla de sessie-informatie op in de browser
-                localStorage.setItem('gcvm_db_session', user.username);
-                localStorage.setItem('gcvm_db_role', user.role);
-
-                showStyle(user.username, user.role);
-            } catch (err) {
-                alert("Database error during login: " + err.message);
-            }
-        }
-
-        function showStyle(username, role) {
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('profile-section').classList.remove('hidden');
-            document.getElementById('displayed-username').innerText = username;
-
-            if (role === 'admin') {
-                document.getElementById('admin-badge').classList.remove('hidden');
-                document.getElementById('admin-view-btn').classList.remove('hidden');
-            }
-        }
-
-        function toggleAdminPanel() {
-            // Aangezien de gebruikerstabel fysiek enkel op de homepage staat, sturen we de admin door
-            alert("Redirecting you to the main Homepage Dashboard to manage users.");
-            window.location.href = "index.html";
-        }
-
-        function logoutUser() {
-            localStorage.removeItem('gcvm_db_session');
-            localStorage.removeItem('gcvm_db_role');
-            window.location.reload();
-        }
-    </script>
-</body>
-</html>
+        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u';
