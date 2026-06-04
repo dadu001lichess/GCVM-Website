@@ -103,6 +103,158 @@
             margin-bottom: 40px;
             letter-spacing: 0.5px;
         }
+        /* Strakke styling voor de loginbox conform originele lay-out */
+.auth-container {
+    margin-bottom: 25px;
+}
+
+.auth-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #3c4043;
+    border-radius: 4px;
+    background-color: #303134;
+    color: white;
+    font-size: 13px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.auth-input::placeholder {
+    color: #80868b;
+}
+
+.auth-btn-container {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.auth-btn {
+    flex: 1;
+    padding: 10px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.auth-btn:hover {
+    background-color: #1557b0;
+}
+
+.auth-btn.secondary {
+    background-color: #3c4043;
+    color: #bdc1c6;
+}
+
+.auth-btn.secondary:hover {
+    background-color: #4f5357;
+    color: white;
+}
+
+.user-info {
+    color: #bdc1c6;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.user-info strong {
+    color: #8ab4f8;
+    font-size: 15px;
+}
+
+.badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    background-color: #34a853;
+    color: white;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.admin-action-btn {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    background-color: #d93025;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+}
+
+.admin-action-btn:hover {
+    background-color: #b31412;
+}
+
+.logout-link {
+    display: inline-block;
+    color: #f28b82;
+    text-decoration: none;
+    font-size: 12px;
+    margin-top: 8px;
+    cursor: pointer;
+}
+
+.logout-link:hover {
+    text-decoration: underline;
+}
+
+nav {
+    border-top: 1px solid #3c4043;
+    padding-top: 15px;
+}
+
+/* Centraal Admin Panel */
+.admin-panel-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dadce0;
+    padding: 24px;
+    border-radius: 8px;
+    margin: 30px 0;
+}
+
+.user-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+}
+
+.ban-btn {
+    background-color: #d93025;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.hidden {
+    display: none !important;
+}
 
         nav a, nav summary {
             display: block;
@@ -145,8 +297,29 @@
    </style>
 </head>
     <body>
-    <aside>
+<aside>
         <div class="logo">GC(V)M</div>
+        
+        <div class="auth-container">
+            <div id="login-section" class="auth-input-group">
+                <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
+                <input type="password" id="password-input" class="auth-input" placeholder="Password...">
+                <div class="auth-btn-container">
+                    <button class="auth-btn" onclick="loginUser()">Login</button>
+                    <button class="auth-btn secondary" onclick="registerUser()">Register</button>
+                </div>
+            </div>
+            
+            <div id="profile-section" class="hidden">
+                <div class="user-info">
+                    Logged in as:<br>
+                    <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
+                    <button id="admin-view-btn" class="admin-action-btn hidden" onclick="toggleAdminPanel()">Open Admin Panel</button>
+                    <span class="logout-link" onclick="logoutUser()">Log out</span>
+                </div>
+            </div>
+        </div>
+
         <nav>
             <a href="index.html">Homepage</a>
             <a href="Training.html">Training</a>
@@ -199,6 +372,123 @@
             <p><i>-new ways to get Shards will get added soon!-</i></p>
         </div>
         </div>
-    </main>    
+    </main> 
+        <script>
+    // Zorg dat de database altijd ingeladen is
+    if (!localStorage.getItem('gcvm_local_db')) {
+        const initialDatabase = [
+            { username: 'GCVM', password: 'JeAdminWachtwoord123', role: 'admin' }
+        ];
+        localStorage.setItem('gcvm_local_db', JSON.stringify(initialDatabase));
+    }
+
+    // Controleer bij het laden van de pagina of iemand al ingelogd is
+    window.onload = function() {
+        const currentSession = localStorage.getItem('gcvm_active_session');
+        const currentRole = localStorage.getItem('gcvm_active_role');
+        if (currentSession) {
+            showStyle(currentSession, currentRole);
+        }
+    };
+
+    function registerUser() {
+        const username = document.getElementById('username-input').value.trim();
+        const password = document.getElementById('password-input').value.trim();
+
+        if (!username || !password) {
+            alert("Please fill in both fields!");
+            return;
+        }
+
+        let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
+        const exists = db.some(user => user.username.toLowerCase() === username.toLowerCase());
+        if (exists) {
+            alert("This username is already registered!");
+            return;
+        }
+
+        db.push({ username: username, password: password, role: 'user' });
+        localStorage.setItem('gcvm_local_db', JSON.stringify(db));
+
+        alert("Account created successfully! You can now log in.");
+        document.getElementById('password-input').value = "";
+    }
+
+    function loginUser() {
+        const username = document.getElementById('username-input').value.trim();
+        const password = document.getElementById('password-input').value.trim();
+
+        let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
+        const user = db.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+
+        if (!user) {
+            alert("Invalid username or password!");
+            return;
+        }
+
+        localStorage.setItem('gcvm_active_session', user.username);
+        localStorage.setItem('gcvm_active_role', user.role);
+
+        showStyle(user.username, user.role);
+    }
+
+    function showStyle(username, role) {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('profile-section').classList.remove('hidden');
+        document.getElementById('displayed-username').innerText = username;
+
+        if (role === 'admin') {
+            document.getElementById('admin-badge').classList.remove('hidden');
+            document.getElementById('admin-view-btn').classList.remove('hidden');
+            if(document.getElementById('user-list-container')) {
+                loadUserList();
+            }
+        }
+    }
+
+    function loadUserList() {
+        let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
+        const container = document.getElementById('user-list-container');
+        if(!container) return;
+        container.innerHTML = "";
+
+        db.forEach(user => {
+            if (user.role === 'admin') return;
+
+            const div = document.createElement('div');
+            div.className = "user-list-item";
+            div.innerHTML = `
+                <span><strong>${user.username}</strong> (Password: ${user.password})</span>
+                <button class="ban-btn" onclick="banUser('${user.username}')">Delete/Ban</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function banUser(targetUsername) {
+        if (confirm(`Are you sure you want to delete and ban ${targetUsername}?`)) {
+            let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
+            db = db.filter(user => user.username !== targetUsername);
+            localStorage.setItem('gcvm_local_db', JSON.stringify(db));
+            loadUserList();
+            alert(`${targetUsername} has been removed.`);
+        }
+    }
+
+    function toggleAdminPanel() {
+        const panel = document.getElementById('admin-panel');
+        if(panel) {
+            panel.classList.toggle('hidden');
+        } else {
+            alert("Admin panel details are only viewable on the main homepage dashboard.");
+        }
+    }
+
+    function logoutUser() {
+        localStorage.removeItem('gcvm_active_session');
+        localStorage.removeItem('gcvm_active_role');
+        window.location.reload();
+    }
+</script>
     </body>
 </html>
