@@ -6,7 +6,6 @@
     <title>GC(V)M - Homepage</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         body {
@@ -121,6 +120,19 @@
             vertical-align: middle;
         }
 
+        .admin-action-btn {
+            display: block;
+            width: 100%;
+            padding: 6px;
+            margin-top: 10px;
+            background-color: #aa0000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
         .logout-link {
             display: inline-block;
             color: #f28b82;
@@ -191,33 +203,29 @@
             margin-bottom: 20px;
         }
 
-        .content a {
-            color: #1a73e8;
-            text-decoration: none;
+        .admin-panel-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dadce0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
         }
 
-        summary {
-            list-style: none;
-            color: #bdc1c6;
-            padding: 12px 0;
-            font-size: 15px;
+        .user-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .ban-btn {
+            background-color: #d93025;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
             cursor: pointer;
-            outline: none;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .sub-menu {
-            padding-left: 20px; 
-            border-left: 1px solid #3c4043; 
-            margin-bottom: 10px;
-        }
-
-        .sub-menu a {
-            font-size: 14px; 
-            padding: 8px 0;
         }
 
         .hidden {
@@ -235,8 +243,8 @@
                 <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
                 <input type="password" id="password-input" class="auth-input" placeholder="Password...">
                 <div class="auth-btn-container">
-                    <button class="auth-btn" onclick="login()">Login</button>
-                    <button class="auth-btn secondary" onclick="register()">Register</button>
+                    <button class="auth-btn" onclick="loginUser()">Login</button>
+                    <button class="auth-btn secondary" onclick="registerUser()">Register</button>
                 </div>
             </div>
             
@@ -244,7 +252,8 @@
                 <div class="user-info">
                     Logged in as:<br>
                     <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
-                    <span class="logout-link" onclick="logout()">Log out</span>
+                    <button id="admin-view-btn" class="admin-action-btn hidden" onclick="toggleAdminPanel()">Open Admin Panel</button>
+                    <span class="logout-link" onclick="logoutUser()">Log out</span>
                 </div>
             </div>
         </div>
@@ -286,119 +295,134 @@
             <p><strong>Homepage updating soon!</strong></p>
             <h2>Welcome to our new GitHub website!</h2>
             <p>Since short this is our new website! With that come some problems, like that some pages are empty... But we'll do our best to update it as fast as possible! Shards pages all work, so don't worry about that!</p>
-            <p>Everytime we have a new page updated, we'll drop it imeadiatly!</p>
-            <p>Some good things about this update:<br>-Better updates<br>-Better layout<br>-Bigger updates and features</p>
+            
+            <div id="admin-panel" class="admin-panel-box hidden">
+                <h3>GC(V)M Admin Control Panel</h3>
+                <p>Here you can manage registered users and delete/ban accounts if necessary.</p>
+                <div id="user-list-container">
+                    </div>
+            </div>
+
             <h2>About us:</h2>
             <p>We are a <a href="https://lichess.org/team/growing-chess-variants-masters">(Li)chess team</a>, whose main goal is to coach low-rated players to become better at chess! We also host tournaments and simuls, and we of course have fun!</p>
-            <p>We also inspired people like GatoChess89 to also make a coaching team, with which we've created an "alliance".</p>
         </div>
     </main>
 
     <script>
-        const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
-        // VERVANG DE STRING HIERONDER DOOR JOUW ECHTE SLESSEL (sb_publishable...)!
-        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u';
-
-        // Initialiseer verbinding via de window-omgeving
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // We maken een vaste lijst van accounts aan in het browsergeheugen als die er nog niet is
+        if (!localStorage.getItem('gcvm_local_db')) {
+            const initialDatabase = [
+                { username: 'GCVM', password: 'AdminPassGCVM', role: 'admin' } // Verander hier direct je Admin wachtwoord!
+            ];
+            localStorage.setItem('gcvm_local_db', JSON.stringify(initialDatabase));
+        }
 
         window.onload = function() {
-            const savedUser = localStorage.getItem('gcvm_db_user');
-            const savedRole = localStorage.getItem('gcvm_db_role');
-            if (savedUser) {
-                showLoggedInStyle(savedUser, savedRole);
+            const currentSession = localStorage.getItem('gcvm_active_session');
+            const currentRole = localStorage.getItem('gcvm_active_role');
+            if (currentSession) {
+                showStyle(currentSession, currentRole);
             }
         };
 
         // REGISTREREN
-        async function register() {
-            try {
-                const username = document.getElementById('username-input').value.trim();
-                const password = document.getElementById('password-input').value.trim();
+        function registerUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
 
-                if (!username || !password) {
-                    alert("Please fill in both fields!");
-                    return;
-                }
-
-                const { data: existingUser, error: checkError } = await supabase
-                    .from('gcvm_users')
-                    .select('username')
-                    .eq('username', username)
-                    .maybeSingle();
-
-                if (existingUser) {
-                    alert("This username is already registered!");
-                    return;
-                }
-
-                const { error: insertError } = await supabase
-                    .from('gcvm_users')
-                    .insert([{ username: username, password: password }]);
-
-                if (insertError) {
-                    alert("Registration failed: " + insertError.message);
-                } else {
-                    alert("Account created successfully! You can now login.");
-                    document.getElementById('password-input').value = "";
-                }
-            } catch (err) {
-                alert("An error occurred during registration.");
-                console.error(err);
+            if (!username || !password) {
+                alert("Please fill in both fields!");
+                return;
             }
+
+            let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
+
+            // Check of naam al bestaat
+            const exists = db.some(user => user.username.toLowerCase() === username.toLowerCase());
+            if (exists) {
+                alert("This username is already registered!");
+                return;
+            }
+
+            // Voeg gebruiker toe
+            db.push({ username: username, password: password, role: 'user' });
+            localStorage.setItem('gcvm_local_db', JSON.stringify(db));
+
+            alert("Account created successfully! You can now log in.");
+            document.getElementById('password-input').value = "";
         }
 
         // INLOGGEN
-        async function login() {
-            try {
-                const username = document.getElementById('username-input').value.trim();
-                const password = document.getElementById('password-input').value.trim();
+        function loginUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
 
-                if (!username || !password) {
-                    alert("Please fill in both fields!");
-                    return;
-                }
+            let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
+            
+            // Zoek gebruiker
+            const user = db.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
 
-                const { data: user, error } = await supabase
-                    .from('gcvm_users')
-                    .select('*')
-                    .eq('username', username)
-                    .eq('password', password)
-                    .maybeSingle();
-
-                if (error || !user) {
-                    alert("Invalid username or password!");
-                    return;
-                }
-
-                if (user.is_banned) {
-                    alert("This account has been banned from the website.");
-                    return;
-                }
-
-                localStorage.setItem('gcvm_db_user', user.username);
-                localStorage.setItem('gcvm_db_role', user.role);
-
-                showLoggedInStyle(user.username, user.role);
-            } catch (err) {
-                alert("An error occurred during login.");
-                console.error(err);
+            if (!user) {
+                alert("Invalid username or password!");
+                return;
             }
+
+            localStorage.setItem('gcvm_active_session', user.username);
+            localStorage.setItem('gcvm_active_role', user.role);
+
+            showStyle(user.username, user.role);
         }
 
-        function showLoggedInStyle(username, role) {
+        function showStyle(username, role) {
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('profile-section').classList.remove('hidden');
             document.getElementById('displayed-username').innerText = username;
 
             if (role === 'admin') {
                 document.getElementById('admin-badge').classList.remove('hidden');
+                document.getElementById('admin-view-btn').classList.remove('hidden');
+                loadUserList();
             }
         }
 
-        function logout() {
-            localStorage.removeItem('gcvm_db_user');
-            localStorage.removeItem('gcvm_db_role');
+        // ADMIN PANEL INLADEN
+        function loadUserList() {
+            let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
+            const container = document.getElementById('user-list-container');
+            container.innerHTML = "";
+
+            db.forEach(user => {
+                if (user.role === 'admin') return; // Sla admin zelf over in de lijst
+
+                const div = document.createElement('div');
+                div.className = "user-list-item";
+                div.innerHTML = `
+                    <span><strong>${user.username}</strong> (Password: ${user.password})</span>
+                    <button class="ban-btn" onclick="banUser('${user.username}')">Delete/Ban</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // GEBRUIKER BANWEN/VERWIJDEREN
+        function banUser(targetUsername) {
+            if (confirm(`Are you sure you want to delete and ban ${targetUsername}?`)) {
+                let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
+                db = db.filter(user => user.username !== targetUsername);
+                localStorage.setItem('gcvm_local_db', JSON.stringify(db));
+                loadUserList();
+                alert(`${targetUsername} has been removed.`);
+            }
+        }
+
+        function toggleAdminPanel() {
+            const panel = document.getElementById('admin-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('gcvm_active_session');
+            localStorage.removeItem('gcvm_active_role');
             window.location.reload();
         }
     </script>
