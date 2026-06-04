@@ -296,10 +296,10 @@
 
     <script>
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
-        // PLAK HIERONDER JOUW ECHTE LANGE SLESSEL (sb_publishable...)!
+        // VERVANG DE STRING HIERONDER DOOR JOUW ECHTE SLESSEL (sb_publishable...)!
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u';
 
-        // Initialiseer verbinding met de juiste Supabase aanroep
+        // Initialiseer verbinding via de window-omgeving
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         window.onload = function() {
@@ -321,7 +321,6 @@
                     return;
                 }
 
-                // Controleer of de gebruiker al bestaat
                 const { data: existingUser, error: checkError } = await supabase
                     .from('gcvm_users')
                     .select('username')
@@ -333,7 +332,6 @@
                     return;
                 }
 
-                // Voeg de nieuwe gebruiker toe
                 const { error: insertError } = await supabase
                     .from('gcvm_users')
                     .insert([{ username: username, password: password }]);
@@ -345,7 +343,7 @@
                     document.getElementById('password-input').value = "";
                 }
             } catch (err) {
-                alert("An error occurred during registration. Make sure your API key is correctly pasted.");
+                alert("An error occurred during registration.");
                 console.error(err);
             }
         }
@@ -383,7 +381,7 @@
 
                 showLoggedInStyle(user.username, user.role);
             } catch (err) {
-                alert("An error occurred during login. Make sure your API key is correctly pasted.");
+                alert("An error occurred during login.");
                 console.error(err);
             }
         }
