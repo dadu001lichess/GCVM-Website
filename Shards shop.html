@@ -4,13 +4,23 @@
     <meta charset="UTF-8">
     <title>GCVM - Shards shop!</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         main {
             margin-left: 280px; 
             width: calc(100% - 280px);
             min-height: 100vh;
+            background-color: white;
         }
         
+        hr {
+            border: none;
+            border-top: 1px solid #dadce0;
+            margin: 20px 0;
+        }
+
         .banner {
             height: 200px; 
             background-color: #f1f3f4;
@@ -31,27 +41,29 @@
         .content {
             max-width: 800px;
             margin: 0 auto; 
-            padding: 60px 40px;
+            padding: 40px 40px;
+            text-align: left;
+        }
+
+        .content.1 {
+            padding-top: 40px;
+            padding-bottom: 10px;
         }
 
         .content h2 {
             font-size: 28px;
             font-weight: 300;
             color: #202124;
-            margin-bottom: 20px;
+            margin-top: 10px;
         }
 
         .content p {
             font-size: 16px;
             line-height: 1.6;
             color: #3c4043;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .content a {
-            color: #1a73e8;
-            text-decoration: none;
-        }
         * {
             margin: 0;
             padding: 0;
@@ -86,6 +98,130 @@
             color: white;
             margin-bottom: 40px;
             letter-spacing: 0.5px;
+        }
+
+        /* Strakke styling voor de loginbox conform de andere pagina's */
+        .auth-container {
+            margin-bottom: 25px;
+        }
+
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #3c4043;
+            border-radius: 4px;
+            background-color: #303134;
+            color: white;
+            font-size: 13px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .auth-input::placeholder {
+            color: #80868b;
+        }
+
+        .auth-btn-container {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .auth-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+
+        .auth-btn:hover {
+            background-color: #1557b0;
+        }
+
+        .auth-btn.secondary {
+            background-color: #3c4043;
+            color: #bdc1c6;
+        }
+
+        .auth-btn.secondary:hover {
+            background-color: #4f5357;
+            color: white;
+        }
+
+        .user-info {
+            color: #bdc1c6;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .user-info strong {
+            color: #8ab4f8;
+            font-size: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 6px;
+            background-color: #34a853;
+            color: white;
+            border-radius: 10px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .admin-action-btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            background-color: #d93025;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .admin-action-btn:hover {
+            background-color: #b31412;
+        }
+
+        .logout-link {
+            display: inline-block;
+            color: #f28b82;
+            text-decoration: none;
+            font-size: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+
+        nav {
+            border-top: 1px solid #3c4043;
+            padding-top: 15px;
+        }
+
+        .hidden {
+            display: none !important;
         }
 
         nav a, nav summary {
@@ -126,189 +262,36 @@
             font-size: 14px;
             padding: 8px 0;
         }
-   </style>
-</head>
-<body>
-    <aside>
-        <div class="logo">GC(V)M</div>
-        <nav>
-            <a href="index.html">Homepage</a>
-            <a href="Training.html">Training</a>
-            <a href="Coaches.html">Coaches</a>
-            <details>
-              <summary>Shards currency ⌵</summary>
-              <div class="sub-menu">
-                <a href="Shardsintro.html">How to get Shards?</a>
-                <a href="Daily puzzle.html">Daily puzzle</a>
-                <a href="Shards shop.html">Shards shop</a>
-              </div>
-            </details>
-            <a href="Leaders.html">Leaders</a>
-            <a href="Current games.html">Current games</a>
-            <a href="MoTM.html">MoTM</a>
-            <a href="GoTM.html">Game of the month</a>
-            <a href="Jobs.html">Special mentions/Jobs</a>
-            <details>
-              <summary>Updates/News ⌵</summary>
-              <div class="sub-menu">
-                <a href="Updates.html">Updates</a>
-                <a href="News.html">Newspaper</a>
-              </div>    
-            </details>
-            <a href="Contact.html">Contact</a>
-        </nav>
-    </aside>
-        
-    <main>
-        <div class="banner">
-            <h1>GCVM - Shards shop</h1>
-        </div>
 
-        <div class="content">
-            <div style="background: #24292e; padding: 30px; border-radius: 8px; color: #d1d5da; font-family: 'Inter', -apple-system, sans-serif; border: 1px solid #444d56; max-width: 450px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
-                
-                <h2 style="color: #ffffff; margin-top: 0; font-weight: 600; letter-spacing: -0.5px; border-bottom: 1px solid #444d56; padding-bottom: 15px; font-size: 24px; text-align: center;">Shards Shop</h2>
-                
-                <div style="margin: 20px 0; text-align: left;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 0.85em; color: #959da5; text-transform: uppercase; font-weight: bold;">Lichess Username</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="usernameInput" placeholder="Enter Lichess username..." style="flex-grow: 1; padding: 12px; border-radius: 6px; border: 1px solid #444d56; background: #1f2328; color: white; outline: none; transition: border 0.3s;">
-                        <button onclick="checkBalance()" style="background: #444d56; color: #eeeeee; border: none; border-radius: 6px; padding: 0 15px; cursor: pointer; font-size: 0.8em; white-space: nowrap; transition: background 0.2s;">Check Balance</button>
-                    </div>
-                    <div id="balanceDisplay" style="margin-top: 10px; font-weight: bold; color: #c9d1d9; font-size: 0.9em;"></div>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    
-                    <button onclick="buyItem('Daily 5 free Shards', 0)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
-                        <span>Daily 5 free Shards</span>
-                        <span style="color: #959da5;">0 Shards</span>
-                    </button>
-
-                    <button onclick="buyItem('Tournament Perms for one day', 200)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
-                        <span>Tournament Perms for one day</span>
-                        <span style="color: #959da5;">200 Shards</span>
-                    </button>
-                    
-                    <button onclick="buyItem('Analysis Session', 100)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
-                        <span>Analysis Session</span>
-                        <span style="color: #959da5;">100 Shards</span>
-                    </button>
-
-                    <button onclick="buyItem('Team Message', 500)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
-                        <span>Team Message</span>
-                        <span style="color: #959da5;">500 Shards</span>
-                    </button>
-
-                    <details style="width: 100%;"> 
-                        <summary style="font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; list-style: none;">
-                            <span>Training Passwords</span>
-                            <span style="color: #959da5; font-size: 0.8em;">▼</span>
-                        </summary>
-                        <div style="width: 100%; padding: 10px 0 0 20px; display: flex; flex-direction: column; gap: 8px;">
-                            <button onclick="buyItem('Universal training password', 1000)" style="font-family: 'Inter', -apple-system, sans-serif; background: #1f2328; color: #e1e4e8; padding: 12px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; width: 100%;">
-                                <span>Universal Training Password</span>
-                                <span style="color: #959da5;">1000 Shards</span>
-                            </button>
-                        </div>
-                    </details> 
-
-                    <details style="width: 100%;"> 
-                        <summary style="font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; list-style: none;">
-                            <span>Promotions</span>
-                            <span style="color: #959da5; font-size: 0.8em;">▼</span>
-                        </summary>
-                        <div style="width: 100%; padding: 10px 0 0 20px; display: flex; flex-direction: column; gap: 8px;">
-                            <button onclick="buyItem('Study promotion', 100)" style="font-family: 'Inter', -apple-system, sans-serif; background: #1f2328; color: #e1e4e8; padding: 12px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; width: 100%;">
-                                <span>Study promotion</span>
-                                <span style="color: #959da5;">100 Shards</span>
-                            </button>
-                            <button onclick="buyItem('Blog promotion', 100)" style="font-family: 'Inter', -apple-system, sans-serif; background: #1f2328; color: #e1e4e8; padding: 12px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; width: 100%;">
-                                <span>Blog promotion</span>
-                                <span style="color: #959da5;">100 Shards</span>
-                            </button>
-                        </div>
-                    </details>
-                </div>
-
-                <div id="statusMessage" style="margin-top: 20px; font-size: 0.9em; min-height: 24px; color: #959da5; line-height: 1.4; text-align: left;"></div>
-            </div>
-        </div>
-    </main>
-
-    <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyULPDUd_5admFfsVefPZsCvQVTkhryaoj-Q1s80Nt0MkXcR4uK0sQ6yPoNwVbTUeub/exec";
-    const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm7tdaXaidF8Cm2yQS0hwOCJhjnnLT1JdGr79IJU0HkER-MigtjsLKCEiQIlY9fIGUGkSli07zeS3R/pub?gid=2015825906&single=true&output=csv";
-
-    async function getBalance(username) {
-        try {
-            const response = await fetch(csvURL);
-            const text = await response.text();
-            const rows = text.split(/\r?\n/).map(row => row.split(','));
-            
-            for (let i = 0; i < rows.length; i++) {
-                if (rows[i][0] && rows[i][0].replace(/"/g, "").trim().toLowerCase() === username.toLowerCase()) {
-                    return parseInt(rows[i][1]);
-                }
-            }
-            return null;
-        } catch (e) { return "error"; }
-    }
-
-    async function checkBalance() {
-        const name = document.getElementById('usernameInput').value.trim();
-        const display = document.getElementById('balanceDisplay');
-        if(!name) { display.innerText = "Enter a name first!"; return; }
-        
-        display.innerText = "Searching...";
-        const balance = await getBalance(name);
-        
-        if(balance === "error") display.innerText = "Error connecting.";
-        else if(balance === null) display.innerText = "User not found.";
-        else display.innerText = `Current Balance: ${balance} Shards`;
-    }
-
-    async function buyItem(itemName, itemPrice) {
-        const userField = document.getElementById('usernameInput');
-        const status = document.getElementById('statusMessage');
-        const member = userField.value.trim();
-
-        if(!member) {
-            status.style.color = "#f85149";
-            status.innerText = "Please enter your Lichess username first.";
-            return;
+        /* Shop Elementen */
+        .shop-form {
+            background-color: #f8f9fa;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 30px;
         }
 
-        status.style.color = "#d1d5da";
-        status.innerText = "Verifying...";
-
-        const userBalance = await getBalance(member);
-
-        if (userBalance === null || userBalance === "error") {
-            status.style.color = "#f85149";
-            status.innerText = "User not found in team-list.";
-            return;
+        .shop-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px 14px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 10px;
         }
 
-        if (userBalance < itemPrice) {
-            status.style.color = "#f85149";
-            status.innerText = `Insufficient Shards (You have ${userBalance}).`;
-            return;
+        .shop-input:focus {
+            border-color: #1a73e8;
         }
 
-        status.innerText = "Processing order...";
-        await fetch(scriptURL, {
-            method: 'POST',
-            mode: 'no-cors', 
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({username: member, item: itemName, price: itemPrice})
-        });
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
 
-        status.style.color = "#79c0ff";
-        status.innerText = "Order successful! System/Admin will update your balance shortly.";
-        userField.value = ""; 
-        document.getElementById('balanceDisplay').innerText = "";
-    }
-    </script>
-</body>
-</html>
+        .shop
