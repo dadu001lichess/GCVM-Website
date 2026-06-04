@@ -42,27 +42,37 @@
             text-align: left;
             max-width: 800px;
             margin: 0 auto; 
-            padding: 60px 40px;
+            padding: 20px 40px;
+        }
+
+        .content.1 {
+            padding-top: 40px;
+            padding-bottom: 10px;
         }
 
         .content h2 {
             font-size: 28px;
             font-weight: 300;
             color: #202124;
-            margin-bottom: 20px;
+            margin-top: 10px;
         }
 
         .content p {
             font-size: 16px;
             line-height: 1.6;
             color: #3c4043;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .content a {
             color: #1a73e8;
             text-decoration: none;
         }
+
+        .content a:hover {
+            text-decoration: underline;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -319,16 +329,165 @@
         <div class="banner">
             <h1>GCVM - Coaches</h1>
         </div>
+
+        <div class="content 1">
+            <p><h2><br>About our coaches:</h2></p>
+        </div>
         <div class="content">
-            <h2>Under construction!</h2>
-            <p>We are searching for high rated variants/standard players who want to give free lessons to our team members! If you want to do this, contact us via the contact form on this website or send a dm on Lichess to: <a href="https://lichess.org/@/dadu001lichess">dadu001lichess</a> !</p>
+            <p>In the list shown below you can exactly see what they coach, when (what timezone they live in), and their ''Star Rating'', although none of our coaches have that yet. For some coaches their official FIDE profile is also shown!</p>
+        </div>
+        <div class="content 1">
             <hr>
-            <h2>Current coaches:</h2>
-            <p>None yet!</p>
+            <p><h2>Our current list of (active) coaches:</h2></p>
+        </div>
+        <div class="content">
+            <p><b>Normal chess:</b></p>
+            <p><a href="https://lichess.org/@/Distant_Abyss" target="_blank">Distant_Abyss</a>, 400-1300 Elo, UTC +1 <i>(currently not available)</i></p>
+            <p><a href="https://lichess.org/@/chesspersons" target="_blank">chesspersons</a>, 400-1000 Elo, UTC +1 <i>(closed their account)</i></p>
+            <p><a href="https://lichess.org/@/TwistxdYT" target="_blank">TwistxdYT</a>, &lt;2100 Elo, UTC +3 <i>(Ultrabullet timecontrol only)</i></p>
+            <p><a href="https://lichess.org/@/Onlybullet2026" target="_blank">Onlybullet2026</a>, 1200-2000 Elo, UTC +3</p>
+            <p><br><b>3+ (Three Check)</b></p>
+            <p><a href="https://lichess.org/@/chesspersons" target="_blank">chesspersons</a>, 400-1000 Elo, UTC +1 <i>(Closed their account)</i></p>
+            <p><br><b>Atomic</b></p>
+            <p><a href="https://lichess.org/@/Mr-Best" target="_blank">Mr-Best</a>, 400-1400 Elo, UTC -4 (Rated 9/10)</p>
+            <p><br><b>Antichess</b></p>
+            <p><a href="https://lichess.org/@/Mr-Best" target="_blank">Mr-Best</a>, 400-1400 Elo, UTC -4 (Rated 9/10)</p>
+            <p><br><b>RK (Racing Kings)</b></p>
+            <p><a href="https://lichess.org/@/AmyNatania" target="_blank">AmyNatania</a>, 400-1500 Elo, UTC +3 <i>(Has beaten her own coach)</i></p>
+            <br>
+            <p><b><i>Coaches don't coach the timecontrol, but chess. Some exeptions are made.</i></b></p>
+        </div>
+        <div class="content 1">
+            <hr>
+            <p><h2>How to become coach:</h2></p>
+        </div>
+        <div class="content">
+            <p>To become coach, check <a href="https://forms.gle/wNFdrrxJWLGB4Wju9" target="_blank">this</a> out or DM (Private message) <a href="https://lichess.org/@/GCVM" target="_blank">GCVM</a> on Lichess!</p>
+        </div>
+        <div class="content 1">
+            <hr>
+            <p><h2>Coach manuall:</h2></p>
+        </div>
+        <div class="content">
+           <p>-As a coach, when you have a student you're coaching, please contact a leader about who that person is. This is needed for the ''rating'' system. The student will be asked by a leader to ''rate'' his or her coach.</p>
+           <p>-Furtherly, only start coaching someone when you're actually motivated to do it. If not, just politely decline their request to be your student. Once you accept someone as your student, you need to really do your best to let your student improve. If a student lets know that they are tired or they really need to go, stay polite and let them have their rest.</p>
+           <p>-As student, please listen to your coach' advice, and when he/she askes you to do a duel or a game, please do that, it's always asked with a reason.</p>
         </div>
     </main>
 
     <script>
         // JOUW SUPABASE PROJECT GEGEVENS
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u';
+        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
+
+        // Verbinding opstarten via de unieke variabele om crashes te voorkomen
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Bij het laden controleren of de browser de actieve sessie heeft onthouden
+        window.onload = function() {
+            const currentSession = localStorage.getItem('gcvm_db_session');
+            const currentRole = localStorage.getItem('gcvm_db_role');
+            if (currentSession) {
+                showStyle(currentSession, currentRole);
+            }
+        };
+
+        // REGISTREREN IN DE ONLINE DATABASE
+        async function registerUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+
+            if (!username || !password) {
+                alert("Please fill in both fields!");
+                return;
+            }
+
+            try {
+                // Check of de gebruiker al online bestaat
+                const { data: existingUser } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('username')
+                    .eq('username', username)
+                    .maybeSingle();
+
+                if (existingUser) {
+                    alert("This username is already registered online!");
+                    return;
+                }
+
+                // Voeg toe aan de online tabel
+                const { error } = await supabaseClient
+                    .from('gcvm_users')
+                    .insert([{ username: username, password: password, role: 'user' }]);
+
+                if (error) throw error;
+
+                alert("Account created successfully in the cloud! You can now log in.");
+                document.getElementById('password-input').value = "";
+            } catch (err) {
+                alert("Database error during registration: " + err.message);
+            }
+        }
+
+        // INLOGGEN VIA ONLINE DATABASE
+        async function loginUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+
+            if (!username || !password) {
+                alert("Please fill in both fields!");
+                return;
+            }
+
+            try {
+                const { data: user, error } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .maybeSingle();
+
+                if (error || !user) {
+                    alert("Invalid online username or password!");
+                    return;
+                }
+
+                if (user.is_banned) {
+                    alert("This account has been banned from the website.");
+                    return;
+                }
+
+                // Sla de sessie-informatie op in de browser
+                localStorage.setItem('gcvm_db_session', user.username);
+                localStorage.setItem('gcvm_db_role', user.role);
+
+                showStyle(user.username, user.role);
+            } catch (err) {
+                alert("Database error during login: " + err.message);
+            }
+        }
+
+        function showStyle(username, role) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('profile-section').classList.remove('hidden');
+            document.getElementById('displayed-username').innerText = username;
+
+            if (role === 'admin') {
+                document.getElementById('admin-badge').classList.remove('hidden');
+                document.getElementById('admin-view-btn').classList.remove('hidden');
+            }
+        }
+
+        function toggleAdminPanel() {
+            alert("Redirecting you to the main Homepage Dashboard to manage users.");
+            window.location.href = "index.html";
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('gcvm_db_session');
+            localStorage.removeItem('gcvm_db_role');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
