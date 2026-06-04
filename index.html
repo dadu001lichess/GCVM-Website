@@ -31,32 +31,29 @@
             color: white;
             font-size: 22px;
             font-weight: 300;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             letter-spacing: 0.5px;
         }
 
-        /* Stijlen voor de database inlogomgeving */
+        /* Strakke styling voor de loginbox conform originele lay-out */
         .auth-container {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #3c4043;
+            margin-bottom: 25px;
         }
 
         .auth-input-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
         }
 
         .auth-input {
             width: 100%;
-            padding: 10px;
+            padding: 8px 12px;
             border: 1px solid #3c4043;
             border-radius: 4px;
             background-color: #303134;
             color: white;
-            font-size: 14px;
+            font-size: 13px;
             box-sizing: border-box;
             outline: none;
         }
@@ -67,13 +64,14 @@
 
         .auth-btn-container {
             display: flex;
-            gap: 8px;
+            gap: 6px;
+            margin-top: 4px;
         }
 
         .auth-btn {
             flex: 1;
             padding: 10px;
-            background-color: #1a73e8;
+            background-color: #1a73e8; /* De originele blauwe kleur */
             color: white;
             border: none;
             border-radius: 4px;
@@ -101,12 +99,12 @@
         .user-info {
             color: #bdc1c6;
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
         .user-info strong {
             color: #8ab4f8;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .badge {
@@ -116,21 +114,27 @@
             background-color: #34a853;
             color: white;
             border-radius: 10px;
-            margin-left: 5px;
+            margin-left: 6px;
             vertical-align: middle;
         }
 
         .admin-action-btn {
             display: block;
             width: 100%;
-            padding: 6px;
+            padding: 8px;
             margin-top: 10px;
-            background-color: #aa0000;
+            background-color: #d93025;
             color: white;
             border: none;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
+            text-align: center;
+        }
+
+        .admin-action-btn:hover {
+            background-color: #b31412;
         }
 
         .logout-link {
@@ -138,12 +142,18 @@
             color: #f28b82;
             text-decoration: none;
             font-size: 12px;
-            margin-top: 5px;
+            margin-top: 8px;
             cursor: pointer;
         }
 
         .logout-link:hover {
             text-decoration: underline;
+        }
+
+        /* Navigatie koppelingen exact zoals voorheen */
+        nav {
+            border-top: 1px solid #3c4043;
+            padding-top: 15px;
         }
 
         nav a {
@@ -158,6 +168,30 @@
 
         nav a:hover, nav a.active {
             color: #8ab4f8;
+        }
+
+        summary {
+            list-style: none;
+            color: #bdc1c6;
+            padding: 12px 0;
+            font-size: 15px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .sub-menu {
+            padding-left: 20px; 
+            border-left: 1px solid #3c4043; 
+            margin-bottom: 10px;
+        }
+
+        .sub-menu a {
+            font-size: 14px; 
+            padding: 8px 0;
         }
 
         main {
@@ -203,29 +237,49 @@
             margin-bottom: 20px;
         }
 
+        .content a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        /* Centraal Admin Panel op de hoofdpagina */
         .admin-panel-box {
             background-color: #f8f9fa;
             border: 1px solid #dadce0;
-            padding: 20px;
+            padding: 24px;
             border-radius: 8px;
-            margin-top: 30px;
+            margin: 30px 0;
+        }
+
+        .admin-panel-box h3 {
+            margin-top: 0;
+            color: #202124;
+            font-size: 20px;
+            font-weight: 400;
         }
 
         .user-list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #eee;
+            font-size: 15px;
         }
 
         .ban-btn {
             background-color: #d93025;
             color: white;
             border: none;
-            padding: 4px 10px;
+            padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .ban-btn:hover {
+            background-color: #b31412;
         }
 
         .hidden {
@@ -309,10 +363,9 @@
     </main>
 
     <script>
-        // We maken een vaste lijst van accounts aan in het browsergeheugen als die er nog niet is
         if (!localStorage.getItem('gcvm_local_db')) {
             const initialDatabase = [
-                { username: 'GCVM', password: 'AdminPassGCVM', role: 'admin' } // Verander hier direct je Admin wachtwoord!
+                { username: 'GCVM', password: 'AdminPassGCVM', role: 'admin' }
             ];
             localStorage.setItem('gcvm_local_db', JSON.stringify(initialDatabase));
         }
@@ -325,7 +378,6 @@
             }
         };
 
-        // REGISTREREN
         function registerUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
@@ -337,14 +389,12 @@
 
             let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
 
-            // Check of naam al bestaat
             const exists = db.some(user => user.username.toLowerCase() === username.toLowerCase());
             if (exists) {
                 alert("This username is already registered!");
                 return;
             }
 
-            // Voeg gebruiker toe
             db.push({ username: username, password: password, role: 'user' });
             localStorage.setItem('gcvm_local_db', JSON.stringify(db));
 
@@ -352,14 +402,12 @@
             document.getElementById('password-input').value = "";
         }
 
-        // INLOGGEN
         function loginUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
 
             let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
             
-            // Zoek gebruiker
             const user = db.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
 
             if (!user) {
@@ -385,14 +433,13 @@
             }
         }
 
-        // ADMIN PANEL INLADEN
         function loadUserList() {
             let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
             const container = document.getElementById('user-list-container');
             container.innerHTML = "";
 
             db.forEach(user => {
-                if (user.role === 'admin') return; // Sla admin zelf over in de lijst
+                if (user.role === 'admin') return;
 
                 const div = document.createElement('div');
                 div.className = "user-list-item";
@@ -404,7 +451,6 @@
             });
         }
 
-        // GEBRUIKER BANWEN/VERWIJDEREN
         function banUser(targetUsername) {
             if (confirm(`Are you sure you want to delete and ban ${targetUsername}?`)) {
                 let db = JSON.parse(localStorage.getItem('gcvm_local_db'));
