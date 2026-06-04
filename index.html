@@ -344,12 +344,12 @@
     </main>
 
     <script>
-        // JOUW SUPABASE PROJECT GEGEVENS
-        const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; // Plak hier je sb_publishable sleutel!
+// JOUW SUPABASE PROJECT GEGEVENS
+const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u';
 
-        // Verbinding opstarten via de officiële bibliotheek
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Verbinding opstarten met een unieke naam
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
