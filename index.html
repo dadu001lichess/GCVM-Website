@@ -343,13 +343,13 @@
         </div>
     </main>
 
-    <script>
-// JOUW SUPABASE PROJECT GEGEVENS
-const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u';
+<script>
+        // JOUW SUPABASE PROJECT GEGEVENS
+        const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; // PLAK HIER JE VOLLEDIGE SLEUTEL
 
-// Verbinding opstarten met een unieke naam
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Verbinding opstarten via een unieke variabele om crashes te voorkomen
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
@@ -371,7 +371,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
             try {
                 // Check of de gebruiker al in de online database bestaat
-                const { data: existingUser } = await supabase
+                const { data: existingUser } = await supabaseClient
                     .from('gcvm_users')
                     .select('username')
                     .eq('username', username)
@@ -383,7 +383,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 }
 
                 // Voeg toe aan de online database
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('gcvm_users')
                     .insert([{ username: username, password: password, role: 'user' }]);
 
@@ -407,7 +407,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
 
             try {
-                const { data: user, error } = await supabase
+                const { data: user, error } = await supabaseClient
                     .from('gcvm_users')
                     .select('*')
                     .eq('username', username)
@@ -448,7 +448,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         // GEBRUIKERS INLADEN VANUIT SUPABASE NAAR HET ADMIN PANEL
         async function loadUserList() {
             try {
-                const { data: users, error } = await supabase
+                const { data: users, error } = await supabaseClient
                     .from('gcvm_users')
                     .select('*');
 
@@ -477,7 +477,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         async function banUser(targetUsername) {
             if (confirm(`Are you sure you want to delete and ban ${targetUsername} from the database?`)) {
                 try {
-                    const { error } = await supabase
+                    const { error } = await supabaseClient
                         .from('gcvm_users')
                         .delete()
                         .eq('username', targetUsername);
