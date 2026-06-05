@@ -13,13 +13,13 @@
             font-family: 'Open Sans', sans-serif;
             margin: 0;
             display: flex;
-            background-color: #161512; /* Lichess donkere achtergrond */
-            color: #bababa;
+            background-color: white;
+            color: #3c4043;
         }
 
         aside {
             width: 280px;
-            background-color: #1e1e1e; 
+            background-color: #202124; 
             height: 100vh;
             position: fixed;
             padding: 40px 24px;
@@ -27,7 +27,6 @@
             overflow-y: auto;
             left: 0;
             top: 0;
-            border-right: 1px solid #2d2d2d;
         }
 
         .logo {
@@ -53,11 +52,15 @@
             padding: 8px 12px;
             border: 1px solid #3c4043;
             border-radius: 4px;
-            background-color: #2d2d2d;
+            background-color: #303134;
             color: white;
             font-size: 13px;
             box-sizing: border-box;
             outline: none;
+        }
+
+        .auth-input::placeholder {
+            color: #80868b;
         }
 
         .auth-btn-container {
@@ -69,33 +72,38 @@
         .auth-btn {
             flex: 1;
             padding: 10px;
-            background-color: #363534;
+            background-color: #1a73e8;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s;
         }
 
-        .auth-btn:hover { background-color: #454443; }
+        .auth-btn:hover { background-color: #1557b0; }
+        .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
+        .auth-btn.secondary:hover { background-color: #4f5357; color: white; }
 
-        .user-info { color: #bababa; font-size: 14px; }
-        .user-info strong { color: #fff; font-size: 15px; }
+        .user-info { color: #bdc1c6; font-size: 14px; line-height: 1.4; }
+        .user-info strong { color: #8ab4f8; font-size: 15px; }
 
         .badge {
             display: inline-block;
             font-size: 10px;
             padding: 2px 6px;
-            background-color: #bf811d;
+            background-color: #34a853;
             color: white;
             border-radius: 10px;
             margin-left: 6px;
+            vertical-align: middle;
         }
 
         .logout-link {
             display: inline-block;
-            color: #ff6b6b;
+            color: #f28b82;
             text-decoration: none;
             font-size: 12px;
             margin-top: 8px;
@@ -104,172 +112,205 @@
 
         nav a {
             display: block;
-            color: #bababa;
+            color: #bdc1c6;
             text-decoration: none;
             padding: 12px 0;
             font-size: 15px;
+            transition: color 0.2s;
         }
-        nav a:hover, nav a.active { color: #fff; font-weight: 600; }
+        nav a:hover, nav a.active { color: #8ab4f8; }
 
-        summary { color: #bababa; padding: 12px 0; cursor: pointer; }
-        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; }
-        .sub-menu a { font-size: 14px; padding: 6px 0; }
+        summary { list-style: none; color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; }
+        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; margin-bottom: 10px; }
+        .sub-menu a { font-size: 14px; padding: 8px 0; }
 
         main {
             margin-left: 280px; 
             width: calc(100% - 280px);
             min-height: 100vh;
-            padding: 40px;
-            box-sizing: border-box;
         }
 
-        /* LICHESS PROFIEL LAYOUT */
-        .lichess-profile {
+        .banner {
+            height: 200px; 
+            background-color: #f1f3f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #dadce0;
+        }
+
+        .banner h1 {
+            font-size: 42px;
+            font-weight: 400;
+            margin: 0;
+            text-align: center;
+            color: #3c4043;
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 0 auto; 
+            padding: 40px;
+        }
+
+        /* SCHOON EN LICHT PROFIEL GRID (MATCHT MET JOUW SITE STIJL) */
+        .profile-grid {
             display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 30px;
-            background-color: #1e1e1e;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            position: relative;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            margin-top: 20px;
         }
 
         /* Linkerkolom: Ratings */
-        .profile-side {
-            border-right: 1px solid #2d2d2d;
-            padding-right: 20px;
+        .profile-side-stats {
+            border-right: 1px solid #dadce0;
+            padding-right: 30px;
         }
 
-        .rating-block {
-            background: #262421;
-            padding: 12px;
-            border-radius: 4px;
+        .rating-box-item {
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            padding: 14px;
+            border-radius: 6px;
             margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .rating-name { font-weight: 600; color: #fff; }
-        .rating-value { color: #bf811d; font-weight: 600; font-size: 18px; }
-        .rating-games { font-size: 11px; color: #7a7a7a; }
+        .rating-title { font-weight: 600; color: #202124; font-size: 14px; }
+        .rating-score { color: #1a73e8; font-weight: 600; font-size: 16px; }
+        .rating-details { font-size: 11px; color: #70757a; margin-top: 2px; }
 
         /* Rechterkolom: Info & Bio */
-        .profile-main {
+        .profile-main-info {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
         }
 
-        .profile-header {
+        .profile-top-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
+            border-bottom: 1px solid #dadce0;
+            padding-bottom: 15px;
         }
 
-        .user-title {
+        .user-header-title {
             font-size: 32px;
-            color: #fff;
+            color: #202124;
             margin: 0;
-            font-weight: 400;
+            font-weight: 300;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .flair-tag {
-            font-size: 20px;
-            background: #262421;
-            padding: 4px 8px;
+        .flair-badge-display {
+            font-size: 18px;
+            background: #f1f3f4;
+            padding: 2px 8px;
             border-radius: 4px;
-            border: 1px solid #3c4043;
+            border: 1px solid #dadce0;
+            font-weight: normal;
         }
 
-        .status-indicator {
+        .status-dot-indicator {
             display: inline-block;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
         }
-        .online { background-color: #629924; }
-        .offline { background-color: #a0a0a0; }
+        .online { background-color: #34a853; }
+        .offline { background-color: #70757a; }
 
-        .settings-btn {
-            background: none;
-            border: 1px solid #3c4043;
-            color: #bababa;
-            padding: 8px 12px;
+        .action-settings-btn {
+            background: white;
+            border: 1px solid #dadce0;
+            color: #3c4043;
+            padding: 8px 14px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
         }
-        .settings-btn:hover { background: #2d2d2d; color: #fff; }
+        .action-settings-btn:hover { background: #f8f9fa; color: #202124; }
 
-        .bio-display {
-            background: #262421;
+        .bio-text-container {
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
             padding: 20px;
             border-radius: 6px;
-            font-style: italic;
             line-height: 1.6;
-            color: #dfdfdf;
+            color: #3c4043;
+            font-size: 15px;
         }
 
-        /* ELO Grafiek Placeholder */
-        .graph-placeholder {
-            background: #232220;
-            border: 2px dashed #3c4043;
-            height: 180px;
+        /* ELO Grafiek Container */
+        .progress-graph-box {
+            background: #ffffff;
+            border: 1px solid #dadce0;
             border-radius: 6px;
+            height: 160px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #7a7a7a;
-            font-weight: 600;
+            color: #70757a;
+            font-weight: 400;
+            font-size: 14px;
+            background-image: linear-gradient(#f1f3f4 1px, transparent 1px), linear-gradient(90deg, #f1f3f4 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
-        /* Instellingenpaneel (Dropdown) */
-        .settings-panel {
-            background: #262421;
-            border: 1px solid #bf811d;
+        /* Instellingen Editor Paneel */
+        .editor-settings-panel {
+            background: #f8f9fa;
+            border: 1px solid #1a73e8;
             padding: 20px;
             border-radius: 6px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
-        .settings-panel label {
+        .editor-settings-panel label {
             display: block;
             font-weight: 600;
+            font-size: 14px;
             margin-bottom: 6px;
-            color: #fff;
+            color: #202124;
         }
 
-        .settings-textarea {
+        .editor-textarea {
             width: 100%;
             height: 80px;
-            background: #161512;
-            color: white;
-            border: 1px solid #3c4043;
+            background: white;
+            color: #3c4043;
+            border: 1px solid #dadce0;
             padding: 10px;
             border-radius: 4px;
             resize: none;
             box-sizing: border-box;
             outline: none;
-        }
-
-        .settings-select {
-            width: 100%;
-            padding: 10px;
-            background: #161512;
-            color: white;
-            border: 1px solid #3c4043;
-            border-radius: 4px;
-            outline: none;
+            font-family: inherit;
+            font-size: 14px;
             margin-bottom: 15px;
         }
 
-        .save-btn {
-            background: #629924;
+        .editor-select {
+            width: 100%;
+            padding: 10px;
+            background: white;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            outline: none;
+            margin-bottom: 20px;
+            font-family: inherit;
+        }
+
+        .btn-submit-save {
+            background: #1a73e8;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -277,42 +318,44 @@
             font-weight: 600;
             cursor: pointer;
         }
-        .save-btn:hover { background: #73aa34; }
+        .btn-submit-save:hover { background: #1557b0; }
 
-        /* Zoekbalk bovenin */
-        .search-container {
+        /* Zoekbalk styling */
+        .search-member-row {
             display: flex;
             gap: 10px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             max-width: 400px;
         }
 
-        .search-input {
+        .search-member-input {
             flex-grow: 1;
-            background: #1e1e1e;
-            border: 1px solid #3c4043;
+            background: white;
+            border: 1px solid #dadce0;
             padding: 10px;
-            color: white;
+            color: #3c4043;
             border-radius: 4px;
             outline: none;
+            font-size: 14px;
         }
 
-        .search-btn {
-            background: #bf811d;
+        .search-member-btn {
+            background: #3c4043;
             color: white;
             border: none;
-            padding: 0 15px;
+            padding: 0 16px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
         }
+        .search-member-btn:hover { background: #202124; }
 
         .hidden { display: none !important; }
         
         .alert-box {
-            background-color: #2d1a1a;
-            border: 1px solid #ff6b6b;
-            color: #ff8b8b;
+            background-color: #fce8e6;
+            border: 1px solid #f28b82;
+            color: #a51d24;
             padding: 15px;
             border-radius: 6px;
             text-align: center;
@@ -374,105 +417,110 @@
     </aside>
 
     <main>
-        <div class="search-container">
-            <input type="text" id="memberSearchField" class="search-input" placeholder="Search Lichess username...">
-            <button class="search-btn" onclick="searchOtherMember()">Search</button>
+        <div class="banner">
+            <h1>GCVM - Member Profiles</h1>
         </div>
 
-        <div id="logged-out-warning" class="alert-box">
-            Please log in through the sidebar to explore and customize profiles!
-        </div>
-
-        <div id="profile-page-content" class="hidden">
-            
-            <div id="settings-panel" class="settings-panel hidden">
-                <h3 style="margin-top:0; color:#fff;">⚙️ Profile Settings</h3>
-                
-                <label>Choose your Flair:</label>
-                <select id="flair-select" class="settings-select">
-                    <option value="">No Flair</option>
-                    <option value="👑">👑 King</option>
-                    <option value="🦄">🦄 Knight</option>
-                    <option value="🔮">🔮 Variant Master</option>
-                    <option value="🎯">🎯 Tactician</option>
-                    <option value="🛡️">🛡️ Defender</option>
-                </select>
-
-                <label>Edit Bio:</label>
-                <textarea id="bio-textarea-input" class="settings-textarea" placeholder="Tell the team about yourself..."></textarea>
-                
-                <div style="margin-top:12px;">
-                    <button class="save-btn" onclick="saveProfileSettings()">Save Settings</button>
-                    <button class="settings-btn" style="margin-left:8px;" onclick="toggleSettings()">Cancel</button>
-                </div>
+        <div class="content">
+            <div class="search-member-row">
+                <input type="text" id="memberSearchField" class="search-member-input" placeholder="Search team member...">
+                <button class="search-member-btn" onclick="searchOtherMember()">Search</button>
             </div>
 
-            <div class="lichess-profile">
+            <div id="logged-out-warning" class="alert-box">
+                Please log in through the sidebar to view and customize member profiles!
+            </div>
+
+            <div id="profile-page-content" class="hidden">
                 
-                <div class="profile-side">
-                    <h3 style="color:#fff; margin-top:0; font-size:18px; border-bottom:1px solid #2d2d2d; padding-bottom:8px;">Elo Ratings</h3>
+                <div id="settings-panel" class="editor-settings-panel hidden">
+                    <h3 style="margin-top:0; color:#1a73e8; font-weight: 400;">⚙️ Edit Profile Settings</h3>
                     
-                    <div class="rating-block">
-                        <div>
-                            <div class="rating-name">⚔️ Team Classical</div>
-                            <div class="rating-games">0 games</div>
-                        </div>
-                        <div class="rating-value">1500?</div>
-                    </div>
+                    <label>Select Team Flair:</label>
+                    <select id="flair-select" class="editor-select">
+                        <option value="">No Flair</option>
+                        <option value="👑">👑 King</option>
+                        <option value="🦄">🦄 Knight</option>
+                        <option value="🔮">🔮 Variant Master</option>
+                        <option value="🎯">🎯 Tactician</option>
+                        <option value="🛡️">🛡️ Defender</option>
+                    </select>
 
-                    <div class="rating-block">
-                        <div>
-                            <div class="rating-name">⚡ Team Blitz</div>
-                            <div class="rating-games">0 games</div>
-                        </div>
-                        <div class="rating-value">1500?</div>
-                    </div>
-
-                    <div class="rating-block">
-                        <div>
-                            <div class="rating-name">🔥 Team Bullet</div>
-                            <div class="rating-games">0 games</div>
-                        </div>
-                        <div class="rating-value">1500?</div>
-                    </div>
-
-                    <div class="rating-block">
-                        <div>
-                            <div class="rating-name">🎲 Variants ELO</div>
-                            <div class="rating-games">0 games</div>
-                        </div>
-                        <div class="rating-value">1500?</div>
+                    <label>Update Biography:</label>
+                    <textarea id="bio-textarea-input" class="editor-textarea" placeholder="Tell the team about yourself or your chess goals..."></textarea>
+                    
+                    <div>
+                        <button class="btn-submit-save" onclick="saveProfileSettings()">Save Changes</button>
+                        <button class="action-settings-btn" style="margin-left:8px;" onclick="toggleSettings()">Cancel</button>
                     </div>
                 </div>
 
-                <div class="profile-main">
-                    <div class="profile-header">
-                        <div>
-                            <h1 class="user-title">
-                                <span class="status-indicator online" id="view-status-dot"></span>
-                                <span id="view-username">Username</span>
-                                <span id="view-flair" class="flair-tag hidden">👑</span>
-                            </h1>
-                            <p style="margin:5px 0 0 0; font-size:13px; color:#7a7a7a;">GC(V)M Team Member</p>
-                        </div>
+                <div class="profile-grid">
+                    
+                    <div class="profile-side-stats">
+                        <h3 style="color:#202124; margin-top:0; font-size:18px; font-weight: 400; margin-bottom: 20px;">Elo Ratings</h3>
                         
-                        <button id="edit-settings-trigger" class="settings-btn hidden" onclick="toggleSettings()">⚙️ Settings</button>
-                    </div>
+                        <div class="rating-box-item">
+                            <div>
+                                <div class="rating-title">Classical</div>
+                                <div class="rating-details">0 games played</div>
+                            </div>
+                            <div class="rating-score">1500?</div>
+                        </div>
 
-                    <div>
-                        <h3 style="color:#fff; font-size:16px; margin-bottom:8px;">Biography</h3>
-                        <div id="view-bio" class="bio-display">Hello! I am a proud member of GC(V)M.</div>
-                    </div>
+                        <div class="rating-box-item">
+                            <div>
+                                <div class="rating-title">Rapid</div>
+                                <div class="rating-details">0 games played</div>
+                            </div>
+                            <div class="rating-score">1500?</div>
+                        </div>
 
-                    <div>
-                        <h3 style="color:#fff; font-size:16px; margin-bottom:8px;">Rating Progress Graph</h3>
-                        <div class="graph-placeholder">
-                            📈 ELO Rating Graph History — <span style="color:#bf811d; margin-left:5px;">Coming Soon!</span>
+                        <div class="rating-box-item">
+                            <div>
+                                <div class="rating-title">Blitz</div>
+                                <div class="rating-details">0 games played</div>
+                            </div>
+                            <div class="rating-score">1500?</div>
+                        </div>
+
+                        <div class="rating-box-item">
+                            <div>
+                                <div class="rating-title">Bullet</div>
+                                <div class="rating-details">0 games played</div>
+                            </div>
+                            <div class="rating-score">1500?</div>
                         </div>
                     </div>
-                </div>
 
-            </div> </div>
+                    <div class="profile-main-info">
+                        <div class="profile-top-header">
+                            <div>
+                                <h2 class="user-header-title">
+                                    <span class="status-dot-indicator online" id="view-status-dot"></span>
+                                    <span id="view-username">Username</span>
+                                    <span id="view-flair" class="flair-badge-display hidden">👑</span>
+                                </h2>
+                            </div>
+                            
+                            <button id="edit-settings-trigger" class="action-settings-btn hidden" onclick="toggleSettings()">⚙️ Settings</button>
+                        </div>
+
+                        <div>
+                            <h3 style="color:#202124; font-size:16px; font-weight: 600; margin-bottom:10px;">Biography</h3>
+                            <div id="view-bio" class="bio-text-container">Hello! I am a proud member of GC(V)M.</div>
+                        </div>
+
+                        <div>
+                            <h3 style="color:#202124; font-size:16px; font-weight: 600; margin-bottom:10px;">Rating Progress Graph</h3>
+                            <div class="progress-graph-box">
+                                Progress Chart History — <span style="color:#1a73e8; font-weight: 600; margin-left:5px;">Coming Soon!</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> </div>
+        </div>
     </main>
 
     <script>
@@ -491,7 +539,7 @@
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('profile-page-content').classList.remove('hidden');
                 
-                // Standaard open je je eigen profiel
+                // Open standaard je eigen profiel
                 loadProfileData(currentSession);
 
                 updateOnlineTimestamp(currentSession);
@@ -505,7 +553,7 @@
             } catch(e) {}
         }
 
-        // LAAD DATA OP HET PROFIEL (Eigen profiel óf van iemand anders)
+        // PROFIEL GEGEVENS INLADEN UIT SUPABASE
         async function loadProfileData(username) {
             currentViewingUser = username;
             const activeUser = localStorage.getItem('gcvm_db_session');
@@ -518,15 +566,14 @@
                     .maybeSingle();
 
                 if (error || !user) {
-                    alert("User not found!");
+                    alert("Member profile not found!");
                     return;
                 }
 
-                // Vul de velden in op het profiel
                 document.getElementById('view-username').innerText = user.username;
-                document.getElementById('view-bio').innerText = user.bio || "No biography shared yet.";
+                document.getElementById('view-bio').innerText = user.bio || "This member hasn't written a biography yet.";
                 
-                // Flair tonen of verbergen
+                // Flair verwerken
                 const flairBox = document.getElementById('view-flair');
                 if (user.flair) {
                     flairBox.innerText = user.flair;
@@ -535,21 +582,21 @@
                     flairBox.classList.add('hidden');
                 }
 
-                // Check of de gebruiker online of offline is
+                // Online/Offline status bepalen
                 const lastSeenDate = new Date(user.last_seen);
                 const limit = new Date(Date.now() - 5 * 60 * 1000);
                 const dot = document.getElementById('view-status-dot');
                 if (lastSeenDate > limit) {
-                    dot.className = "status-indicator online";
+                    dot.className = "status-dot-indicator online";
                 } else {
-                    dot.className = "status-indicator offline";
+                    dot.className = "status-dot-indicator offline";
                 }
 
-                // Toon de instellingenknop ALLEEN als je je eigen profiel bekijkt
+                // Check of de bezoeker naar zijn eigen profiel kijkt
                 const settingsBtn = document.getElementById('edit-settings-trigger');
                 if (username.toLowerCase() === activeUser.toLowerCase()) {
                     settingsBtn.classList.remove('hidden');
-                    // Vul alvast de invoervelden in het instellingenpaneel in
+                    // Vul invoervelden alvast in
                     document.getElementById('bio-textarea-input').value = user.bio || "";
                     document.getElementById('flair-select').value = user.flair || "";
                 } else {
@@ -560,7 +607,7 @@
             } catch(e) { console.error(e); }
         }
 
-        // INPUT OPSLAAN UIT HET SETTINGS PANEEL
+        // SETTINGS OPSLAAN IN SUPABASE
         async function saveProfileSettings() {
             const username = localStorage.getItem('gcvm_db_session');
             const newBio = document.getElementById('bio-textarea-input').value;
@@ -576,7 +623,6 @@
 
                 if (error) throw error;
 
-                // Sluit paneel en herlaad profielgegevens
                 toggleSettings();
                 loadProfileData(username);
             } catch (err) {
@@ -584,7 +630,6 @@
             }
         }
 
-        // ZOEKFUNCTIE OM PROFIEL VAN ANDER LID OP TE HALEN
         function searchOtherMember() {
             const name = document.getElementById('memberSearchField').value.trim();
             if (name) {
@@ -597,7 +642,7 @@
             panel.classList.toggle('hidden');
         }
 
-        // --- AUTH LOGICA EN SIDEBAR ---
+        // --- SIDEBAR AUTH CODE ---
         async function loginUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
@@ -605,7 +650,7 @@
 
             try {
                 const { data: user, error } = await supabaseClient.from('gcvm_users').select('*').eq('username', username).eq('password', password).maybeSingle();
-                if (error || !user) { alert("Invalid login!"); return; }
+                if (error || !user) { alert("Invalid credentials!"); return; }
 
                 localStorage.setItem('gcvm_db_session', user.username);
                 localStorage.setItem('gcvm_db_role', user.role);
@@ -621,7 +666,7 @@
             try {
                 const { error } = await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', bio: 'Hello! I am a proud member of GC(V)M.', flair: '' }]);
                 if (error) throw error;
-                alert("Account created!");
+                alert("Account created successfully!");
             } catch (err) { alert(err.message); }
         }
 
