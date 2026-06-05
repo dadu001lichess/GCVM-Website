@@ -13,13 +13,13 @@
             font-family: 'Open Sans', sans-serif;
             margin: 0;
             display: flex;
-            background-color: white;
-            color: #3c4043;
+            background-color: #161512; /* Lichess donkere achtergrond */
+            color: #bababa;
         }
 
         aside {
             width: 280px;
-            background-color: #202124; 
+            background-color: #1e1e1e; 
             height: 100vh;
             position: fixed;
             padding: 40px 24px;
@@ -27,6 +27,7 @@
             overflow-y: auto;
             left: 0;
             top: 0;
+            border-right: 1px solid #2d2d2d;
         }
 
         .logo {
@@ -35,12 +36,10 @@
             font-weight: 300;
             margin-bottom: 20px;
             letter-spacing: 0.5px;
-            text-align: left;
         }
 
         .auth-container {
             margin-bottom: 25px;
-            text-align: left;
         }
 
         .auth-input-group {
@@ -54,15 +53,11 @@
             padding: 8px 12px;
             border: 1px solid #3c4043;
             border-radius: 4px;
-            background-color: #303134;
+            background-color: #2d2d2d;
             color: white;
             font-size: 13px;
             box-sizing: border-box;
             outline: none;
-        }
-
-        .auth-input::placeholder {
-            color: #80868b;
         }
 
         .auth-btn-container {
@@ -74,245 +69,250 @@
         .auth-btn {
             flex: 1;
             padding: 10px;
-            background-color: #1a73e8;
+            background-color: #363534;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 13px;
             font-weight: 600;
-            text-align: center;
-            transition: background-color 0.2s;
         }
 
-        .auth-btn:hover {
-            background-color: #1557b0;
-        }
+        .auth-btn:hover { background-color: #454443; }
 
-        .auth-btn.secondary {
-            background-color: #3c4043;
-            color: #bdc1c6;
-        }
-
-        .auth-btn.secondary:hover {
-            background-color: #4f5357;
-            color: white;
-        }
-
-        .user-info {
-            color: #bdc1c6;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .user-info strong {
-            color: #8ab4f8;
-            font-size: 15px;
-        }
+        .user-info { color: #bababa; font-size: 14px; }
+        .user-info strong { color: #fff; font-size: 15px; }
 
         .badge {
             display: inline-block;
             font-size: 10px;
             padding: 2px 6px;
-            background-color: #34a853;
+            background-color: #bf811d;
             color: white;
             border-radius: 10px;
             margin-left: 6px;
-            vertical-align: middle;
-        }
-
-        .admin-action-btn {
-            display: block;
-            width: 100%;
-            padding: 8px;
-            margin-top: 10px;
-            background-color: #d93025;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
         }
 
         .logout-link {
             display: inline-block;
-            color: #f28b82;
+            color: #ff6b6b;
             text-decoration: none;
             font-size: 12px;
             margin-top: 8px;
             cursor: pointer;
         }
 
-        .logout-link:hover {
-            text-decoration: underline;
-        }
-
-        nav {
-            border-top: 1px solid #3c4043;
-            padding-top: 15px;
-            text-align: left;
-        }
-
         nav a {
             display: block;
-            color: #bdc1c6;
+            color: #bababa;
             text-decoration: none;
             padding: 12px 0;
             font-size: 15px;
-            font-weight: 400;
-            transition: color 0.2s;
         }
+        nav a:hover, nav a.active { color: #fff; font-weight: 600; }
 
-        nav a:hover, nav a.active {
-            color: #8ab4f8;
-        }
-
-        summary {
-            list-style: none;
-            color: #bdc1c6;
-            padding: 12px 0;
-            font-size: 15px;
-            cursor: pointer;
-            outline: none;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .sub-menu {
-            padding-left: 20px; 
-            border-left: 1px solid #3c4043; 
-            margin-bottom: 10px;
-        }
-
-        .sub-menu a {
-            font-size: 14px; 
-            padding: 8px 0;
-        }
+        summary { color: #bababa; padding: 12px 0; cursor: pointer; }
+        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; }
+        .sub-menu a { font-size: 14px; padding: 6px 0; }
 
         main {
             margin-left: 280px; 
             width: calc(100% - 280px);
             min-height: 100vh;
+            padding: 40px;
+            box-sizing: border-box;
         }
-        
-        .banner {
-            height: 200px; 
-            background-color: #f1f3f4;
+
+        /* LICHESS PROFIEL LAYOUT */
+        .lichess-profile {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* Linkerkolom: Ratings */
+        .profile-side {
+            border-right: 1px solid #2d2d2d;
+            padding-right: 20px;
+        }
+
+        .rating-block {
+            background: #262421;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rating-name { font-weight: 600; color: #fff; }
+        .rating-value { color: #bf811d; font-weight: 600; font-size: 18px; }
+        .rating-games { font-size: 11px; color: #7a7a7a; }
+
+        /* Rechterkolom: Info & Bio */
+        .profile-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .user-title {
+            font-size: 32px;
+            color: #fff;
+            margin: 0;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flair-tag {
+            font-size: 20px;
+            background: #262421;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #3c4043;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .online { background-color: #629924; }
+        .offline { background-color: #a0a0a0; }
+
+        .settings-btn {
+            background: none;
+            border: 1px solid #3c4043;
+            color: #bababa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .settings-btn:hover { background: #2d2d2d; color: #fff; }
+
+        .bio-display {
+            background: #262421;
+            padding: 20px;
+            border-radius: 6px;
+            font-style: italic;
+            line-height: 1.6;
+            color: #dfdfdf;
+        }
+
+        /* ELO Grafiek Placeholder */
+        .graph-placeholder {
+            background: #232220;
+            border: 2px dashed #3c4043;
+            height: 180px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-bottom: 1px solid #dadce0;
+            color: #7a7a7a;
+            font-weight: 600;
         }
 
-        .banner h1 {
-            font-size: 42px;
-            font-weight: 400;
-            margin: 0;
-            text-align: center;
-            color: #3c4043;
+        /* Instellingenpaneel (Dropdown) */
+        .settings-panel {
+            background: #262421;
+            border: 1px solid #bf811d;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
         }
 
-        .content {
-            max-width: 800px;
-            margin: 0 auto; 
-            padding: 40px;
-            text-align: left;
+        .settings-panel label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #fff;
         }
 
-        /* Profile Cards & UI elements */
-        .profile-container {
-            background-color: #f8f9fa;
-            border: 1px solid #dadce0;
-            padding: 30px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-        .online { background-color: #34a853; }
-        .offline { background-color: #70757a; }
-
-        .bio-box {
+        .settings-textarea {
             width: 100%;
-            height: 90px;
-            padding: 12px;
-            margin-top: 10px;
-            border: 1px solid #dadce0;
+            height: 80px;
+            background: #161512;
+            color: white;
+            border: 1px solid #3c4043;
+            padding: 10px;
             border-radius: 4px;
             resize: none;
-            font-family: inherit;
-            font-size: 14px;
+            box-sizing: border-box;
             outline: none;
         }
 
-        .btn-primary {
-            background-color: #1a73e8;
+        .settings-select {
+            width: 100%;
+            padding: 10px;
+            background: #161512;
             color: white;
-            border: none;
-            padding: 10px 20px;
+            border: 1px solid #3c4043;
             border-radius: 4px;
-            margin-top: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
+            outline: none;
+            margin-bottom: 15px;
         }
 
-        .btn-primary:hover { background-color: #1557b0; }
+        .save-btn {
+            background: #629924;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .save-btn:hover { background: #73aa34; }
 
-        .search-row {
+        /* Zoekbalk bovenin */
+        .search-container {
             display: flex;
             gap: 10px;
-            margin-top: 12px;
+            margin-bottom: 25px;
+            max-width: 400px;
         }
 
         .search-input {
             flex-grow: 1;
+            background: #1e1e1e;
+            border: 1px solid #3c4043;
             padding: 10px;
-            border: 1px solid #dadce0;
+            color: white;
             border-radius: 4px;
             outline: none;
         }
 
-        .btn-search {
-            background-color: #3c4043;
+        .search-btn {
+            background: #bf811d;
             color: white;
             border: none;
+            padding: 0 15px;
             border-radius: 4px;
-            padding: 0 20px;
             cursor: pointer;
             font-weight: 600;
-        }
-
-        .search-result-box {
-            background: white;
-            border: 1px solid #dadce0;
-            padding: 20px;
-            border-radius: 6px;
-            margin-top: 15px;
-        }
-
-        .coming-soon-text {
-            color: #1a73e8;
-            font-weight: 600;
-            font-size: 13px;
         }
 
         .hidden { display: none !important; }
         
         .alert-box {
-            background-color: #fce8e6;
-            border: 1px solid #f28b82;
-            color: #a51d24;
+            background-color: #2d1a1a;
+            border: 1px solid #ff6b6b;
+            color: #ff8b8b;
             padding: 15px;
             border-radius: 6px;
             text-align: center;
@@ -374,68 +374,113 @@
     </aside>
 
     <main>
-        <div class="banner">
-            <h1>GCVM - Member Profiles</h1>
+        <div class="search-container">
+            <input type="text" id="memberSearchField" class="search-input" placeholder="Search Lichess username...">
+            <button class="search-btn" onclick="searchOtherMember()">Search</button>
         </div>
 
-        <div class="content">
+        <div id="logged-out-warning" class="alert-box">
+            Please log in through the sidebar to explore and customize profiles!
+        </div>
+
+        <div id="profile-page-content" class="hidden">
             
-            <div id="logged-out-warning" class="alert-box">
-                Please log in through the sidebar to view and customize your profile!
+            <div id="settings-panel" class="settings-panel hidden">
+                <h3 style="margin-top:0; color:#fff;">⚙️ Profile Settings</h3>
+                
+                <label>Choose your Flair:</label>
+                <select id="flair-select" class="settings-select">
+                    <option value="">No Flair</option>
+                    <option value="👑">👑 King</option>
+                    <option value="🦄">🦄 Knight</option>
+                    <option value="🔮">🔮 Variant Master</option>
+                    <option value="🎯">🎯 Tactician</option>
+                    <option value="🛡️">🛡️ Defender</option>
+                </select>
+
+                <label>Edit Bio:</label>
+                <textarea id="bio-textarea-input" class="settings-textarea" placeholder="Tell the team about yourself..."></textarea>
+                
+                <div style="margin-top:12px;">
+                    <button class="save-btn" onclick="saveProfileSettings()">Save Settings</button>
+                    <button class="settings-btn" style="margin-left:8px;" onclick="toggleSettings()">Cancel</button>
+                </div>
             </div>
 
-            <div id="profile-page-content" class="hidden">
+            <div class="lichess-profile">
                 
-                <div class="profile-container">
-                    <h2 style="margin-top: 0;" id="my-profile-title">My Profile</h2>
-                    <p><span class="status-dot online"></span> Your status: <strong>Online</strong></p>
+                <div class="profile-side">
+                    <h3 style="color:#fff; margin-top:0; font-size:18px; border-bottom:1px solid #2d2d2d; padding-bottom:8px;">Elo Ratings</h3>
                     
-                    <div style="margin-top: 15px;">
-                        <label style="font-weight: 600; font-size: 14px;">Edit Your Bio:</label>
-                        <textarea id="my-bio-textarea" class="bio-box" placeholder="Write something about yourself or your chess goals..."></textarea>
-                        <button class="btn-primary" onclick="saveMyBio()">Save Profile Bio</button>
-                        <span id="bio-saved-feedback" style="margin-left: 10px; font-size: 13px; color: #34a853; font-weight: 600;"></span>
+                    <div class="rating-block">
+                        <div>
+                            <div class="rating-name">⚔️ Team Classical</div>
+                            <div class="rating-games">0 games</div>
+                        </div>
+                        <div class="rating-value">1500?</div>
                     </div>
 
-                    <div style="margin-top: 20px; border-top: 1px solid #dadce0; padding-top: 15px;">
-                        <p style="margin: 5px 0;">Total Shards: <span class="coming-soon-text">Coming Soon!</span></p>
-                        <p style="margin: 5px 0;">Earned Badges / Trophies: <span class="coming-soon-text">Coming Soon!</span></p>
+                    <div class="rating-block">
+                        <div>
+                            <div class="rating-name">⚡ Team Blitz</div>
+                            <div class="rating-games">0 games</div>
+                        </div>
+                        <div class="rating-value">1500?</div>
+                    </div>
+
+                    <div class="rating-block">
+                        <div>
+                            <div class="rating-name">🔥 Team Bullet</div>
+                            <div class="rating-games">0 games</div>
+                        </div>
+                        <div class="rating-value">1500?</div>
+                    </div>
+
+                    <div class="rating-block">
+                        <div>
+                            <div class="rating-name">🎲 Variants ELO</div>
+                            <div class="rating-games">0 games</div>
+                        </div>
+                        <div class="rating-value">1500?</div>
                     </div>
                 </div>
 
-                <div class="profile-container" style="background-color: #ffffff;">
-                    <h3 style="margin-top: 0;">Search for Team Members</h3>
-                    <p style="font-size: 14px; color: #5f6368; margin-bottom: 5px;">Type a member's Lichess username below to check if they are online and read their bio.</p>
-                    
-                    <div class="search-row">
-                        <input type="text" id="memberSearchField" class="search-input" placeholder="Search username...">
-                        <button class="btn-search" onclick="searchOtherMember()">Search Profile</button>
+                <div class="profile-main">
+                    <div class="profile-header">
+                        <div>
+                            <h1 class="user-title">
+                                <span class="status-indicator online" id="view-status-dot"></span>
+                                <span id="view-username">Username</span>
+                                <span id="view-flair" class="flair-tag hidden">👑</span>
+                            </h1>
+                            <p style="margin:5px 0 0 0; font-size:13px; color:#7a7a7a;">GC(V)M Team Member</p>
+                        </div>
+                        
+                        <button id="edit-settings-trigger" class="settings-btn hidden" onclick="toggleSettings()">⚙️ Settings</button>
                     </div>
 
-                    <div id="search-result" class="search-result-box hidden">
-                        <h4 id="res-username" style="margin: 0 0 5px 0; font-size: 18px;">Username</h4>
-                        <p style="margin: 0 0 10px 0; font-size: 14px;">
-                            Website Status: <span id="res-status-dot" class="status-dot"></span> <strong id="res-status-text">Offline</strong>
-                        </p>
-                        <p style="font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #5f6368;">Bio:</p>
-                        <p id="res-bio" style="font-style: italic; background-color: #f1f3f4; padding: 12px; border-radius: 4px; margin: 0; font-size: 14px;">No bio shared.</p>
-                        
-                        <div style="margin-top: 15px; font-size: 12px; color: #70757a; border-top: 1px solid #eee; padding-top: 10px;">
-                            View past tournament matches & stats: <span class="coming-soon-text">Coming Soon!</span>
+                    <div>
+                        <h3 style="color:#fff; font-size:16px; margin-bottom:8px;">Biography</h3>
+                        <div id="view-bio" class="bio-display">Hello! I am a proud member of GC(V)M.</div>
+                    </div>
+
+                    <div>
+                        <h3 style="color:#fff; font-size:16px; margin-bottom:8px;">Rating Progress Graph</h3>
+                        <div class="graph-placeholder">
+                            📈 ELO Rating Graph History — <span style="color:#bf811d; margin-left:5px;">Coming Soon!</span>
                         </div>
                     </div>
                 </div>
 
-            </div>
-
-        </div>
+            </div> </div>
     </main>
 
     <script>
-        // Supabase Project configuratie
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentViewingUser = "";
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
@@ -443,151 +488,148 @@
             if (currentSession) {
                 showStyle(currentSession, currentRole);
                 
-                // Laat profiel content zien en verberg de uitlog-melding
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('profile-page-content').classList.remove('hidden');
-                document.getElementById('my-profile-title').innerText = "My Profile (" + currentSession + ")";
                 
-                loadProfileBio(currentSession);
+                // Standaard open je je eigen profiel
+                loadProfileData(currentSession);
+
                 updateOnlineTimestamp(currentSession);
                 setInterval(() => updateOnlineTimestamp(currentSession), 60000);
             }
         };
 
-        // Update online activiteit
         async function updateOnlineTimestamp(username) {
             try {
-                await supabaseClient
-                    .from('gcvm_users')
-                    .update({ last_seen: new Date().toISOString() })
-                    .eq('username', username);
+                await supabaseClient.from('gcvm_users').update({ last_seen: new Date().toISOString() }).eq('username', username);
             } catch(e) {}
         }
 
-        // Haal eigen bio op bij laden
-        async function loadProfileBio(username) {
+        // LAAD DATA OP HET PROFIEL (Eigen profiel óf van iemand anders)
+        async function loadProfileData(username) {
+            currentViewingUser = username;
+            const activeUser = localStorage.getItem('gcvm_db_session');
+
             try {
-                const { data: user } = await supabaseClient
+                const { data: user, error } = await supabaseClient
                     .from('gcvm_users')
-                    .select('bio')
+                    .select('username', 'bio', 'flair', 'last_seen')
                     .eq('username', username)
                     .maybeSingle();
-                
-                if(user && user.bio) {
-                    document.getElementById('my-bio-textarea').value = user.bio;
+
+                if (error || !user) {
+                    alert("User not found!");
+                    return;
                 }
-            } catch(e) {}
+
+                // Vul de velden in op het profiel
+                document.getElementById('view-username').innerText = user.username;
+                document.getElementById('view-bio').innerText = user.bio || "No biography shared yet.";
+                
+                // Flair tonen of verbergen
+                const flairBox = document.getElementById('view-flair');
+                if (user.flair) {
+                    flairBox.innerText = user.flair;
+                    flairBox.classList.remove('hidden');
+                } else {
+                    flairBox.classList.add('hidden');
+                }
+
+                // Check of de gebruiker online of offline is
+                const lastSeenDate = new Date(user.last_seen);
+                const limit = new Date(Date.now() - 5 * 60 * 1000);
+                const dot = document.getElementById('view-status-dot');
+                if (lastSeenDate > limit) {
+                    dot.className = "status-indicator online";
+                } else {
+                    dot.className = "status-indicator offline";
+                }
+
+                // Toon de instellingenknop ALLEEN als je je eigen profiel bekijkt
+                const settingsBtn = document.getElementById('edit-settings-trigger');
+                if (username.toLowerCase() === activeUser.toLowerCase()) {
+                    settingsBtn.classList.remove('hidden');
+                    // Vul alvast de invoervelden in het instellingenpaneel in
+                    document.getElementById('bio-textarea-input').value = user.bio || "";
+                    document.getElementById('flair-select').value = user.flair || "";
+                } else {
+                    settingsBtn.classList.add('hidden');
+                    document.getElementById('settings-panel').classList.add('hidden');
+                }
+
+            } catch(e) { console.error(e); }
         }
 
-        // Sla gewijzigde bio op
-        async function saveMyBio() {
+        // INPUT OPSLAAN UIT HET SETTINGS PANEEL
+        async function saveProfileSettings() {
             const username = localStorage.getItem('gcvm_db_session');
-            const bioText = document.getElementById('my-bio-textarea').value;
-            const fb = document.getElementById('bio-saved-feedback');
+            const newBio = document.getElementById('bio-textarea-input').value;
+            const newFlair = document.getElementById('flair-select').value;
 
             if (!username) return;
 
             try {
                 const { error } = await supabaseClient
                     .from('gcvm_users')
-                    .update({ bio: bioText })
+                    .update({ bio: newBio, flair: newFlair })
                     .eq('username', username);
 
                 if (error) throw error;
-                fb.innerText = "Saved successfully!";
-                setTimeout(() => fb.innerText = "", 3000);
-            } catch(err) {
-                alert("Error saving: " + err.message);
+
+                // Sluit paneel en herlaad profielgegevens
+                toggleSettings();
+                loadProfileData(username);
+            } catch (err) {
+                alert("Error saving settings: " + err.message);
             }
         }
 
-        // Zoek naar profiel van iemand anders
-        async function searchOtherMember() {
-            const searchName = document.getElementById('memberSearchField').value.trim();
-            const resultBox = document.getElementById('search-result');
-            
-            if (!searchName) return;
-
-            try {
-                const { data: user, error } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('username', 'bio', 'last_seen')
-                    .eq('username', searchName)
-                    .maybeSingle();
-
-                if (error || !user) {
-                    alert("Member not found in database!");
-                    resultBox.classList.add('hidden');
-                    return;
-                }
-
-                resultBox.classList.remove('hidden');
-                document.getElementById('res-username').innerText = user.username;
-                document.getElementById('res-bio').innerText = user.bio || "This member hasn't written a bio yet.";
-
-                // Tijd berekenen voor online status (5 minuten venster)
-                const lastSeenDate = new Date(user.last_seen);
-                const limit = new Date(Date.now() - 5 * 60 * 1000);
-                const dot = document.getElementById('res-status-dot');
-                const txt = document.getElementById('res-status-text');
-
-                if (lastSeenDate > limit) {
-                    dot.className = "status-dot online";
-                    txt.innerText = "Online";
-                    txt.style.color = "#34a853";
-                } else {
-                    dot.className = "status-dot offline";
-                    txt.innerText = "Offline";
-                    txt.style.color = "#70757a";
-                }
-
-            } catch(err) {
-                alert("Search error: " + err.message);
+        // ZOEKFUNCTIE OM PROFIEL VAN ANDER LID OP TE HALEN
+        function searchOtherMember() {
+            const name = document.getElementById('memberSearchField').value.trim();
+            if (name) {
+                loadProfileData(name);
             }
         }
 
-        // --- AUTH LOGICA VOOR SIDEBAR ---
-        async function registerUser() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
-
-            if (!username || !password) { alert("Fill in both fields!"); return; }
-
-            try {
-                const { data: exist } = await supabaseClient.from('gcvm_users').select('username').eq('username', username).maybeSingle();
-                if (exist) { alert("Username already taken!"); return; }
-
-                const { error } = await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', bio: 'Hello! I am a proud member of GC(V)M.' }]);
-                if (error) throw error;
-
-                alert("Account created! You can now log in.");
-                document.getElementById('password-input').value = "";
-            } catch (err) { alert("Registration error: " + err.message); }
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('hidden');
         }
 
+        // --- AUTH LOGICA EN SIDEBAR ---
         async function loginUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-
-            if (!username || !password) { alert("Fill in both fields!"); return; }
+            if (!username || !password) return;
 
             try {
                 const { data: user, error } = await supabaseClient.from('gcvm_users').select('*').eq('username', username).eq('password', password).maybeSingle();
-                if (error || !user) { alert("Invalid username or password!"); return; }
+                if (error || !user) { alert("Invalid login!"); return; }
 
                 localStorage.setItem('gcvm_db_session', user.username);
                 localStorage.setItem('gcvm_db_role', user.role);
                 window.location.reload();
-            } catch (err) { alert("Login error: " + err.message); }
+            } catch (err) { alert(err.message); }
+        }
+
+        async function registerUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+            if (!username || !password) return;
+
+            try {
+                const { error } = await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', bio: 'Hello! I am a proud member of GC(V)M.', flair: '' }]);
+                if (error) throw error;
+                alert("Account created!");
+            } catch (err) { alert(err.message); }
         }
 
         function showStyle(username, role) {
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('profile-section').classList.remove('hidden');
             document.getElementById('displayed-username').innerText = username;
-            if (role === 'admin') {
-                document.getElementById('admin-badge').classList.remove('hidden');
-            }
+            if (role === 'admin') document.getElementById('admin-badge').classList.remove('hidden');
         }
 
         function logoutUser() {
