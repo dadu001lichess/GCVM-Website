@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCVM - Profile View</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: white;
+            color: #3c4043;
+        }
+
+        aside {
+            width: 280px;
+            background-color: #202124; 
+            height: 100vh;
+            position: fixed;
+            padding: 40px 24px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            left: 0;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
+        .auth-container { margin-bottom: 25px; }
+        .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
+        
+        .auth-input {
+            width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px;
+            background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none;
+        }
+
+        .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
+        .auth-btn {
+            flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;
+        }
+        .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
+        .user-info { color: #bdc1c6; font-size: 14px; }
+        .user-info strong { color: #8ab4f8; font-size: 15px; }
+        .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; }
+        .logout-link { color: #f28b82; font-size: 12px; margin-top: 8px; cursor: pointer; display: inline-block; }
+
+        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
+        nav a:hover, nav a.active { color: #8ab4f8; }
+        summary { color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; list-style: none; }
+        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; }
+        .sub-menu a { font-size: 14px; padding: 8px 0; }
+
+        main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; box-sizing: border-box; position: relative; }
+        .banner { height: 120px; background-color: #f1f3f4; display: flex; align-items: center; padding-left: 40px; border-bottom: 1px solid #dadce0; }
+        .banner h1 { font-size: 32px; font-weight: 400; margin: 0; color: #202124; }
+        .content { max-width: 1000px; margin: 0 auto; padding: 40px; }
+
+        .top-right-search {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            display: flex;
+            gap: 8px;
+            z-index: 5;
+        }
+        .search-input { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 200px; }
+        .search-btn { background: #3c4043; color: white; border: none; padding: 0 14px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .search-btn:hover { background: #202124; }
+
+        .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; }
+        .side-panel { border-right: 1px solid #dadce0; padding-right: 20px; }
+        
+        .rating-card {
+            background: #f8f9fa; border: 1px solid #dadce0; padding: 12px 16px; border-radius: 6px;
+            margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .rating-name { font-weight: 600; font-size: 14px; }
+        .rating-val { color: #1a73e8; font-weight: 600; font-size: 16px; }
+        .rating-sub { font-size: 11px; color: #70757a; }
+
+        .main-panel { display: flex; flex-direction: column; gap: 25px; }
+        .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 10px; }
+        .profile-title { font-size: 28px; margin: 0; font-weight: 400; }
+
+        /* PUUR VISUELE WEERGAVE VAN FLAIR EN BIO */
+        .flair-display-box { font-size: 16px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 8px 12px; border-radius: 4px; width: fit-content; }
+        .bio-display-text { font-size: 15px; line-height: 1.6; white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #dadce0; min-height: 100px; }
+        
+        .edit-link-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 10px; text-decoration: none; display: inline-block; }
+        .edit-link-btn:hover { background: #1557b0; }
+
+        .graph-placeholder {
+            border: 1px solid #dadce0; border-radius: 6px; height: 150px; display: flex; align-items: center;
+            justify-content: center; color: #70757a; font-size: 14px;
+            background-image: linear-gradient(#f1f3f4 1px, transparent 1px), linear-gradient(90deg, #f1f3f4 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .alert-warn { background: #fce8e6; border: 1px solid #f28b82; color: #a51d24; padding: 15px; border-radius: 6px; text-align: center; font-weight: 600; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="logo">GC(V)M</div>
+        <div class="auth-container">
+            <div id="login-section" class="auth-input-group">
+                <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
+                <input type="password" id="password-input" class="auth-input" placeholder="Password...">
+                <div class="auth-btn-container">
+                    <button class="auth-btn" onclick="loginUser()">Login</button>
+                    <button class="auth-btn secondary" onclick="registerUser()">Register</button>
+                </div>
+            </div>
+            <div id="profile-section" class="hidden">
+                <div class="user-info">
+                    Logged in as:<br>
+                    <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
+                    <span class="logout-link" onclick="logoutUser()">Log out</span>
+                </div>
+            </div>
+        </div>
+        <nav>
+            <a href="index.html">Homepage</a>
+            <a href="profileview.html" class="active">My Profile</a>
+            <a href="Training.html">Training</a>
+            <a href="Coaches.html">Coaches</a>
+            <details>
+                <summary>Shards currency ⌵</summary>
+                <div class="sub-menu">
+                    <a href="Shardsintro.html">How to get Shards?</a>
+                    <a href="Daily puzzle.html">Daily puzzle</a>
+                    <a href="Shards shop.html">Shards shop</a>
+                </div>
+            </details>
+            <a href="Leaders.html">Leaders</a>
+            <a href="Current games.html">Current games</a>
+            <a href="MoTM.html">MoTM</a>
+            <a href="GoTM.html">Game of the month</a>
+            <a href="Jobs.html">Special mentions/Jobs</a>
+            <details>
+                <summary>Updates/News ⌵</summary>
+                <div class="sub-menu">
+                    <a href="Updates.html">Updates</a>
+                    <a href="News.html">Newspaper</a>
+                </div>    
+            </details>
+            <a href="Contact.html">Contact</a>
+        </nav>
+    </aside>
+
+    <main>
+        <div class="top-right-search">
+            <input type="text" id="memberSearchField" class="search-input" placeholder="Search member...">
+            <button class="search-btn" onclick="searchOtherMember()">Search</button>
+        </div>
+
+        <div class="banner">
+            <h1 id="page-main-title">Member Profile</h1>
+        </div>
+
+        <div class="content">
+            <div id="logged-out-warning" class="alert-warn">
+                Please log in through the sidebar to view member profiles!
+            </div>
+
+            <div id="profile-page-content" class="hidden">
+                <div class="profile-grid">
+                    
+                    <div class="side-panel">
+                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Elo Ratings</h3>
+                        <div class="rating-card"><div><div class="rating-name">Classical</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
+                        <div class="rating-card"><div><div class="rating-name">Rapid</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
+                        <div class="rating-card"><div><div class="rating-name">Blitz</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
+                        <div class="rating-card"><div><div class="rating-name">Bullet</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
+                    </div>
+
+                    <div class="main-panel">
+                        <div class="profile-header">
+                            <h2 class="profile-title" id="view-username">Username</h2>
+                        </div>
+
+                        <div id="flair-display-row" class="hidden">
+                            <h3 style="margin:0 0 5px 0; font-size:14px; color:#70757a;">Team Title:</h3>
+                            <div id="flair-badge-text" class="flair-display-box">No Flair</div>
+                        </div>
+
+                        <div>
+                            <h3 style="margin:0 0 10px 0; font-size:16px;">Biography:</h3>
+                            <div id="bio-text-container" class="bio-display-text">Loading biography...</div>
+                            
+                            <a href="Profile.html" id="edit-profile-btn" class="edit-link-btn hidden">Edit Profile</a>
+                        </div>
+
+                        <div>
+                            <h3 style="margin:0 0 10px 0; font-size:16px;">Rating Progress Graph</h3>
+                            <div class="graph-placeholder">
+                                Progress Chart History — <span style="color:#1a73e8; font-weight:600; margin-left:5px;">Coming Soon!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        window.onload = function() {
+            const currentSession = localStorage.getItem('gcvm_db_session');
+            const currentRole = localStorage.getItem('gcvm_db_role');
+            
+            if (currentSession) {
+                showSidebarLoggedIn(currentSession, currentRole);
+                document.getElementById('logged-out-warning').classList.add('hidden');
+                document.getElementById('profile-page-content').classList.remove('hidden');
+                
+                // Controleer of er via de URL gezocht is naar een specifieke user (bijv. profileview.html?user=GCVM)
+                const urlParams = new URLSearchParams(window.location.search);
+                const userParam = urlParams.get('user');
+                
+                if (userParam) {
+                    loadProfileView(userParam);
+                } else {
+                    loadProfileView(currentSession);
+                }
+            }
+        };
+
+        async function loadProfileView(username) {
+            const activeUser = localStorage.getItem('gcvm_db_session');
+            document.getElementById('page-main-title').innerText = `${username}'s Profile`;
+
+            try {
+                const { data: users, error } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('username, bio, flair')
+                    .ilike('username', username);
+
+                if (error) throw error;
+
+                if (!users || users.length === 0) {
+                    document.getElementById('bio-text-container').innerText = "Member not found.";
+                    return;
+                }
+
+                const user = users[0];
+                
+                // Vul Bio en Flair in
+                document.getElementById('bio-text-container').innerText = user.bio.trim() !== "" ? user.bio : "This member hasn't written a biography yet.";
+                document.getElementById('view-username').innerText = user.username + (user.flair ? ` [${user.flair}]` : "");
+
+                if (user.flair) {
+                    document.getElementById('flair-display-row').classList.remove('hidden');
+                    document.getElementById('flair-badge-text').innerText = user.flair;
+                } else {
+                    document.getElementById('flair-display-row').classList.add('hidden');
+                }
+
+                // KNOP CHECK: Als jij dit bent, toon de "Edit Profile" knop!
+                const editBtn = document.getElementById('edit-profile-btn');
+                if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
+                    editBtn.classList.remove('hidden');
+                } else {
+                    editBtn.classList.add('hidden');
+                }
+
+            } catch(err) { console.error(err); }
+        }
+
+        function searchOtherMember() {
+            const name = document.getElementById('memberSearchField').value.trim();
+            if (name) {
+                // Verander de URL-parameter om de gezochte gebruiker in te laden
+                window.location.search = `?user=${name}`;
+            }
+        }
+
+        async function loginUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+            if (!username || !password) return alert("Fill in all fields!");
+
+            try {
+                const { data: users, error } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('*')
+                    .ilike('username', username)
+                    .eq('password', password);
+                
+                if (error || !users || users.length === 0) { alert("Invalid credentials!"); return; }
+
+                const user = users[0];
+                localStorage.setItem('gcvm_db_session', user.username);
+                localStorage.setItem('gcvm_db_role', user.role);
+                window.location.reload();
+            } catch (err) { alert(err.message); }
+        }
+
+        async function registerUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+            if (!username || !password) return alert("Fill in all fields!");
+
+            try {
+                const { error } = await supabaseClient
+                    .from('gcvm_users')
+                    .insert([{ username, password, role: 'user', bio: '', flair: '' }]);
+                
+                if (error) throw error;
+                alert("Account created!");
+            } catch (err) { alert("Error: " + err.message); }
+        }
+
+        function showSidebarLoggedIn(username, role) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('profile-section').classList.remove('hidden');
+            document.getElementById('displayed-username').innerText = username;
+            if (role === 'admin') document.getElementById('admin-badge').classList.remove('hidden');
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('gcvm_db_session');
+            localStorage.removeItem('gcvm_db_role');
+            window.location.href = "profileview.html";
+        }
+    </script>
+</body>
+</html>
