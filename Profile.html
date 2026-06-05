@@ -153,7 +153,7 @@
             padding: 40px;
         }
 
-        /* SCHOON EN LICHT PROFIEL GRID (MATCHT MET JOUW SITE STIJL) */
+        /* LIGHT PROFILE GRID STYLE */
         .profile-grid {
             display: grid;
             grid-template-columns: 280px 1fr;
@@ -161,7 +161,6 @@
             margin-top: 20px;
         }
 
-        /* Linkerkolom: Ratings */
         .profile-side-stats {
             border-right: 1px solid #dadce0;
             padding-right: 30px;
@@ -182,7 +181,6 @@
         .rating-score { color: #1a73e8; font-weight: 600; font-size: 16px; }
         .rating-details { font-size: 11px; color: #70757a; margin-top: 2px; }
 
-        /* Rechterkolom: Info & Bio */
         .profile-main-info {
             display: flex;
             flex-direction: column;
@@ -246,9 +244,9 @@
             line-height: 1.6;
             color: #3c4043;
             font-size: 15px;
+            white-space: pre-wrap; /* Behoudt enters/alinea's uit de bio */
         }
 
-        /* ELO Grafiek Container */
         .progress-graph-box {
             background: #ffffff;
             border: 1px solid #dadce0;
@@ -264,7 +262,6 @@
             background-size: 20px 20px;
         }
 
-        /* Instellingen Editor Paneel */
         .editor-settings-panel {
             background: #f8f9fa;
             border: 1px solid #1a73e8;
@@ -310,7 +307,7 @@
         }
 
         .btn-submit-save {
-            background: #1a73e8;
+            background: #34a853;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -318,9 +315,8 @@
             font-weight: 600;
             cursor: pointer;
         }
-        .btn-submit-save:hover { background: #1557b0; }
+        .btn-submit-save:hover { background: #2d8e47; }
 
-        /* Zoekbalk styling */
         .search-member-row {
             display: flex;
             gap: 10px;
@@ -524,36 +520,48 @@
     </main>
 
     <script>
+        // Supabase initialisatie
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentViewingUser = "";
 
+        // Startfunctie bij het laden van de pagina
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
             const currentRole = localStorage.getItem('gcvm_db_role');
+            
             if (currentSession) {
+                // Toon de ingelogde staat in de sidebar
                 showStyle(currentSession, currentRole);
                 
+                // Activeer de profiel interface en verberg de waarschuwing
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('profile-page-content').classList.remove('hidden');
                 
-                // Open standaard je eigen profiel
+                // Laad standaard direct het profiel van de ingelogde speler zelf in
                 loadProfileData(currentSession);
 
+                // Online status direct doorgeven en elke minuut herhalen
                 updateOnlineTimestamp(currentSession);
                 setInterval(() => updateOnlineTimestamp(currentSession), 60000);
             }
         };
 
+        // Update de 'last_seen' kolom live in de database
         async function updateOnlineTimestamp(username) {
             try {
-                await supabaseClient.from('gcvm_users').update({ last_seen: new Date().toISOString() }).eq('username', username);
-            } catch(e) {}
+                await supabaseClient
+                    .from('gcvm_users')
+                    .update({ last_seen: new Date().toISOString() })
+                    .eq('username', username);
+            } catch(e) {
+                console.error("Kon online status niet updaten:", e);
+            }
         }
 
-        // PROFIEL GEGEVENS INLADEN UIT SUPABASE
+        // Haalt profielgegevens op uit Supabase (voor jezelf óf een ander gezocht lid)
         async function loadProfileData(username) {
             currentViewingUser = username;
             const activeUser = localStorage.getItem('gcvm_db_session');
@@ -565,24 +573,27 @@
                     .eq('username', username)
                     .maybeSingle();
 
-                if (error || !user) {
-                    alert("Member profile not found!");
+                if (error) throw error;
+
+                if (!user) {
+                    alert("Member profile '" + username + "' not found in the database!");
                     return;
                 }
 
+                // Vul de HTML-elementen met de databasegegevens
                 document.getElementById('view-username').innerText = user.username;
                 document.getElementById('view-bio').innerText = user.bio || "This member hasn't written a biography yet.";
                 
-                // Flair verwerken
+                // Verwerk de Flair badge
                 const flairBox = document.getElementById('view-flair');
-                if (user.flair) {
+                if (user.flair && user.flair.trim() !== "") {
                     flairBox.innerText = user.flair;
                     flairBox.classList.remove('hidden');
                 } else {
                     flairBox.classList.add('hidden');
                 }
 
-                // Online/Offline status bepalen
+                // Online / Offline status indicator berekenen (actief in de afgelopen 5 minuten)
                 const lastSeenDate = new Date(user.last_seen);
                 const limit = new Date(Date.now() - 5 * 60 * 1000);
                 const dot = document.getElementById('view-status-dot');
@@ -592,22 +603,27 @@
                     dot.className = "status-dot-indicator offline";
                 }
 
-                // Check of de bezoeker naar zijn eigen profiel kijkt
+                // Controleer of de gebruiker naar zijn EIGEN profiel kijkt
                 const settingsBtn = document.getElementById('edit-settings-trigger');
                 if (username.toLowerCase() === activeUser.toLowerCase()) {
+                    // Toon de instellingen tandwiel-knop
                     settingsBtn.classList.remove('hidden');
-                    // Vul invoervelden alvast in
+                    // Zet de huidige database-waarden alvast klaar in de invoervelden van het bewerkscherm
                     document.getElementById('bio-textarea-input').value = user.bio || "";
                     document.getElementById('flair-select').value = user.flair || "";
                 } else {
+                    // Verberg de knop en sluit het paneel als je bij iemand anders kijkt
                     settingsBtn.classList.add('hidden');
                     document.getElementById('settings-panel').classList.add('hidden');
                 }
 
-            } catch(e) { console.error(e); }
+            } catch(err) { 
+                console.error("Fout bij inladen profiel:", err); 
+                alert("Could not load profile details: " + err.message);
+            }
         }
 
-        // SETTINGS OPSLAAN IN SUPABASE
+        // Slaat de gewijzigde Bio en Flair op in Supabase
         async function saveProfileSettings() {
             const username = localStorage.getItem('gcvm_db_session');
             const newBio = document.getElementById('bio-textarea-input').value;
@@ -616,6 +632,7 @@
             if (!username) return;
 
             try {
+                // Voer de update uit op de rij waar username gelijk is aan de actieve sessie
                 const { error } = await supabaseClient
                     .from('gcvm_users')
                     .update({ bio: newBio, flair: newFlair })
@@ -623,33 +640,48 @@
 
                 if (error) throw error;
 
+                // Geef visuele bevestiging dat het gelukt is
+                alert("Profile changes successfully saved to the cloud database!");
+                
+                // Sluit het bewerkingspaneel en herlaad de pagina-data direct live
                 toggleSettings();
                 loadProfileData(username);
             } catch (err) {
-                alert("Error saving settings: " + err.message);
+                alert("Failed to save changes: " + err.message);
+                console.error("Gedetailleerde database fout:", err);
             }
         }
 
+        // Start de zoekfunctie voor andere leden via de bovenste zoekbalk
         function searchOtherMember() {
             const name = document.getElementById('memberSearchField').value.trim();
             if (name) {
                 loadProfileData(name);
+            } else {
+                alert("Please enter a username to search!");
             }
         }
 
+        // Toont of verbergt het instellingenpaneel
         function toggleSettings() {
             const panel = document.getElementById('settings-panel');
             panel.classList.toggle('hidden');
         }
 
-        // --- SIDEBAR AUTH CODE ---
+        // --- AUTH & SIDEBAR LOGICA ---
         async function loginUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) return;
+            if (!username || !password) return alert("Fill in all fields!");
 
             try {
-                const { data: user, error } = await supabaseClient.from('gcvm_users').select('*').eq('username', username).eq('password', password).maybeSingle();
+                const { data: user, error } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .maybeSingle();
+                
                 if (error || !user) { alert("Invalid credentials!"); return; }
 
                 localStorage.setItem('gcvm_db_session', user.username);
@@ -661,13 +693,16 @@
         async function registerUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) return;
+            if (!username || !password) return alert("Fill in all fields!");
 
             try {
-                const { error } = await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', bio: 'Hello! I am a proud member of GC(V)M.', flair: '' }]);
+                const { error } = await supabaseClient
+                    .from('gcvm_users')
+                    .insert([{ username, password, role: 'user', bio: 'Hello! I am a proud member of GC(V)M.', flair: '' }]);
+                
                 if (error) throw error;
-                alert("Account created successfully!");
-            } catch (err) { alert(err.message); }
+                alert("Account created! You can now log in.");
+            } catch (err) { alert("Registration error: " + err.message); }
         }
 
         function showStyle(username, role) {
