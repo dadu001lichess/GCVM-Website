@@ -244,6 +244,18 @@
             margin: 30px 0;
         }
 
+        /* Nieuwe zoekbalk styling voor Admins */
+        .admin-search-bar {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            outline: none;
+        }
+
         .user-list-item {
             display: flex;
             justify-content: space-between;
@@ -252,6 +264,23 @@
             border-bottom: 1px solid #eee;
             font-size: 15px;
         }
+
+        .admin-btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pass-btn {
+            background-color: #f4b400;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .pass-btn:hover { background-color: #db9e00; }
 
         .ban-btn {
             background-color: #d93025;
@@ -263,6 +292,7 @@
             font-weight: 600;
             font-size: 13px;
         }
+        .ban-btn:hover { background-color: #b31412; }
 
         .hidden {
             display: none !important;
@@ -296,7 +326,7 @@
 
         <nav>
             <a href="index.html" class="active">Homepage</a>
-            <a href="Training.html">Training</a>
+            <a href="Profile.html">My Profile</a> <a href="Training.html">Training</a>
             <a href="Coaches.html">Coaches</a>
             <details>
               <summary>Shards currency ⌵</summary>
@@ -335,6 +365,9 @@
             <div id="admin-panel" class="admin-panel-box hidden">
                 <h3>GC(V)M Admin Control Panel</h3>
                 <p>Here you can manage registered users directly from the online Supabase database.</p>
+                
+                <input type="text" id="admin-search-input" class="admin-search-bar" placeholder="Search for users by name..." oninput="filterAdminUsers()">
+                
                 <div id="user-list-container"></div>
             </div>
 
@@ -344,20 +377,34 @@
     </main>
 
 <script>
-        // JOUW SUPABASE PROJECT GEGEVENS
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; // PLAK HIER JE VOLLEDIGE SLEUTEL
+        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
 
-        // Verbinding opstarten via een unieke variabele om crashes te voorkomen
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let cachedUsersList = []; // Onthoudt de lijst voor het filteren/zoeken
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
             const currentRole = localStorage.getItem('gcvm_db_role');
             if (currentSession) {
                 showStyle(currentSession, currentRole);
+                
+                // Houd de status live bij zolang ze op de homepage zijn
+                updateOnlineStatus(currentSession);
+                setInterval(() => updateOnlineStatus(currentSession), 60000);
             }
         };
+
+        // ZET LIVE TIJDSTEMPEL DAT GEBRUIKER ACTIEF IS
+        async function updateOnlineStatus(username) {
+            try {
+                await supabaseClient
+                    .from('gcvm_users')
+                    .update({ last_seen: new Date().toISOString() })
+                    .eq('username', username);
+            } catch(e) { console.error(e); }
+        }
 
         // REGISTREREN IN DE ONLINE DATABASE
         async function registerUser() {
@@ -370,7 +417,6 @@
             }
 
             try {
-                // Check of de gebruiker al in de online database bestaat
                 const { data: existingUser } = await supabaseClient
                     .from('gcvm_users')
                     .select('username')
@@ -382,10 +428,10 @@
                     return;
                 }
 
-                // Voeg toe aan de online database
+                // Standaard bio meegeven bij registratie
                 const { error } = await supabaseClient
                     .from('gcvm_users')
-                    .insert([{ username: username, password: password, role: 'user' }]);
+                    .insert([{ username: username, password: password, role: 'user', bio: 'Hello! I am a proud member of GC(V)M.' }]);
 
                 if (error) throw error;
 
@@ -428,6 +474,7 @@
                 localStorage.setItem('gcvm_db_role', user.role);
 
                 showStyle(user.username, user.role);
+                updateOnlineStatus(user.username);
             } catch (err) {
                 alert("Database error during login: " + err.message);
             }
@@ -454,22 +501,61 @@
 
                 if (error) throw error;
 
-                const container = document.getElementById('user-list-container');
-                container.innerHTML = "";
-
-                users.forEach(user => {
-                    if (user.role === 'admin') return;
-
-                    const div = document.createElement('div');
-                    div.className = "user-list-item";
-                    div.innerHTML = `
-                        <span><strong>${user.username}</strong></span>
-                        <button class="ban-btn" onclick="banUser('${user.username}')">Delete/Ban</button>
-                    `;
-                    container.appendChild(div);
-                });
+                cachedUsersList = users; // Sla op in het geheugen voor de zoekfunctie
+                displayFilteredUsers(cachedUsersList);
             } catch (err) {
                 console.error("Could not load users:", err);
+            }
+        }
+
+        // BIJGEWERKTE FUNCTIE OM GEBRUIKERS EN EXTRA ADMINACTIES TE TONEN
+        function displayFilteredUsers(usersArray) {
+            const container = document.getElementById('user-list-container');
+            container.innerHTML = "";
+
+            usersArray.forEach(user => {
+                if (user.role === 'admin') return; // Admins kunnen elkaar niet aanpassen
+
+                const div = document.createElement('div');
+                div.className = "user-list-item";
+                div.innerHTML = `
+                    <span><strong>${user.username}</strong></span>
+                    <div class="admin-btn-group">
+                        <button class="pass-btn" onclick="changeUserPassword('${user.username}')">Change Password</button>
+                        <button class="ban-btn" onclick="banUser('${user.username}')">Delete/Ban</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // HANDELT HET REALTIME ZOEKEN IN HET ADMIN PANEL AF
+        function filterAdminUsers() {
+            const searchTerm = document.getElementById('admin-search-input').value.toLowerCase().trim();
+            const filtered = cachedUsersList.filter(user => user.username.toLowerCase().includes(searchTerm));
+            displayFilteredUsers(filtered);
+        }
+
+        // NIEUW: WACHTWOORD VEILIG RESETTEN VAN EEN LID (Privacy proof: oude wachtwoord is onzichtbaar)
+        async function changeUserPassword(targetUsername) {
+            const newPassword = prompt(`Enter a new password for ${targetUsername}:\n(Privacy notice: The current password cannot be seen)`);
+            
+            if (newPassword === null) return; // Klikte op annuleren
+            if (newPassword.trim() === "") {
+                alert("Password cannot be blank!");
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('gcvm_users')
+                    .update({ password: newPassword.trim() })
+                    .eq('username', targetUsername);
+
+                if (error) throw error;
+                alert(`Password for ${targetUsername} has been successfully updated.`);
+            } catch (err) {
+                alert("Failed to update password: " + err.message);
             }
         }
 
