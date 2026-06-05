@@ -33,239 +33,351 @@
             top: 0;
         }
 
-        .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
-
-        nav a {
-            display: block;
-            color: #bdc1c6;
-            text-decoration: none;
-            padding: 12px 0;
-            font-size: 15px;
-            font-weight: 400;
-            transition: color 0.2s;
+        .logo {
+            color: white;
+            font-size: 22px;
+            font-weight: 300;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
         }
+
+        /* exact dezelfde auth styling als index.html */
+        .auth-container { margin-bottom: 25px; }
+        .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
+        .auth-input {
+            width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px;
+            background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none;
+        }
+        .auth-input::placeholder { color: #80868b; }
+        .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
+        .auth-btn {
+            flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; text-align: center; transition: background-color 0.2s;
+        }
+        .auth-btn:hover { background-color: #1557b0; }
+        .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
+        .auth-btn.secondary:hover { background-color: #4f5357; color: white; }
+        .user-info { color: #bdc1c6; font-size: 14px; line-height: 1.4; }
+        .user-info strong { color: #8ab4f8; font-size: 15px; }
+        .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
+        .logout-link { display: inline-block; color: #f28b82; text-decoration: none; font-size: 12px; margin-top: 8px; cursor: pointer; }
+        .logout-link:hover { text-decoration: underline; }
+
+        nav { border-top: 1px solid #3c4043; padding-top: 15px; }
+        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; font-weight: 400; transition: color 0.2s; }
         nav a:hover, nav a.active { color: #8ab4f8; }
+        summary { list-style: none; color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; outline: none; }
+        summary::-webkit-details-marker { display: none; }
+        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; margin-bottom: 10px; }
+        .sub-menu a { font-size: 14px; padding: 8px 0; }
 
         main {
             margin-left: 280px; 
             width: calc(100% - 280px);
             min-height: 100vh;
-            padding: 40px;
+            padding: 60px 40px;
             box-sizing: border-box;
         }
 
-        .lobby-container, .game-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-        }
+        /* Lobby & Match layouts */
+        .lobby-container, .game-container { max-width: 800px; margin: 0 auto; }
+        .btn { padding: 10px 20px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
         .btn:hover { background-color: #1557b0; }
-
-        .lobby-list {
-            margin-top: 20px;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            padding: 15px;
-            background-color: #f8f9fa;
-        }
-
-        .lobby-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        #my-board {
-            width: 400px;
-            margin: 20px 0;
-        }
-
-        .hidden { display: none !important; }
+        .lobby-list { margin-top: 20px; border: 1px solid #dadce0; border-radius: 8px; padding: 15px; background-color: #f8f9fa; }
+        .lobby-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
         
-        .game-status {
-            font-weight: 600;
-            margin-top: 10px;
-            color: #3c4043;
-        }
+        .setup-box { background-color: #f8f9fa; border: 1px solid #dadce0; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        .select-style { padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #dadce0; margin-right: 10px; }
+
+        #my-board { width: 400px; margin: 20px 0; }
+        .clocks-container { display: flex; gap: 40px; margin-bottom: 15px; font-size: 18px; font-weight: 600; }
+        .clock { background: #f1f3f4; padding: 8px 16px; border-radius: 4px; border: 1px solid #dadce0; }
+        .clock.active-turn { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <aside>
         <div class="logo">GC(V)M</div>
+        
+        <div class="auth-container">
+            <div id="login-section" class="auth-input-group">
+                <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
+                <input type="password" id="password-input" class="auth-input" placeholder="Password...">
+                <div class="auth-btn-container">
+                    <button class="auth-btn" onclick="loginUser()">Login</button>
+                    <button class="auth-btn secondary" onclick="registerUser()">Register</button>
+                </div>
+            </div>
+            
+            <div id="profile-section" class="hidden">
+                <div class="user-info">
+                    Logged in as:<br>
+                    <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
+                    <span class="logout-link" onclick="logoutUser()">Log out</span>
+                </div>
+            </div>
+        </div>
+
         <nav>
             <a href="index.html">Homepage</a>
             <a href="play.html" class="active">Play Game</a>
             <a href="profileview.html">Profile</a>
-            </nav>
+            <a href="Training.html">Training</a>
+            <a href="Coaches.html">Coaches</a>
+            <details>
+              <summary>Shards currency ⌵</summary>
+              <div class="sub-menu">
+                <a href="Shardsintro.html">How to get Shards?</a>
+                <a href="Daily puzzle.html">Daily puzzle</a>
+                <a href="Shards shop.html">Shards shop</a>
+              </div>
+            </details>
+            <a href="Current games.html">Current games</a>
+            <a href="GoTM.html">Game of the month</a>
+            <a href="Jobs.html">Special mentions/Jobs</a>
+            <details>
+              <summary>Updates/News ⌵</summary>
+              <div class="sub-menu">
+                <a href="Updates.html">Updates</a>
+                <a href="News.html">Newspaper</a>
+              </div>    
+            </details>
+            <details>
+              <summary>Community ⌵</summary>
+              <div class="sub-menu">
+                <a href="Leaders.html">Mods/Leaders</a>
+                <a href="Contact.html">Contact</a>
+                <a href="MoTM.html">MoTM</a>
+              </div>    
+            </details>
+        </nav>
     </aside>
 
     <main>
         <div id="lobby-view" class="lobby-container">
             <h2>GC(V)M Live Schaaklobby</h2>
-            <p id="welcome-msg">Laden...</p>
             
-            <button class="btn" onclick="createNewChallenge()">🔥 Start een nieuwe uitdaging</button>
+            <div id="lobby-auth-must" class="setup-box" style="background-color: #fce8e6; border-color: #f28b82;">
+                ⚠️ Je moet eerst aan de linkerkant inloggen om uitdagingen te maken of te accepteren!
+            </div>
+
+            <div id="lobby-controls" class="setup-box hidden">
+                <h3>Kies je tijdcontrole</h3>
+                <select id="time-control-select" class="select-style">
+                    <option value="3+2">Blitz (3 min + 2s inc)</option>
+                    <option value="5+0">Blitz (5 min)</option>
+                    <option value="10+0" selected>Rapid (10 min)</option>
+                    <option value="15+10">Rapid (15 min + 10s inc)</option>
+                </select>
+                <button class="btn" onclick="createNewChallenge()">🔥 Nieuwe uitdaging plaatsen</button>
+            </div>
 
             <div class="lobby-list">
                 <h3>Openstaande uitdagingen</h3>
-                <div id="challenges-list">Geen actieve uitdagingen. Start er zelf een!</div>
+                <div id="challenges-list">Geen actieve uitdagingen beschikbaar.</div>
             </div>
         </div>
 
         <div id="game-view" class="game-container hidden">
-            <h2>Wedstrijd aan de gang</h2>
+            <h2>Wedstrijd aan de gang (<span id="match-time-label">10+0</span>)</h2>
             <p id="players-info">Wit: ... vs Zwart: ...</p>
             
+            <div class="clocks-container">
+                <div id="white-clock-box" class="clock">Wit: <span id="white-time-display">--:--</span></div>
+                <div id="black-clock-box" class="clock">Zwart: <span id="black-time-display">--:--</span></div>
+            </div>
+
             <div id="my-board"></div>
             
-            <p id="turn-indicator" class="game-status">Laden van spelstatus...</p>
-            <button class="btn" style="background-color: #d93025;" onclick="leaveGame()">Spel Verlaten</button>
+            <p id="turn-indicator" style="font-weight: 600; color: #202124;">Laden...</p>
+            <button class="btn" style="background-color: #d93025;" onclick="leaveGame()">Lobby verlaten</button>
         </div>
     </main>
 
     <script>
-        // Jouw Supabase configuratie (overgenomen uit je index.html)
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentUser = localStorage.getItem('gcvm_db_session');
+        let currentUser = null;
         let currentGameId = null;
         let myColor = null;
         let board = null;
         let game = new Chess();
         let gameSubscription = null;
+        let clockInterval = null;
+
+        let whiteTimeLeft = 0;
+        let blackTimeLeft = 0;
 
         window.onload = function() {
-            if (!currentUser) {
-                document.getElementById('welcome-msg').innerHTML = "⚠️ Je moet ingelogd zijn op de <a href='index.html'>Homepage</a> om te kunnen spelen.";
-                return;
+            const currentSession = localStorage.getItem('gcvm_db_session');
+            const currentRole = localStorage.getItem('gcvm_db_role');
+            if (currentSession) {
+                showStyle(currentSession, currentRole);
+                updateOnlineStatus(currentSession);
+                setInterval(() => updateOnlineStatus(currentSession), 60000);
             }
-            document.getElementById('welcome-msg').innerText = `Ingelogd als: ${currentUser}. Daag iemand uit of accepteer een uitdaging!`;
-            
             loadLobby();
             listenToLobby();
         };
 
-        // 1. LOBBY LOGICA: Laad alle open uitdagingen
-        async function loadLobby() {
-            const { data, error } = await supabaseClient
-                .from('gcvm_games')
-                .select('*')
-                .eq('status', 'waiting');
+        // --- AUTHENTICATIE LOGICA DIRECT UIT INDEX.HTML ---
+        async function updateOnlineStatus(username) {
+            try {
+                await supabaseClient.from('gcvm_users').update({ last_seen: new Date().toISOString() }).eq('username', username);
+            } catch(e) { console.error(e); }
+        }
 
-            if (error) return console.error(error);
-            displayChallenges(data);
+        async function registerUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+            if (!username || !password) { alert("Please fill in both fields!"); return; }
+            try {
+                const { data: existingUser } = await supabaseClient.from('gcvm_users').select('username').eq('username', username).maybeSingle();
+                if (existingUser) { alert("This username is already registered online!"); return; }
+                const { error } = await supabaseClient.from('gcvm_users').insert([{ username: username, password: password, role: 'user', bio: 'Hello!' }]);
+                if (error) throw error;
+                alert("Account created! You can now log in.");
+                document.getElementById('password-input').value = "";
+            } catch (err) { alert("Error: " + err.message); }
+        }
+
+        async function loginUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+            if (!username || !password) { alert("Please fill in both fields!"); return; }
+            try {
+                const { data: user, error } = await supabaseClient.from('gcvm_users').select('*').eq('username', username).eq('password', password).maybeSingle();
+                if (error || !user) { alert("Invalid username or password!"); return; }
+                if (user.is_banned) { alert("This account is banned."); return; }
+                localStorage.setItem('gcvm_db_session', user.username);
+                localStorage.setItem('gcvm_db_role', user.role);
+                showStyle(user.username, user.role);
+                updateOnlineStatus(user.username);
+                window.location.reload();
+            } catch (err) { alert("Error: " + err.message); }
+        }
+
+        function showStyle(username, role) {
+            currentUser = username;
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('profile-section').classList.remove('hidden');
+            document.getElementById('displayed-username').innerText = username;
+            if (role === 'admin') { document.getElementById('admin-badge').classList.remove('hidden'); }
+            
+            document.getElementById('lobby-auth-must').classList.add('hidden');
+            document.getElementById('lobby-controls').classList.remove('hidden');
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('gcvm_db_session');
+            localStorage.removeItem('gcvm_db_role');
+            window.location.reload();
+        }
+
+        // --- MULTIPLAYER SCHAAK & LOBBY LOGICA ---
+        async function loadLobby() {
+            const { data, error } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
+            if (!error) displayChallenges(data);
         }
 
         function displayChallenges(games) {
             const container = document.getElementById('challenges-list');
             container.innerHTML = "";
-
-            if (games.length === 0) {
-                container.innerHTML = "Geen actieve uitdagingen. Start er zelf een!";
-                return;
-            }
+            if (games.length === 0) { container.innerHTML = "Geen actieve uitdagingen beschikbaar."; return; }
 
             games.forEach(g => {
                 const div = document.createElement('div');
                 div.className = "lobby-item";
+                const isMine = g.white_player === currentUser;
                 div.innerHTML = `
-                    <span>Uitdaging van <strong>${g.white_player}</strong></span>
-                    ${g.white_player !== currentUser ? `<button class="btn" onclick="joinGame('${g.id}')">Speel mee</button>` : `<span>(Wachten...)</span>`}
+                    <span>Uitdaging van <strong>${g.white_player}</strong> (${g.time_control})</span>
+                    ${(!isMine && currentUser) ? `<button class="btn" onclick="joinGame('${g.id}')">Speel mee</button>` : isMine ? `<span>(Wachten...)</span>` : `<span>(Log in om te spelen)</span>`}
                 `;
                 container.appendChild(div);
             });
         }
 
-        // Luister live naar wijzigingen in de lobby
         function listenToLobby() {
-            supabaseClient
-                .channel('public:gcvm_games')
-                .on('postgres_changes', { event: '*', filter: 'status=eq.waiting', table: 'gcvm_games', schema: 'public' }, () => {
-                    loadLobby();
-                })
-                .subscribe();
+            supabaseClient.channel('public:gcvm_games').on('postgres_changes', { event: '*', filter: 'status=eq.waiting', table: 'gcvm_games', schema: 'public' }, () => {
+                loadLobby();
+            }).subscribe();
         }
 
-        // Maak een uitdaging aan (Jij bent wit)
         async function createNewChallenge() {
-            const { data, error } = await supabaseClient
-                .from('gcvm_games')
-                .insert([{ white_player: currentUser, status: 'waiting' }])
-                .select()
-                .single();
+            const tc = document.getElementById('time-control-select').value;
+            const baseMinutes = parseInt(tc.split('+')[0]);
+            const startSeconds = baseMinutes * 60;
 
-            if (error) return alert("Fout bij aanmaken uitdaging: " + error.message);
-            
-            // Luister of iemand JOUW uitdaging accepteert
+            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ 
+                white_player: currentUser, 
+                status: 'waiting',
+                time_control: tc,
+                white_time: startSeconds,
+                black_time: startSeconds
+            }]).select().single();
+
+            if (error) return alert(error.message);
             currentGameId = data.id;
             myColor = 'w';
-            
-            // Abonneer op dit specifieke spel om te zien wanneer de status verandert naar 'playing'
             listenToSpecificGame(data.id);
-            alert("Uitdaging aangemaakt! Wacht tot een tegenstander meedoet...");
+            alert("Uitdaging geplaatst! Wacht tot iemand op 'Speel mee' klikt...");
         }
 
-        // Accepteer een uitdaging van een ander (Jij bent zwart)
         async function joinGame(gameId) {
-            const { data, error } = await supabaseClient
-                .from('gcvm_games')
-                .update({ black_player: currentUser, status: 'playing' })
-                .eq('id', gameId)
-                .select()
-                .single();
+            const { data: checkGame } = await supabaseClient.from('gcvm_games').select('*').eq('id', gameId).single();
+            const baseMinutes = parseInt(checkGame.time_control.split('+')[0]);
+            const startSeconds = baseMinutes * 60;
 
-            if (error) return alert("Kon niet deelnemen: " + error.message);
-            
+            const { data, error } = await supabaseClient.from('gcvm_games').update({ 
+                black_player: currentUser, 
+                status: 'playing',
+                last_move_at: new Date().toISOString(),
+                white_time: startSeconds,
+                black_time: startSeconds
+            }).eq('id', gameId).select().single();
+
+            if (error) return alert("Helaas, de uitdaging is niet meer beschikbaar.");
             myColor = 'b';
             initGame(data);
         }
 
-        // Luister live naar updates binnen een lopend spel
         function listenToSpecificGame(gameId) {
             if (gameSubscription) gameSubscription.unsubscribe();
-
-            gameSubscription = supabaseClient
-                .channel(`game:${gameId}`)
-                .on('postgres_changes', { event: 'UPDATE', filter: `id=eq.${gameId}`, table: 'gcvm_games', schema: 'public' }, (payload) => {
-                    const updatedGame = payload.new;
-                    
-                    // Als de status 'playing' wordt en we zitten nog in de lobby, start het spel
-                    if (updatedGame.status === 'playing' && document.getElementById('game-view').classList.contains('hidden')) {
-                        initGame(updatedGame);
-                    } else if (updatedGame.status === 'playing') {
-                        // Update de bordpositie op basis van de zet van de tegenstander
+            gameSubscription = supabaseClient.channel(`game:${gameId}`).on('postgres_changes', { event: 'UPDATE', filter: `id=eq.${gameId}`, table: 'gcvm_games', schema: 'public' }, (payload) => {
+                const updatedGame = payload.new;
+                if (updatedGame.status === 'playing' && document.getElementById('game-view').classList.contains('hidden')) {
+                    initGame(updatedGame);
+                } else if (updatedGame.status === 'playing') {
+                    // Update bord als tegenstander een zet deed
+                    if(updatedGame.fen !== game.fen()) {
                         game.load(updatedGame.fen);
                         board.position(updatedGame.fen);
-                        updateTurnIndicator();
                     }
-                })
-                .subscribe();
+                    whiteTimeLeft = updatedGame.white_time;
+                    blackTimeLeft = updatedGame.black_time;
+                    updateClockDisplays();
+                    updateTurnIndicator();
+                }
+            }).subscribe();
         }
 
-        // 2. IN-GAME LOGICA: Start het schaakspel en initialiseer het bord
         function initGame(gameData) {
             currentGameId = gameData.id;
             document.getElementById('lobby-view').classList.add('hidden');
             document.getElementById('game-view').classList.remove('hidden');
+            document.getElementById('match-time-label').innerText = gameData.time_control;
             document.getElementById('players-info').innerText = `Wit: ${gameData.white_player} vs Zwart: ${gameData.black_player}`;
             
             game.load(gameData.fen);
+            whiteTimeLeft = gameData.white_time;
+            blackTimeLeft = gameData.black_time;
+            updateClockDisplays();
 
-            // Configureer het visuele Chessboard.js bord
             const config = {
                 draggable: true,
                 position: gameData.fen,
@@ -273,68 +385,102 @@
                 onDragStart: onDragStart,
                 onDrop: onDrop
             };
-            
             board = Chessboard('my-board', config);
             updateTurnIndicator();
-            
-            // Zorg dat de wit-speler ook luistert naar updates
-            if (myColor === 'w') {
-                listenToSpecificGame(currentGameId);
-            }
+            startLocalClock();
+
+            if (myColor === 'w') listenToSpecificGame(currentGameId);
         }
 
-        // Voorkom dat je stukken sleept als het niet jouw beurt is of als het spel voorbij is
-        function onDragStart (source, piece, position, orientation) {
+        function onDragStart (source, piece) {
             if (game.game_over()) return false;
-
-            // Je mag alleen je eigen kleur verplaatsen
-            if ((myColor === 'w' && piece.search(/^b/) !== -1) ||
-                (myColor === 'b' && piece.search(/^w/) !== -1)) {
-                return false;
-            }
-
-            // Je mag alleen slepen als je aan de beurt bent
-            if ((game.turn() === 'w' && myColor !== 'w') || (game.turn() === 'b' && myColor !== 'b')) {
-                return false;
-            }
+            if ((myColor === 'w' && piece.search(/^b/) !== -1) || (myColor === 'b' && piece.search(/^w/) !== -1)) return false;
+            if ((game.turn() === 'w' && myColor !== 'w') || (game.turn() === 'b' && myColor !== 'b')) return false;
         }
 
-        // Wanneer een stuk wordt losgelaten (een zet wordt gedaan)
-        function onDrop (source, target) {
-            // Controleer of de zet volgens de schaakregels mag
-            const move = game.move({
-                from: source,
-                to: target,
-                promotion: 'q' // Promoveer automatisch naar een Koningin voor de simpelheid
-            });
-
-            // Illegale zet
+        async function onDrop (source, target) {
+            const currentTurnBeforeMove = game.turn();
+            const move = game.move({ from: source, to: target, promotion: 'q' });
             if (move === null) return 'snapback';
 
-            // Legale zet! Update direct in Supabase
-            updateGameDatabase(game.fen());
-            updateTurnIndicator();
-        }
+            // Bereken increment indien van toepassing
+            const tc = document.getElementById('match-time-label').innerText;
+            const increment = parseInt(tc.split('+')[1]) || 0;
 
-        // Stuur de nieuwe FEN (bordpositie) naar Supabase
-        async function updateGameDatabase(newFen) {
-            await supabaseClient
-                .from('gcvm_games')
-                .update({ fen: newFen })
-                .eq('id', currentGameId);
+            if (currentTurnBeforeMove === 'w' && myColor === 'w') whiteTimeLeft += increment;
+            if (currentTurnBeforeMove === 'b' && myColor === 'b') blackTimeLeft += increment;
+
+            updateClockDisplays();
+            updateTurnIndicator();
+
+            // Sync naar de database
+            await supabaseClient.from('gcvm_games').update({ 
+                fen: game.fen(),
+                white_time: whiteTimeLeft,
+                black_time: blackTimeLeft,
+                last_move_at: new Date().toISOString()
+            }).eq('id', currentGameId);
         }
 
         function updateTurnIndicator() {
+            const turnBoxW = document.getElementById('white-clock-box');
+            const turnBoxB = document.getElementById('black-clock-box');
+            
             if (game.game_over()) {
-                document.getElementById('turn-indicator').innerText = "Game Over!";
+                document.getElementById('turn-indicator').innerText = "Game Over! Remise of mat.";
+                clearInterval(clockInterval);
                 return;
             }
-            const turn = game.turn() === 'w' ? 'Wit' : 'Zwart';
-            document.getElementById('turn-indicator').innerText = `Beurt: ${turn}`;
+
+            if (game.turn() === 'w') {
+                turnBoxW.classList.add('active-turn');
+                turnBoxB.classList.remove('active-turn');
+                document.getElementById('turn-indicator').innerText = "Beurt: Wit";
+            } else {
+                turnBoxB.classList.add('active-turn');
+                turnBoxW.classList.remove('active-turn');
+                document.getElementById('turn-indicator').innerText = "Beurt: Zwart";
+            }
+        }
+
+        // --- KLOK LOGICA (AFTELLEN) ---
+        function startLocalClock() {
+            if (clockInterval) clearInterval(clockInterval);
+            clockInterval = setInterval(() => {
+                if (game.game_over()) return;
+
+                if (game.turn() === 'w') {
+                    if (whiteTimeLeft > 0) whiteTimeLeft--;
+                    else handleTimeOut('w');
+                } else {
+                    if (blackTimeLeft > 0) blackTimeLeft--;
+                    else handleTimeOut('b');
+                }
+                updateClockDisplays();
+            }, 1000);
+        }
+
+        function updateClockDisplays() {
+            document.getElementById('white-time-display').innerText = formatTime(whiteTimeLeft);
+            document.getElementById('black-time-display').innerText = formatTime(blackTimeLeft);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        async function handleTimeOut(loserColor) {
+            clearInterval(clockInterval);
+            const statusText = loserColor === 'w' ? 'black_won' : 'white_won';
+            document.getElementById('turn-indicator').innerText = `Tijd is op! ${loserColor === 'w' ? 'Zwart' : 'Wit'} wint op tijd.`;
+            await supabaseClient.from('gcvm_games').update({ status: statusText }).eq('id', currentGameId);
         }
 
         function leaveGame() {
             if (gameSubscription) gameSubscription.unsubscribe();
+            if (clockInterval) clearInterval(clockInterval);
             document.getElementById('game-view').classList.add('hidden');
             document.getElementById('lobby-view').classList.remove('hidden');
             loadLobby();
