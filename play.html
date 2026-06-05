@@ -82,18 +82,24 @@
         .lobby-container, .game-container { max-width: 800px; margin: 0 auto; }
         .btn { padding: 10px 20px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
         .btn:hover { background-color: #1557b0; }
+        .btn.secondary-action { background-color: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; margin-right: 8px; }
+        .btn.secondary-action:hover { background-color: #e8eaed; }
+        .btn.danger-action { background-color: #d93025; color: white; margin-right: 8px; }
+        .btn.danger-action:hover { background-color: #b31412; }
+        
         .lobby-list { margin-top: 20px; border: 1px solid #dadce0; border-radius: 8px; padding: 15px; background-color: #f8f9fa; }
         .lobby-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
         
         .setup-box { background-color: #f8f9fa; border: 1px solid #dadce0; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
         .select-style { padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #dadce0; margin-right: 10px; }
 
-        /* Chessboard custom layout styles */
+        /* Chessboard layout elements */
         #my-board { width: 450px; margin: 20px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
         .clocks-container { display: flex; gap: 40px; margin-bottom: 15px; font-size: 18px; font-weight: 600; }
         .clock { background: #f1f3f4; padding: 8px 16px; border-radius: 4px; border: 1px solid #dadce0; }
         .clock.active-turn { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
         
+        .game-controls { margin-top: 15px; display: flex; align-items: center; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -161,12 +167,12 @@
             <h2>GC(V)M Live Chess Lobby</h2>
             
             <div id="lobby-auth-must" class="setup-box" style="background-color: #fce8e6; border-color: #f28b82;">
-                ⚠️ You must log in using the panel on the left sidebar before creating or accepting chess challenges!
+                ⚠️ You must log in on the left panel before creating or joining challenges!
             </div>
 
             <div id="resume-box" class="setup-box hidden" style="background-color: #e6f4ea; border-color: #34a853;">
                 <h3 style="color: #137333; margin-top: 0;">🔄 Active Match Detected!</h3>
-                <p>You have an ongoing live match in progress right now.</p>
+                <p>You have an ongoing game running in the cloud database right now.</p>
                 <button class="btn" style="background-color: #34a853;" onclick="resumeActiveMatch()">Back to Game</button>
             </div>
 
@@ -184,7 +190,7 @@
 
             <div class="lobby-list">
                 <h3>Open Challenges</h3>
-                <div id="challenges-list">No active challenges available. Post one above!</div>
+                <div id="challenges-list">No active challenges available.</div>
             </div>
         </div>
 
@@ -199,8 +205,14 @@
 
             <div id="my-board"></div>
             
-            <p id="turn-indicator" style="font-weight: 600; color: #202124;">Loading match layout...</p>
-            <button class="btn" style="background-color: #d93025;" onclick="leaveGame()">Return to Lobby</button>
+            <p id="turn-indicator" style="font-weight: 600; color: #202124;">Loading match...</p>
+            
+            <div class="game-controls">
+                <button id="resign-btn" class="btn danger-action" onclick="resignMatch()">Resign</button>
+                <button id="draw-btn" class="btn secondary-action" onclick="offerDraw()">Offer Draw</button>
+                <button id="accept-draw-btn" class="btn hidden" style="background-color: #f4b400; color: white; margin-right: 8px;" onclick="acceptDraw()">Accept Draw Offer</button>
+                <button id="exit-btn" class="btn secondary-action" onclick="leaveGame()">Lobby / Exit Screen</button>
+            </div>
         </div>
     </main>
 
@@ -219,7 +231,7 @@
 
         let whiteTimeLeft = 0;
         let blackTimeLeft = 0;
-        let activeMatchData = null; // Caches an active match if one is found
+        let activeMatchData = null;
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
@@ -234,7 +246,7 @@
             listenToLobby();
         };
 
-        // --- ACCOUNT AUTHENTICATION LOGIC ---
+        // --- ACCOUNT AUTHENTICATION ---
         async function updateOnlineStatus(username) {
             try {
                 await supabaseClient.from('gcvm_users').update({ last_seen: new Date().toISOString() }).eq('username', username);
@@ -262,7 +274,6 @@
             try {
                 const { data: user, error } = await supabaseClient.from('gcvm_users').select('*').eq('username', username).eq('password', password).maybeSingle();
                 if (error || !user) { alert("Invalid username or password!"); return; }
-                if (user.is_banned) { alert("This account is banned."); return; }
                 localStorage.setItem('gcvm_db_session', user.username);
                 localStorage.setItem('gcvm_db_role', user.role);
                 showStyle(user.username, user.role);
@@ -276,7 +287,6 @@
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('profile-section').classList.remove('hidden');
             document.getElementById('displayed-username').innerText = username;
-            if (role === 'admin') { document.getElementById('admin-badge').classList.remove('hidden'); }
             
             document.getElementById('lobby-auth-must').classList.add('hidden');
             document.getElementById('lobby-controls').classList.remove('hidden');
@@ -288,11 +298,9 @@
             window.location.reload();
         }
 
-        // --- RECOVERY LOGIC (BACK TO GAME FEATURE) ---
+        // --- ACCOUNT RECOVERY (BACK TO GAME) ---
         async function checkForOngoingGames() {
             if (!currentUser) return;
-            
-            // Look for any game in progress where the logged-in user is playing
             const { data, error } = await supabaseClient
                 .from('gcvm_games')
                 .select('*')
@@ -314,7 +322,7 @@
             initGame(activeMatchData);
         }
 
-        // --- LOBBY PAIRING MATCHMAKING ---
+        // --- LOBBY MATCHMAKING ---
         async function loadLobby() {
             const { data, error } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
             if (!error) {
@@ -326,7 +334,6 @@
         function checkMyActiveChallenges(games) {
             if (!currentUser) return;
             const hasActive = games.some(g => g.white_player === currentUser);
-            
             if (hasActive) {
                 document.getElementById('create-challenge-btn').disabled = true;
                 document.getElementById('create-challenge-btn').style.opacity = "0.5";
@@ -341,7 +348,7 @@
         function displayChallenges(games) {
             const container = document.getElementById('challenges-list');
             container.innerHTML = "";
-            if (games.length === 0) { container.innerHTML = "No active challenges available right now."; return; }
+            if (games.length === 0) { container.innerHTML = "No active challenges available."; return; }
 
             games.forEach(g => {
                 const div = document.createElement('div');
@@ -363,7 +370,6 @@
 
         async function createNewChallenge() {
             if (document.getElementById('create-challenge-btn').disabled) return;
-
             const tc = document.getElementById('time-control-select').value;
             const baseMinutes = parseInt(tc.split('+')[0]);
             const startSeconds = baseMinutes * 60;
@@ -418,28 +424,62 @@
                     return;
                 }
 
-                if (updatedGame.status === 'playing' && document.getElementById('game-view').classList.contains('hidden')) {
-                    initGame(updatedGame);
-                } else if (updatedGame.status === 'playing') {
-                    if(updatedGame.fen !== game.fen()) {
+                if (updatedGame.status === 'playing') {
+                    if (document.getElementById('game-view').classList.contains('hidden')) {
+                        initGame(updatedGame);
+                        return;
+                    }
+                    
+                    if (updatedGame.fen !== game.fen()) {
                         game.load(updatedGame.fen);
                         board.position(updatedGame.fen);
                     }
+                    
+                    // --- REALTIME BACK-FROM-AFK TIME ADJUSTMENT ---
                     whiteTimeLeft = updatedGame.white_time;
                     blackTimeLeft = updatedGame.black_time;
+                    adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
+                    
+                    // Handle incoming draw offers
+                    if (updatedGame.draw_offer && updatedGame.draw_offer !== myColor) {
+                        document.getElementById('accept-draw-btn').classList.remove('hidden');
+                    } else if (!updatedGame.draw_offer) {
+                        document.getElementById('accept-draw-btn').classList.add('hidden');
+                    }
+                    
                     updateClockDisplays();
                     updateTurnIndicator();
                 } else if (updatedGame.status.endsWith('_won') || updatedGame.status === 'draw') {
-                    // Match concluded over database update
-                    game.load(updatedGame.fen);
-                    board.position(updatedGame.fen);
                     clearInterval(clockInterval);
+                    if (board) {
+                        game.load(updatedGame.fen);
+                        board.position(updatedGame.fen);
+                    }
                     displayGameEndMessage(updatedGame.status);
                 }
             }).subscribe();
         }
 
-        // --- LIVE IN-GAME ACTIONS & TIMERS ---
+        // --- CLOCK DRIFT RECOVERY FUNCTION ---
+        function adjustTimeForPassedLapse(lastMoveAtIso, currentFen) {
+            if (!lastMoveAtIso) return;
+            const tempGame = new Chess(currentFen);
+            const activeTurn = tempGame.turn(); // 'w' or 'b'
+            
+            const lastMoveTime = new Date(lastMoveAtIso).getTime();
+            const nowTime = new Date().getTime();
+            const elapsedSeconds = Math.floor((nowTime - lastMoveTime) / 1000);
+            
+            if (elapsedSeconds > 0) {
+                if (activeTurn === 'w') {
+                    whiteTimeLeft = Math.max(0, whiteTimeLeft - elapsedSeconds);
+                } else {
+                    blackTimeLeft = Math.max(0, blackTimeLeft - elapsedSeconds);
+                }
+            }
+        }
+
+        // --- IN-GAME ACTIONS & INTERFACE ---
         function initGame(gameData) {
             currentGameId = gameData.id;
             document.getElementById('lobby-view').classList.add('hidden');
@@ -450,6 +490,9 @@
             game.load(gameData.fen);
             whiteTimeLeft = gameData.white_time;
             blackTimeLeft = gameData.black_time;
+            
+            // Adjust calculations right upon reload/entry
+            adjustTimeForPassedLapse(gameData.last_move_at, gameData.fen);
             updateClockDisplays();
 
             const config = {
@@ -462,6 +505,13 @@
             };
             board = Chessboard('my-board', config);
             
+            // Check draw UI status
+            if (gameData.draw_offer && gameData.draw_offer !== myColor) {
+                document.getElementById('accept-draw-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('accept-draw-btn').classList.add('hidden');
+            }
+
             if (gameData.status.endsWith('_won') || gameData.status === 'draw') {
                 displayGameEndMessage(gameData.status);
             } else {
@@ -505,11 +555,48 @@
                 updateTurnIndicator();
             }
 
+            // A move removes previous unhandled draw offers
             await supabaseClient.from('gcvm_games').update({ 
                 fen: game.fen(),
                 white_time: whiteTimeLeft,
                 black_time: blackTimeLeft,
                 status: gameStatusUpdate,
+                draw_offer: null, 
+                last_move_at: new Date().toISOString()
+            }).eq('id', currentGameId);
+        }
+
+        // --- NEW FEATURES: RESIGN & DRAW SYSTEM ---
+        async function resignMatch() {
+            if (!currentGameId || game.game_over()) return;
+            if (!confirm("Are you sure you want to resign this game?")) return;
+
+            clearInterval(clockInterval);
+            const statusText = (myColor === 'w') ? 'black_won' : 'white_won';
+            displayGameEndMessage(statusText);
+
+            await supabaseClient.from('gcvm_games').update({ 
+                status: statusText,
+                last_move_at: new Date().toISOString()
+            }).eq('id', currentGameId);
+        }
+
+        async function offerDraw() {
+            if (!currentGameId || game.game_over()) return;
+            alert("Draw offer submitted to your opponent!");
+            await supabaseClient.from('gcvm_games').update({ 
+                draw_offer: myColor 
+            }).eq('id', currentGameId);
+        }
+
+        async function acceptDraw() {
+            if (!currentGameId || game.game_over()) return;
+            clearInterval(clockInterval);
+            displayGameEndMessage('draw');
+            
+            await supabaseClient.from('gcvm_games').update({ 
+                status: 'draw',
+                draw_offer: null,
                 last_move_at: new Date().toISOString()
             }).eq('id', currentGameId);
         }
@@ -538,6 +625,9 @@
             document.getElementById('turn-indicator').innerText = msg;
             document.getElementById('white-clock-box').classList.remove('active-turn');
             document.getElementById('black-clock-box').classList.remove('active-turn');
+            document.getElementById('resign-btn').classList.add('hidden');
+            document.getElementById('draw-btn').classList.add('hidden');
+            document.getElementById('accept-draw-btn').classList.add('hidden');
         }
 
         function startLocalClock() {
