@@ -41,7 +41,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Authentication Sidebar Styling */
         .auth-container { margin-bottom: 25px; }
         .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
         .auth-input {
@@ -93,7 +92,6 @@
         .setup-box { background-color: #f8f9fa; border: 1px solid #dadce0; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
         .select-style { padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #dadce0; margin-right: 10px; }
 
-        /* Chessboard layout elements */
         #my-board { width: 450px; margin: 20px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
         .clocks-container { display: flex; gap: 40px; margin-bottom: 15px; font-size: 18px; font-weight: 600; }
         .clock { background: #f1f3f4; padding: 8px 16px; border-radius: 4px; border: 1px solid #dadce0; }
@@ -246,7 +244,6 @@
             listenToLobby();
         };
 
-        // --- ACCOUNT AUTHENTICATION ---
         async function updateOnlineStatus(username) {
             try {
                 await supabaseClient.from('gcvm_users').update({ last_seen: new Date().toISOString() }).eq('username', username);
@@ -298,7 +295,6 @@
             window.location.reload();
         }
 
-        // --- ACCOUNT RECOVERY (BACK TO GAME) ---
         async function checkForOngoingGames() {
             if (!currentUser) return;
             const { data, error } = await supabaseClient
@@ -322,7 +318,6 @@
             initGame(activeMatchData);
         }
 
-        // --- LOBBY MATCHMAKING ---
         async function loadLobby() {
             const { data, error } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
             if (!error) {
@@ -379,7 +374,8 @@
                 status: 'waiting',
                 time_control: tc,
                 white_time: startSeconds,
-                black_time: startSeconds
+                black_time: startSeconds,
+                fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
             }]).select().single();
 
             if (error) return alert(error.message);
@@ -416,31 +412,27 @@
 
         function listenToSpecificGame(gameId) {
             if (gameSubscription) gameSubscription.unsubscribe();
-            gameSubscription = supabaseClient.channel(`game:${gameId}`).on('postgres_changes', { event: '*', filter: `id=eq.${gameId}`, table: 'gcvm_games', schema: 'public' }, (payload) => {
+            
+            gameSubscription = supabaseClient.channel(`game_room_${gameId}`)
+            .on('postgres_changes', { event: 'UPDATE', filter: `id=eq.${gameId}`, table: 'gcvm_games', schema: 'public' }, (payload) => {
                 const updatedGame = payload.new;
                 
-                if (payload.eventType === 'DELETE') {
-                    leaveGame();
-                    return;
-                }
-
                 if (updatedGame.status === 'playing') {
                     if (document.getElementById('game-view').classList.contains('hidden')) {
                         initGame(updatedGame);
                         return;
                     }
                     
+                    // FORCE SYNC: If the database FEN is different from the local engine, force an absolute reload
                     if (updatedGame.fen !== game.fen()) {
                         game.load(updatedGame.fen);
                         board.position(updatedGame.fen);
                     }
                     
-                    // --- REALTIME BACK-FROM-AFK TIME ADJUSTMENT ---
                     whiteTimeLeft = updatedGame.white_time;
                     blackTimeLeft = updatedGame.black_time;
                     adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
                     
-                    // Handle incoming draw offers
                     if (updatedGame.draw_offer && updatedGame.draw_offer !== myColor) {
                         document.getElementById('accept-draw-btn').classList.remove('hidden');
                     } else if (!updatedGame.draw_offer) {
@@ -451,20 +443,21 @@
                     updateTurnIndicator();
                 } else if (updatedGame.status.endsWith('_won') || updatedGame.status === 'draw') {
                     clearInterval(clockInterval);
-                    if (board) {
-                        game.load(updatedGame.fen);
-                        board.position(updatedGame.fen);
-                    }
+                    game.load(updatedGame.fen);
+                    board.position(updatedGame.fen);
                     displayGameEndMessage(updatedGame.status);
                 }
-            }).subscribe();
+            })
+            .on('postgres_changes', { event: 'DELETE', filter: `id=eq.${gameId}`, table: 'gcvm_games', schema: 'public' }, () => {
+                leaveGame();
+            })
+            .subscribe();
         }
 
-        // --- CLOCK DRIFT RECOVERY FUNCTION ---
         function adjustTimeForPassedLapse(lastMoveAtIso, currentFen) {
             if (!lastMoveAtIso) return;
             const tempGame = new Chess(currentFen);
-            const activeTurn = tempGame.turn(); // 'w' or 'b'
+            const activeTurn = tempGame.turn(); 
             
             const lastMoveTime = new Date(lastMoveAtIso).getTime();
             const nowTime = new Date().getTime();
@@ -479,7 +472,6 @@
             }
         }
 
-        // --- IN-GAME ACTIONS & INTERFACE ---
         function initGame(gameData) {
             currentGameId = gameData.id;
             document.getElementById('lobby-view').classList.add('hidden');
@@ -491,7 +483,6 @@
             whiteTimeLeft = gameData.white_time;
             blackTimeLeft = gameData.black_time;
             
-            // Adjust calculations right upon reload/entry
             adjustTimeForPassedLapse(gameData.last_move_at, gameData.fen);
             updateClockDisplays();
 
@@ -505,7 +496,6 @@
             };
             board = Chessboard('my-board', config);
             
-            // Check draw UI status
             if (gameData.draw_offer && gameData.draw_offer !== myColor) {
                 document.getElementById('accept-draw-btn').classList.remove('hidden');
             } else {
@@ -530,6 +520,8 @@
 
         async function onDrop (source, target) {
             const currentTurnBeforeMove = game.turn();
+            
+            // Validate move locally via chess.js
             const move = game.move({ from: source, to: target, promotion: 'q' });
             if (move === null) return 'snapback';
 
@@ -555,7 +547,7 @@
                 updateTurnIndicator();
             }
 
-            // A move removes previous unhandled draw offers
+            // Database write forces real-time update event downstream to opponent
             await supabaseClient.from('gcvm_games').update({ 
                 fen: game.fen(),
                 white_time: whiteTimeLeft,
@@ -566,7 +558,6 @@
             }).eq('id', currentGameId);
         }
 
-        // --- NEW FEATURES: RESIGN & DRAW SYSTEM ---
         async function resignMatch() {
             if (!currentGameId || game.game_over()) return;
             if (!confirm("Are you sure you want to resign this game?")) return;
