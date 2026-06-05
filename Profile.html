@@ -97,13 +97,14 @@
         .banner h1 { font-size: 32px; font-weight: 400; margin: 0; color: #202124; }
         .content { max-width: 1000px; margin: 0 auto; padding: 40px; }
 
-        /* ZOEK BALK */
-        .search-row { display: flex; gap: 10px; margin-bottom: 30px; max-width: 400px; }
+        /* ZOEKBALK LAYOUT 1 */
+        .search-section-title { font-size: 18px; font-weight: 400; margin-top: 40px; margin-bottom: 10px; color: #202124; }
+        .search-row { display: flex; gap: 10px; margin-bottom: 20px; max-width: 500px; }
         .search-input { flex-grow: 1; padding: 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; }
         .search-btn { background: #3c4043; color: white; border: none; padding: 0 20px; border-radius: 4px; cursor: pointer; font-weight: 600; }
 
         /* GRID INDELING */
-        .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; }
+        .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; margin-top: 20px; }
         .side-panel { border-right: 1px solid #dadce0; padding-right: 20px; }
         
         .rating-card {
@@ -121,7 +122,7 @@
         .rating-sub { font-size: 11px; color: #70757a; }
 
         /* HOOFD BLOK */
-        .main-panel { display: flex; flex-direction: column; gap: 30px; }
+        .main-panel { display: flex; flex-direction: column; gap: 25px; }
         
         .profile-header { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #dadce0; padding-bottom: 10px; }
         .profile-title { font-size: 28px; margin: 0; font-weight: 400; }
@@ -130,14 +131,30 @@
         .status-dot.online { background: #34a853; }
         .status-text { font-size: 14px; color: #70757a; }
 
-        /* SIMPELE EDIT UTILITIES */
-        .bio-box { background: #f8f9fa; border: 1px solid #dadce0; padding: 20px; border-radius: 6px; font-size: 15px; line-height: 1.6; white-space: pre-wrap; }
+        /* BIO & FLAIR EXTRA FIELDS */
+        .flair-container { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+        .edit-select { width: 220px; padding: 8px; border: 1px solid #dadce0; border-radius: 4px; font-family: inherit; font-size: 14px; }
         
-        .edit-field-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-        .edit-textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; resize: none; font-family: inherit; font-size: 14px; box-sizing: border-box; }
-        .edit-select { width: 200px; padding: 8px; border: 1px solid #dadce0; border-radius: 4px; font-family: inherit; }
+        .bio-textarea { 
+            width: 100%; 
+            height: 120px; 
+            padding: 12px; 
+            border: 1px solid #dadce0; 
+            border-radius: 4px; 
+            resize: none; 
+            font-family: inherit; 
+            font-size: 15px; 
+            box-sizing: border-box; 
+            background-color: #fff;
+            color: #3c4043;
+        }
+        .bio-textarea:disabled {
+            background-color: #f8f9fa;
+            color: #3c4043;
+            cursor: not-allowed;
+        }
         
-        .save-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 10px; }
+        .save-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 12px; }
         .save-btn:hover { background: #1557b0; }
 
         .graph-placeholder {
@@ -213,11 +230,6 @@
         </div>
 
         <div class="content">
-            <div class="search-row">
-                <input type="text" id="memberSearchField" class="search-input" placeholder="Search team member...">
-                <button class="search-btn" onclick="searchOtherMember()">Search</button>
-            </div>
-
             <div id="logged-out-warning" class="alert-warn">
                 Please log in through the sidebar to view or edit profile pages!
             </div>
@@ -252,26 +264,22 @@
                             <span class="status-text" id="view-status-text">Status: Checking...</span>
                         </div>
 
+                        <div id="flair-edit-row" class="flair-container hidden">
+                            <label style="font-size:13px; font-weight:600;">Select your flair:</label>
+                            <select id="flair-select" class="edit-select">
+                                <option value="">No Flair</option>
+                                <option value="👑 King">👑 King</option>
+                                <option value="🦄 Knight">🦄 Horsey</option>
+                                <option value="🔮 Variant Master">🔮 Master</option>
+                                <option value="🎯 Tactician">🎯 Tactician</option>
+                            </select>
+                        </div>
+
                         <div>
-                            <h3 style="margin:0 0 10px 0; font-size:16px;">Biography</h3>
+                            <h3 style="margin:0 0 10px 0; font-size:16px;">Edit Your Bio:</h3>
+                            <textarea id="bio-textarea-input" class="bio-textarea" placeholder="This member hasn't written a biography yet."></textarea>
                             
-                            <div id="bio-view-mode" class="bio-box">Loading bio...</div>
-                            
-                            <div id="bio-edit-mode" class="edit-field-group class hidden">
-                                <label style="font-size:13px; font-weight:600;">Select Team Flair:</label>
-                                <select id="flair-select" class="edit-select">
-                                    <option value="">No Flair</option>
-                                    <option value="👑 King">👑 King</option>
-                                    <option value="🦄 Knight">🦄 Knight</option>
-                                    <option value="🔮 Variant Master">🔮 Variant Master</option>
-                                    <option value="🎯 Tactician">🎯 Tactician</option>
-                                </select>
-                                
-                                <label style="font-size:13px; font-weight:600; margin-top:10px;">Edit Your Bio:</label>
-                                <textarea id="bio-textarea-input" class="edit-textarea"></textarea>
-                                
-                                <button class="save-btn" onclick="saveProfileSettings()">Save Profile Bio</button>
-                            </div>
+                            <button id="save-bio-btn" class="save-btn hidden" onclick="saveProfileSettings()">Save Profile Bio</button>
                         </div>
 
                         <div>
@@ -281,9 +289,18 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
+
+            <div id="search-section-wrapper" class="hidden">
+                <h3 class="search-section-title">Search for Team Members</h3>
+                <p style="font-size: 13px; color:#70757a; margin-top:0;">Type a member's Lichess username below to check if they are online and read their bio.</p>
+                <div class="search-row">
+                    <input type="text" id="memberSearchField" class="search-input" placeholder="Search profile username...">
+                    <button class="search-btn" onclick="searchOtherMember()">Search Profile</button>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -302,11 +319,12 @@
                 showSidebarLoggedIn(currentSession, currentRole);
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('profile-page-content').classList.remove('hidden');
+                document.getElementById('search-section-wrapper').classList.remove('hidden');
                 
-                // Laad standaard je eigen profiel in
+                // Laad standaard direct je eigen profiel
                 loadProfileData(currentSession);
 
-                // Start online tracker
+                // Start online status checker
                 updateOnlineTimestamp(currentSession);
                 setInterval(() => updateOnlineTimestamp(currentSession), 60000);
             }
@@ -325,7 +343,7 @@
             currentViewingUser = username;
             const activeUser = localStorage.getItem('gcvm_db_session');
 
-            // Pas de grote hoofdtitel bovenin dynamisch aan
+            // Pas de grote titel bovenin aan
             if(activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
                 document.getElementById('page-main-title').innerText = "My Profile (GCVM)";
             } else {
@@ -342,11 +360,15 @@
                 if (error) throw error;
 
                 if (!user) {
-                    alert("Member '" + username + "' not found!");
+                    alert("Member '" + username + "' not found in the database!");
                     return;
                 }
 
-                // Toon de naam en eventuele flair badge er direct naast
+                // FIX: Altijd de échte data uit de database in het textvak plaatsen!
+                const bioBox = document.getElementById('bio-textarea-input');
+                bioBox.value = user.bio || "";
+
+                // Geef de naam weer inclusief flair badge
                 const displayFlair = user.flair ? ` [${user.flair}]` : "";
                 document.getElementById('view-username').innerText = user.username + displayFlair;
 
@@ -356,7 +378,7 @@
                 
                 if (user.last_seen) {
                     const lastSeenDate = new Date(user.last_seen);
-                    const limit = new Date(Date.now() - 5 * 60 * 1000); // 5 min venster
+                    const limit = new Date(Date.now() - 5 * 60 * 1000); 
                     
                     const timeString = lastSeenDate.toLocaleString('nl-NL', { 
                         day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
@@ -374,23 +396,30 @@
                 } else {
                     dot.className = "status-dot";
                     statusText.innerText = "Website Status: 🔘 Offline (Last online: never)";
+                    statusText.style.color = "#70757a";
                 }
 
-                // SWAP MODES: Ben jij dit zelf? Toon invoervelden. Iemand anders? Toon platte tekst box.
+                // RECHTEN-CHECK: Kijk je naar jezelf of naar een ander?
+                const saveBtn = document.getElementById('save-bio-btn');
+                const flairRow = document.getElementById('flair-edit-row');
+
                 if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
-                    document.getElementById('bio-view-mode').classList.add('hidden');
-                    document.getElementById('bio-edit-mode').classList.remove('hidden');
-                    
-                    document.getElementById('bio-textarea-input').value = user.bio || "";
+                    // Je bent het zelf -> Veld mag bewerkt worden, knoppen aan!
+                    bioBox.removeAttribute('disabled');
+                    saveBtn.classList.remove('hidden');
+                    flairRow.classList.remove('hidden');
                     document.getElementById('flair-select').value = user.flair || "";
                 } else {
-                    document.getElementById('bio-edit-mode').classList.add('hidden');
-                    document.getElementById('bio-view-mode').classList.remove('hidden');
-                    
-                    document.getElementById('bio-view-mode').innerText = user.bio || "This member hasn't written a biography yet.";
+                    // Je kijkt naar een ander (bijv. Testaccount bekijkt GCVM) -> Blokkeer bewerken!
+                    bioBox.setAttribute('disabled', 'true');
+                    saveBtn.classList.add('hidden');
+                    flairRow.classList.add('hidden');
+                    if (bioBox.value.trim() === "") {
+                        bioBox.value = "This member hasn't written a biography yet.";
+                    }
                 }
 
-            } catch(err) { console.error("Fout bij laden:", err); }
+            } catch(err) { console.error("Fout tijdens ophalen database:", err); }
         }
 
         async function saveProfileSettings() {
