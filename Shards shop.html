@@ -88,11 +88,10 @@
             font-size: 22px;
             font-weight: 300;
             color: white;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             letter-spacing: 0.5px;
         }
 
-        /* Strakke styling voor de loginbox in de zijbalk */
         .auth-container {
             margin-bottom: 25px;
         }
@@ -157,6 +156,7 @@
             color: #bdc1c6;
             font-size: 14px;
             line-height: 1.4;
+            text-align: left;
         }
 
         .user-info strong {
@@ -173,25 +173,6 @@
             border-radius: 10px;
             margin-left: 6px;
             vertical-align: middle;
-        }
-
-        .admin-action-btn {
-            display: block;
-            width: 100%;
-            padding: 8px;
-            margin-top: 10px;
-            background-color: #d93025;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .admin-action-btn:hover {
-            background-color: #b31412;
         }
 
         .logout-link {
@@ -274,27 +255,25 @@
                 <div class="user-info">
                     Logged in as:<br>
                     <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
-                    <button id="admin-view-btn" class="admin-action-btn hidden" onclick="toggleAdminPanel()">Open Admin Panel</button>
                     <span class="logout-link" onclick="logoutUser()">Log out</span>
                 </div>
             </div>
         </div>
 
         <nav>
-            <a href="index.html">Homepage</a>
+            <a href="index.html" class="active">Homepage</a>
+            <a href="profileview.html" class="active">Profile</a>
             <a href="Training.html">Training</a>
             <a href="Coaches.html">Coaches</a>
-            <details open>
+            <details>
               <summary>Shards currency ⌵</summary>
               <div class="sub-menu">
                 <a href="Shardsintro.html">How to get Shards?</a>
                 <a href="Daily puzzle.html">Daily puzzle</a>
-                <a href="Shards shop.html" class="active">Shards shop</a>
+                <a href="Shards shop.html">Shards shop</a>
               </div>
             </details>
-            <a href="Leaders.html">Leaders</a>
             <a href="Current games.html">Current games</a>
-            <a href="MoTM.html">MoTM</a>
             <a href="GoTM.html">Game of the month</a>
             <a href="Jobs.html">Special mentions/Jobs</a>
             <details>
@@ -304,7 +283,14 @@
                 <a href="News.html">Newspaper</a>
               </div>    
             </details>
-            <a href="Contact.html">Contact</a>
+            <details>
+              <summary>Community ⌵</summary>
+              <div class="sub-menu">
+                <a href="Leaders.html">Mods/Leaders</a>
+                <a href="Contact.html">Contact</a>
+                <a href="MoTM.html">MoTM</a>
+              </div>    
+            </details>
         </nav>
     </aside>
         
@@ -386,18 +372,15 @@
     </main>
 
     <script>
-    // JOUW SUPABASE PROJECT GEGEVENS
+    // Project database parameters
     const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
 
-    // Verbinding opstarten via Supabase
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Google Script en Spreadsheets URL's voor Shop verwerking
     const scriptURL = "https://script.google.com/macros/s/AKfycbyULPDUd_5admFfsVefPZsCvQVTkhryaoj-Q1s80Nt0MkXcR4uK0sQ6yPoNwVbTUeub/exec";
     const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm7tdaXaidF8Cm2yQS0hwOCJhjnnLT1JdGr79IJU0HkER-MigtjsLKCEiQIlY9fIGUGkSli07zeS3R/pub?gid=2015825906&single=true&output=csv";
 
-    // Bij het laden actieve sessie ophalen
     window.onload = function() {
         const currentSession = localStorage.getItem('gcvm_db_session');
         const currentRole = localStorage.getItem('gcvm_db_role');
@@ -407,7 +390,7 @@
         }
     };
 
-    // REGISTREREN IN DATABASE
+    // REGISTER DATABASE USER
     async function registerUser() {
         const username = document.getElementById('username-input').value.trim();
         const password = document.getElementById('password-input').value.trim();
@@ -442,7 +425,7 @@
         }
     }
 
-    // INLOGGEN VIA ONLINE DATABASE
+    // LOGIN DATABASE USER
     async function loginUser() {
         const username = document.getElementById('username-input').value.trim();
         const password = document.getElementById('password-input').value.trim();
@@ -487,13 +470,7 @@
 
         if (role === 'admin') {
             document.getElementById('admin-badge').classList.remove('hidden');
-            document.getElementById('admin-view-btn').classList.remove('hidden');
         }
-    }
-
-    function toggleAdminPanel() {
-        alert("Redirecting you to the main Homepage Dashboard to manage users.");
-        window.location.href = "index.html";
     }
 
     function logoutUser() {
@@ -502,7 +479,7 @@
         window.location.reload();
     }
 
-    // --- BALANS & INTEGRATIE LOGICA SHOP ---
+    // BALANCE & PURCHASE PROCESSING
     async function getBalance(username) {
         try {
             const response = await fetch(csvURL);
