@@ -297,7 +297,7 @@
             <div id="profile-section" class="hidden">
                 <div class="user-info">
                     Logged in as:<br>
-                    <strong id="displayed-username">...</strong><br>
+                    <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
                     <span class="logout-link" onclick="logoutUser()">Log out</span>
                 </div>
             </div>
@@ -476,8 +476,9 @@
             drawBoard();
             
             const currentSession = localStorage.getItem('gcvm_db_session');
+            const currentRole = localStorage.getItem('gcvm_db_role');
             if (currentSession) {
-                showStyle(currentSession);
+                showStyle(currentSession, currentRole);
                 updateOnlineStatus(currentSession);
                 setInterval(() => updateOnlineStatus(currentSession), 60000);
             }
@@ -556,17 +557,21 @@
                 localStorage.setItem('gcvm_db_session', user.username);
                 localStorage.setItem('gcvm_db_role', user.role);
 
-                showStyle(user.username);
+                showStyle(user.username, user.role);
                 updateOnlineStatus(user.username);
             } catch (err) {
                 alert("Database error during login: " + err.message);
             }
         }
 
-        function showStyle(username) {
+        function showStyle(username, role) {
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('profile-section').classList.remove('hidden');
             document.getElementById('displayed-username').innerText = username;
+
+            if (role === 'admin') {
+                document.getElementById('admin-badge').classList.remove('hidden');
+            }
             
             const inputNaam = document.getElementById('winner-name');
             if (inputNaam) {
