@@ -550,26 +550,27 @@
         };
 
         // Update de 'last_seen' kolom live in de database
+// Update de 'Last_seen' kolom live in de database
         async function updateOnlineTimestamp(username) {
             try {
                 await supabaseClient
-                    .from('gcvm_users')
-                    .update({ last_seen: new Date().toISOString() })
+                    .from('Users')
+                    .update({ Last_seen: new Date().toISOString() }) // Hoofdletter L
                     .eq('username', username);
             } catch(e) {
                 console.error("Kon online status niet updaten:", e);
             }
         }
 
-// Haalt profielgegevens op uit Supabase
+        // Haalt profielgegevens op uit Supabase
         async function loadProfileData(username) {
             currentViewingUser = username;
             const activeUser = localStorage.getItem('gcvm_db_session');
 
             try {
                 const { data: user, error } = await supabaseClient
-                    .from('gcvm_users') // Let op: als je tabel anders heet, pas dit dan aan naar je exacte tabelnaam!
-                    .select('username', 'bio', 'flair', 'last_seen')
+                    .from('Users')
+                    .select('username', 'Bio', 'Flair', 'Last_seen') // Hoofdletters!
                     .eq('username', username)
                     .maybeSingle();
 
@@ -582,12 +583,12 @@
 
                 // Vul de HTML-elementen met de databasegegevens
                 document.getElementById('view-username').innerText = user.username;
-                document.getElementById('view-bio').innerText = user.bio || "This member hasn't written a biography yet.";
+                document.getElementById('view-bio').innerText = user.Bio || "This member hasn't written a biography yet.";
                 
                 // Verwerk de Flair badge
                 const flairBox = document.getElementById('view-flair');
-                if (user.flair && user.flair.trim() !== "") {
-                    flairBox.innerText = user.flair;
+                if (user.Flair && user.Flair.trim() !== "") {
+                    flairBox.innerText = user.Flair;
                     flairBox.classList.remove('hidden');
                 } else {
                     flairBox.classList.add('hidden');
@@ -596,11 +597,11 @@
                 // Online / Offline status & "Last online" tekst berekenen
                 const dot = document.getElementById('view-status-dot');
                 
-                if (user.last_seen) {
-                    const lastSeenDate = new Date(user.last_seen);
+                if (user.Last_seen) {
+                    const lastSeenDate = new Date(user.Last_seen);
                     const limit = new Date(Date.now() - 5 * 60 * 1000); // 5 minuten grens
                     
-                    // Maak een mooie leesbare datum/tijd sticker
+                    // Netjes geformatteerde Nederlandse tijdstempel
                     const netjesGeformatteerd = lastSeenDate.toLocaleString('nl-NL', { 
                         day: '2-digit', month: '2-digit', year: 'numeric', 
                         hour: '2-digit', minute: '2-digit' 
@@ -608,11 +609,9 @@
 
                     if (lastSeenDate > limit) {
                         dot.className = "status-dot-indicator online";
-                        // Voeg de tekst toe naast de naam
                         document.getElementById('view-username').innerHTML = `${user.username} <span style="font-size:12px; color:#34a853; font-weight:normal; margin-left:10px;">(Online)</span>`;
                     } else {
                         dot.className = "status-dot-indicator offline";
-                        // Laat zien wanneer de speler voor het laatst online was
                         document.getElementById('view-username').innerHTML = `${user.username} <span style="font-size:12px; color:#70757a; font-weight:normal; margin-left:10px;">(Last online: ${netjesGeformatteerd})</span>`;
                     }
                 } else {
@@ -624,8 +623,8 @@
                 const settingsBtn = document.getElementById('edit-settings-trigger');
                 if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
                     settingsBtn.classList.remove('hidden');
-                    document.getElementById('bio-textarea-input').value = user.bio || "";
-                    document.getElementById('flair-select').value = user.flair || "";
+                    document.getElementById('bio-textarea-input').value = user.Bio || "";
+                    document.getElementById('flair-select').value = user.Flair || "";
                 } else {
                     settingsBtn.classList.add('hidden');
                     document.getElementById('settings-panel').classList.add('hidden');
@@ -646,8 +645,8 @@
 
             try {
                 const { error } = await supabaseClient
-                    .from('gcvm_users')
-                    .update({ bio: newBio, flair: newFlair })
+                    .from('Users')
+                    .update({ Bio: newBio, Flair: newFlair }) // Hoofdletters!
                     .eq('username', username);
 
                 if (error) throw error;
