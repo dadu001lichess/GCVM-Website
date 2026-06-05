@@ -550,12 +550,12 @@
         };
 
         // Update de 'last_seen' kolom live in de database
-// Update de 'Last_seen' kolom live in de database
+// Update de 'last_seen' kolom live in de database
         async function updateOnlineTimestamp(username) {
             try {
                 await supabaseClient
-                    .from('Users')
-                    .update({ Last_seen: new Date().toISOString() }) // Hoofdletter L
+                    .from('gcvm_users')
+                    .update({ last_seen: new Date().toISOString() })
                     .eq('username', username);
             } catch(e) {
                 console.error("Kon online status niet updaten:", e);
@@ -569,8 +569,8 @@
 
             try {
                 const { data: user, error } = await supabaseClient
-                    .from('Users')
-                    .select('username', 'Bio', 'Flair', 'Last_seen') // Hoofdletters!
+                    .from('gcvm_users')
+                    .select('username', 'bio', 'flair', 'last_seen')
                     .eq('username', username)
                     .maybeSingle();
 
@@ -583,12 +583,12 @@
 
                 // Vul de HTML-elementen met de databasegegevens
                 document.getElementById('view-username').innerText = user.username;
-                document.getElementById('view-bio').innerText = user.Bio || "This member hasn't written a biography yet.";
+                document.getElementById('view-bio').innerText = user.bio || "This member hasn't written a biography yet.";
                 
                 // Verwerk de Flair badge
                 const flairBox = document.getElementById('view-flair');
-                if (user.Flair && user.Flair.trim() !== "") {
-                    flairBox.innerText = user.Flair;
+                if (user.flair && user.flair.trim() !== "") {
+                    flairBox.innerText = user.flair;
                     flairBox.classList.remove('hidden');
                 } else {
                     flairBox.classList.add('hidden');
@@ -597,11 +597,11 @@
                 // Online / Offline status & "Last online" tekst berekenen
                 const dot = document.getElementById('view-status-dot');
                 
-                if (user.Last_seen) {
-                    const lastSeenDate = new Date(user.Last_seen);
-                    const limit = new Date(Date.now() - 5 * 60 * 1000); // 5 minuten grens
+                if (user.last_seen) {
+                    const lastSeenDate = new Date(user.last_seen);
+                    const limit = new Date(Date.now() - 5 * 60 * 1000); // 5 minuten online-venster
                     
-                    // Netjes geformatteerde Nederlandse tijdstempel
+                    // Maak een nette Nederlandse datum/tijd weergave
                     const netjesGeformatteerd = lastSeenDate.toLocaleString('nl-NL', { 
                         day: '2-digit', month: '2-digit', year: 'numeric', 
                         hour: '2-digit', minute: '2-digit' 
@@ -623,8 +623,8 @@
                 const settingsBtn = document.getElementById('edit-settings-trigger');
                 if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
                     settingsBtn.classList.remove('hidden');
-                    document.getElementById('bio-textarea-input').value = user.Bio || "";
-                    document.getElementById('flair-select').value = user.Flair || "";
+                    document.getElementById('bio-textarea-input').value = user.bio || "";
+                    document.getElementById('flair-select').value = user.flair || "";
                 } else {
                     settingsBtn.classList.add('hidden');
                     document.getElementById('settings-panel').classList.add('hidden');
@@ -645,8 +645,8 @@
 
             try {
                 const { error } = await supabaseClient
-                    .from('Users')
-                    .update({ Bio: newBio, Flair: newFlair }) // Hoofdletters!
+                    .from('gcvm_users')
+                    .update({ bio: newBio, flair: newFlair })
                     .eq('username', username);
 
                 if (error) throw error;
@@ -659,7 +659,6 @@
                 console.error("Gedetailleerde database fout:", err);
             }
         }
-
         // Start de zoekfunctie voor andere leden via de bovenste zoekbalk
         function searchOtherMember() {
             const name = document.getElementById('memberSearchField').value.trim();
