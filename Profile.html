@@ -30,42 +30,20 @@
             z-index: 10;
         }
 
-        .logo {
-            color: white;
-            font-size: 22px;
-            font-weight: 300;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-        }
-
+        .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
         .auth-container { margin-bottom: 25px; }
         .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
         
         .auth-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #3c4043;
-            border-radius: 4px;
-            background-color: #303134;
-            color: white;
-            font-size: 13px;
-            box-sizing: border-box;
-            outline: none;
+            width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px;
+            background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none;
         }
 
         .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
         .auth-btn {
-            flex: 1;
-            padding: 10px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
+            flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;
         }
-
         .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
         .user-info { color: #bdc1c6; font-size: 14px; }
         .user-info strong { color: #8ab4f8; font-size: 15px; }
@@ -78,94 +56,55 @@
         .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; }
         .sub-menu a { font-size: 14px; padding: 8px 0; }
 
-        main {
-            margin-left: 280px; 
-            width: calc(100% - 280px);
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-
-        .banner {
-            height: 120px; 
-            background-color: #f1f3f4;
-            display: flex;
-            align-items: center;
-            padding-left: 40px;
-            border-bottom: 1px solid #dadce0;
-        }
-
+        main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; box-sizing: border-box; position: relative; }
+        .banner { height: 120px; background-color: #f1f3f4; display: flex; align-items: center; padding-left: 40px; border-bottom: 1px solid #dadce0; }
         .banner h1 { font-size: 32px; font-weight: 400; margin: 0; color: #202124; }
         .content { max-width: 1000px; margin: 0 auto; padding: 40px; }
 
-        /* ZOEKBALK LAYOUT 1 */
-        .search-section-title { font-size: 18px; font-weight: 400; margin-top: 40px; margin-bottom: 10px; color: #202124; }
-        .search-row { display: flex; gap: 10px; margin-bottom: 20px; max-width: 500px; }
-        .search-input { flex-grow: 1; padding: 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; }
-        .search-btn { background: #3c4043; color: white; border: none; padding: 0 20px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        /* ZOEKBALK RECHTERBOVENHOEK */
+        .top-right-search {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            display: flex;
+            gap: 8px;
+            z-index: 5;
+        }
+        .search-input { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 200px; }
+        .search-btn { background: #3c4043; color: white; border: none; padding: 0 14px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .search-btn:hover { background: #202124; }
 
         /* GRID INDELING */
-        .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; margin-top: 20px; }
+        .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; }
         .side-panel { border-right: 1px solid #dadce0; padding-right: 20px; }
         
         .rating-card {
-            background: #f8f9fa;
-            border: 1px solid #dadce0;
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: #f8f9fa; border: 1px solid #dadce0; padding: 12px 16px; border-radius: 6px;
+            margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
         }
         .rating-name { font-weight: 600; font-size: 14px; }
         .rating-val { color: #1a73e8; font-weight: 600; font-size: 16px; }
         .rating-sub { font-size: 11px; color: #70757a; }
 
-        /* HOOFD BLOK */
         .main-panel { display: flex; flex-direction: column; gap: 25px; }
-        
-        .profile-header { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #dadce0; padding-bottom: 10px; }
+        .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 10px; }
         .profile-title { font-size: 28px; margin: 0; font-weight: 400; }
-        
-        .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #70757a; }
-        .status-dot.online { background: #34a853; }
-        .status-text { font-size: 14px; color: #70757a; }
 
-        /* BIO & FLAIR EXTRA FIELDS */
-        .flair-container { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+        /* CLEAN RESTRUSTURED BIO & FLAIR */
+        .flair-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
         .edit-select { width: 220px; padding: 8px; border: 1px solid #dadce0; border-radius: 4px; font-family: inherit; font-size: 14px; }
         
         .bio-textarea { 
-            width: 100%; 
-            height: 120px; 
-            padding: 12px; 
-            border: 1px solid #dadce0; 
-            border-radius: 4px; 
-            resize: none; 
-            font-family: inherit; 
-            font-size: 15px; 
-            box-sizing: border-box; 
-            background-color: #fff;
-            color: #3c4043;
-        }
-        .bio-textarea:disabled {
-            background-color: #f8f9fa;
-            color: #3c4043;
-            cursor: not-allowed;
+            width: 100%; height: 140px; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; 
+            resize: none; font-family: inherit; font-size: 15px; box-sizing: border-box; background-color: #fff; color: #3c4043;
         }
         
-        .save-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 12px; }
+        .save-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 10px; }
         .save-btn:hover { background: #1557b0; }
 
         .graph-placeholder {
-            border: 1px solid #dadce0;
-            border-radius: 6px;
-            height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #70757a;
-            font-size: 14px;
+            border: 1px solid #dadce0; border-radius: 6px; height: 150px; display: flex; align-items: center;
+            justify-content: center; color: #70757a; font-size: 14px;
             background-image: linear-gradient(#f1f3f4 1px, transparent 1px), linear-gradient(90deg, #f1f3f4 1px, transparent 1px);
             background-size: 20px 20px;
         }
@@ -225,13 +164,18 @@
     </aside>
 
     <main>
+        <div class="top-right-search">
+            <input type="text" id="memberSearchField" class="search-input" placeholder="Search member...">
+            <button class="search-btn" onclick="searchOtherMember()">Search</button>
+        </div>
+
         <div class="banner">
-            <h1 id="page-main-title">My Profile (GCVM)</h1>
+            <h1 id="page-main-title">Profile Editor</h1>
         </div>
 
         <div class="content">
             <div id="logged-out-warning" class="alert-warn">
-                Please log in through the sidebar to view or edit profile pages!
+                Please log in through the sidebar to view or customize your profile!
             </div>
 
             <div id="profile-page-content" class="hidden">
@@ -239,47 +183,32 @@
                     
                     <div class="side-panel">
                         <h3 style="margin-top:0; font-weight:600; font-size:16px;">Elo Ratings</h3>
-                        <div class="rating-card">
-                            <div><div class="rating-name">Classical</div><div class="rating-sub">0 games</div></div>
-                            <div class="rating-val">1500?</div>
-                        </div>
-                        <div class="rating-card">
-                            <div><div class="rating-name">Rapid</div><div class="rating-sub">0 games</div></div>
-                            <div class="rating-val">1500?</div>
-                        </div>
-                        <div class="rating-card">
-                            <div><div class="rating-name">Blitz</div><div class="rating-sub">0 games</div></div>
-                            <div class="rating-val">1500?</div>
-                        </div>
-                        <div class="rating-card">
-                            <div><div class="rating-name">Bullet</div><div class="rating-sub">0 games</div></div>
-                            <div class="rating-val">1500?</div>
-                        </div>
+                        <div class="rating-card"><div><div class="rating-name">Classical</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
+                        <div class="rating-card"><div><div class="rating-name">Rapid</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
+                        <div class="rating-card"><div><div class="rating-name">Blitz</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
+                        <div class="rating-card"><div><div class="rating-name">Bullet</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
                     </div>
 
                     <div class="main-panel">
                         <div class="profile-header">
-                            <span class="status-dot" id="view-status-dot"></span>
                             <h2 class="profile-title" id="view-username">Username</h2>
-                            <span class="status-text" id="view-status-text">Status: Checking...</span>
                         </div>
 
-                        <div id="flair-edit-row" class="flair-container hidden">
-                            <label style="font-size:13px; font-weight:600;">Select your flair:</label>
+                        <div class="flair-group">
+                            <label style="font-size:13px; font-weight:600;">Team Flair:</label>
                             <select id="flair-select" class="edit-select">
                                 <option value="">No Flair</option>
                                 <option value="👑 King">👑 King</option>
-                                <option value="🦄 Knight">🦄 Horsey</option>
-                                <option value="🔮 Variant Master">🔮 Master</option>
+                                <option value="🦄 Knight">🦄 Knight</option>
+                                <option value="🔮 Variant Master">🔮 Variant Master</option>
                                 <option value="🎯 Tactician">🎯 Tactician</option>
                             </select>
                         </div>
 
                         <div>
-                            <h3 style="margin:0 0 10px 0; font-size:16px;">Edit Your Bio:</h3>
-                            <textarea id="bio-textarea-input" class="bio-textarea" placeholder="This member hasn't written a biography yet."></textarea>
-                            
-                            <button id="save-bio-btn" class="save-btn hidden" onclick="saveProfileSettings()">Save Profile Bio</button>
+                            <h3 style="margin:0 0 10px 0; font-size:16px;">Biography:</h3>
+                            <textarea id="bio-textarea-input" class="bio-textarea" placeholder="Write your bio here..."></textarea>
+                            <button id="save-bio-btn" class="save-btn" onclick="saveProfileSettings()">Save Profile Bio</button>
                         </div>
 
                         <div>
@@ -291,16 +220,6 @@
                     </div>
                 </div>
             </div>
-
-            <div id="search-section-wrapper" class="hidden">
-                <h3 class="search-section-title">Search for Team Members</h3>
-                <p style="font-size: 13px; color:#70757a; margin-top:0;">Type a member's Lichess username below to check if they are online and read their bio.</p>
-                <div class="search-row">
-                    <input type="text" id="memberSearchField" class="search-input" placeholder="Search profile username...">
-                    <button class="search-btn" onclick="searchOtherMember()">Search Profile</button>
-                </div>
-            </div>
-
         </div>
     </main>
 
@@ -319,107 +238,64 @@
                 showSidebarLoggedIn(currentSession, currentRole);
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('profile-page-content').classList.remove('hidden');
-                document.getElementById('search-section-wrapper').classList.remove('hidden');
                 
-                // Laad standaard direct je eigen profiel
+                // Laad direct je eigen profiel
                 loadProfileData(currentSession);
-
-                // Start online status checker
-                updateOnlineTimestamp(currentSession);
-                setInterval(() => updateOnlineTimestamp(currentSession), 60000);
             }
         };
-
-        async function updateOnlineTimestamp(username) {
-            try {
-                await supabaseClient
-                    .from('gcvm_users')
-                    .update({ last_seen: new Date().toISOString() })
-                    .eq('username', username);
-            } catch(e) { console.error(e); }
-        }
 
         async function loadProfileData(username) {
             currentViewingUser = username;
             const activeUser = localStorage.getItem('gcvm_db_session');
 
-            // Pas de grote titel bovenin aan
+            // Titel aanpassen
             if(activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
-                document.getElementById('page-main-title').innerText = "My Profile (GCVM)";
+                document.getElementById('page-main-title').innerText = "Profile Editor";
             } else {
                 document.getElementById('page-main-title').innerText = `${username}'s Profile`;
             }
 
             try {
-                const { data: user, error } = await supabaseClient
+                const { data: users, error } = await supabaseClient
                     .from('gcvm_users')
-                    .select('username', 'bio', 'flair', 'last_seen')
-                    .eq('username', username)
-                    .maybeSingle();
+                    .select('username', 'bio', 'flair')
+                    .ilike('username', username);
 
                 if (error) throw error;
 
-                if (!user) {
-                    alert("Member '" + username + "' not found in the database!");
+                if (!users || users.length === 0) {
+                    alert("Member '" + username + "' not found!");
                     return;
                 }
 
-                // FIX: Altijd de échte data uit de database in het textvak plaatsen!
+                const user = users[0];
                 const bioBox = document.getElementById('bio-textarea-input');
-                bioBox.value = user.bio || "";
+                const flairSelect = document.getElementById('flair-select');
+                const saveBtn = document.getElementById('save-bio-btn');
 
-                // Geef de naam weer inclusief flair badge
+                // Vul de velden met data
+                bioBox.value = user.bio || "";
+                flairSelect.value = user.flair || "";
+
+                // Geef de naam weer met eventuele flair erachter
                 const displayFlair = user.flair ? ` [${user.flair}]` : "";
                 document.getElementById('view-username').innerText = user.username + displayFlair;
 
-                // ONLINE / OFFLINE STATUS BEREKENING
-                const dot = document.getElementById('view-status-dot');
-                const statusText = document.getElementById('view-status-text');
-                
-                if (user.last_seen) {
-                    const lastSeenDate = new Date(user.last_seen);
-                    const limit = new Date(Date.now() - 5 * 60 * 1000); 
-                    
-                    const timeString = lastSeenDate.toLocaleString('nl-NL', { 
-                        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
-                    });
-
-                    if (lastSeenDate > limit) {
-                        dot.className = "status-dot online";
-                        statusText.innerText = "Your status: Online";
-                        statusText.style.color = "#34a853";
-                    } else {
-                        dot.className = "status-dot";
-                        statusText.innerText = `Website Status: 🔘 Offline (Last online: ${timeString})`;
-                        statusText.style.color = "#70757a";
-                    }
-                } else {
-                    dot.className = "status-dot";
-                    statusText.innerText = "Website Status: 🔘 Offline (Last online: never)";
-                    statusText.style.color = "#70757a";
-                }
-
-                // RECHTEN-CHECK: Kijk je naar jezelf of naar een ander?
-                const saveBtn = document.getElementById('save-bio-btn');
-                const flairRow = document.getElementById('flair-edit-row');
-
+                // CHECK: Ben jij dit zelf? Zo nee, blokkeer editen en verberg de save-knop
                 if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
-                    // Je bent het zelf -> Veld mag bewerkt worden, knoppen aan!
                     bioBox.removeAttribute('disabled');
+                    flairSelect.removeAttribute('disabled');
                     saveBtn.classList.remove('hidden');
-                    flairRow.classList.remove('hidden');
-                    document.getElementById('flair-select').value = user.flair || "";
                 } else {
-                    // Je kijkt naar een ander (bijv. Testaccount bekijkt GCVM) -> Blokkeer bewerken!
                     bioBox.setAttribute('disabled', 'true');
+                    flairSelect.setAttribute('disabled', 'true');
                     saveBtn.classList.add('hidden');
-                    flairRow.classList.add('hidden');
                     if (bioBox.value.trim() === "") {
                         bioBox.value = "This member hasn't written a biography yet.";
                     }
                 }
 
-            } catch(err) { console.error("Fout tijdens ophalen database:", err); }
+            } catch(err) { console.error("Fout bij laden:", err); }
         }
 
         async function saveProfileSettings() {
@@ -433,7 +309,7 @@
                 const { error } = await supabaseClient
                     .from('gcvm_users')
                     .update({ bio: newBio, flair: newFlair })
-                    .eq('username', username);
+                    .ilike('username', username);
 
                 if (error) throw error;
 
@@ -455,15 +331,15 @@
             if (!username || !password) return alert("Fill in all fields!");
 
             try {
-                const { data: user, error } = await supabaseClient
+                const { data: users, error } = await supabaseClient
                     .from('gcvm_users')
                     .select('*')
-                    .eq('username', username)
-                    .eq('password', password)
-                    .maybeSingle();
+                    .ilike('username', username)
+                    .eq('password', password);
                 
-                if (error || !user) { alert("Invalid credentials!"); return; }
+                if (error || !users || users.length === 0) { alert("Invalid credentials!"); return; }
 
+                const user = users[0];
                 localStorage.setItem('gcvm_db_session', user.username);
                 localStorage.setItem('gcvm_db_role', user.role);
                 window.location.reload();
