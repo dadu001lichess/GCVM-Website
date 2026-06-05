@@ -9,10 +9,58 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: white;
+            color: #3c4043;
+        }
+
+        aside {
+            width: 280px;
+            background-color: #202124; 
+            height: 100vh;
+            position: fixed;
+            padding: 40px 24px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            left: 0;
+            top: 0;
+            z-index: 10;
+        }
+
+        .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
+        .auth-container { margin-bottom: 25px; }
+        .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
+        
+        .auth-input {
+            width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px;
+            background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none;
+        }
+
+        .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
+        .auth-btn {
+            flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none;
+            border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;
+        }
+        .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
+        .user-info { color: #bdc1c6; font-size: 14px; }
+        .user-info strong { color: #8ab4f8; font-size: 15px; }
+        .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; }
+        .logout-link { color: #f28b82; font-size: 12px; margin-top: 8px; cursor: pointer; display: inline-block; }
+
+        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
+        nav a:hover, nav a.active { color: #8ab4f8; }
+        summary { color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; list-style: none; }
+        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; }
+        .sub-menu a { font-size: 14px; padding: 8px 0; }
+
         main {
             margin-left: 280px; 
             width: calc(100% - 280px);
             min-height: 100vh;
+            box-sizing: border-box;
         }
         
         .banner {
@@ -34,299 +82,82 @@
 
         .content {
             max-width: 800px;
-            margin: 0 auto; 
+            margin: 0 auto;
             padding: 60px 40px;
         }
 
-        .content h2 {
-            font-size: 28px;
-            font-weight: 300;
-            color: #202124;
-            margin-bottom: 20px;
-        }
-
-        .content p {
-            font-size: 16px;
+        .intro-text {
+            font-size: 18px;
             line-height: 1.6;
-            color: #3c4043;
-            margin-bottom: 20px;
+            color: #5f6368;
+            margin-bottom: 50px;
+            text-align: center;
         }
 
-        .content a {
-            color: #1a73e8;
-            text-decoration: none;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .training-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
         }
 
-        body { 
-            font-family: 'Open Sans', sans-serif;
-            text-align: center; 
-            background-color: white; 
-            color: #3c4043; 
-            padding: 0;
-        }
-
-        aside {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 280px;
-            height: 100vh;
-            background-color: #202124;
-            padding: 40px 24px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-sizing: border-box;
-            text-align: left;
-        }
-
-        .logo {
-            font-size: 22px;
-            font-weight: 300;
-            color: white;
-            margin-bottom: 40px;
-            letter-spacing: 0.5px;
-        }
-
-        /* Strakke styling voor de loginbox conform originele lay-out */
-        .auth-container {
-            margin-bottom: 25px;
-        }
-
-        .auth-input-group {
+        .training-card {
+            background: #ffffff;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            justify-content: space-between;
         }
 
-        .auth-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #3c4043;
-            border-radius: 4px;
-            background-color: #303134;
-            color: white;
-            font-size: 13px;
-            box-sizing: border-box;
-            outline: none;
+        .training-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 8px 0 rgba(60,64,67,0.2), 0 6px 12px 4px rgba(60,64,67,0.1);
         }
 
-        .auth-input::placeholder {
-            color: #80868b;
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #202124;
+            margin-top: 0;
+            margin-bottom: 12px;
         }
 
-        .auth-btn-container {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px;
+        .card-desc {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #5f6368;
+            margin-bottom: 24px;
+            flex-grow: 1;
         }
 
-        .auth-btn {
-            flex: 1;
-            padding: 10px;
+        .card-btn {
+            display: inline-block;
             background-color: #1a73e8;
             color: white;
-            border: none;
+            text-decoration: none;
+            padding: 12px 24px;
             border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
             font-weight: 600;
+            font-size: 14px;
             text-align: center;
             transition: background-color 0.2s;
         }
 
-        .auth-btn:hover {
+        .card-btn:hover {
             background-color: #1557b0;
         }
 
-        .auth-btn.secondary {
-            background-color: #3c4043;
-            color: #bdc1c6;
-        }
-
-        .auth-btn.secondary:hover {
-            background-color: #4f5357;
-            color: white;
-        }
-
-        .user-info {
-            color: #bdc1c6;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .user-info strong {
-            color: #8ab4f8;
-            font-size: 15px;
-        }
-
-        .badge {
-            display: inline-block;
-            font-size: 10px;
-            padding: 2px 6px;
-            background-color: #34a853;
-            color: white;
-            border-radius: 10px;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
-
-        .admin-action-btn {
-            display: block;
-            width: 100%;
-            padding: 8px;
-            margin-top: 10px;
-            background-color: #d93025;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .admin-action-btn:hover {
-            background-color: #b31412;
-        }
-
-        .logout-link {
-            display: inline-block;
-            color: #f28b82;
-            text-decoration: none;
-            font-size: 12px;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-
-        .logout-link:hover {
-            text-decoration: underline;
-        }
-
-        nav {
-            border-top: 1px solid #3c4043;
-            padding-top: 15px;
-        }
-
-        /* Centraal Admin Panel (Enkel gebruikt voor opmaak-consistentie) */
-        .admin-panel-box {
-            background-color: #f8f9fa;
-            border: 1px solid #dadce0;
-            padding: 24px;
-            border-radius: 8px;
-            margin: 30px 0;
-        }
-
-        .user-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 15px;
-        }
-
-        .ban-btn {
-            background-color: #d93025;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        nav a, nav summary {
-            display: block;
-            color: #bdc1c6;
-            text-decoration: none;
-            padding: 12px 0;
-            font-size: 15px;
-            font-weight: 400;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        nav a:hover, nav a.active, nav summary:hover {
-            color: #8ab4f8;
-        }
-
-        nav details {
-            margin: 0;
-        }
-
-        nav summary {
-            list-style: none;
-            outline: none;
-        }
-
-        nav summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .sub-menu {
-            padding-left: 20px;
-            border-left: 1px solid #3c4043;
-            margin-bottom: 10px;
-        }
-
-        .sub-menu a {
-            font-size: 14px;
-            padding: 8px 0;
-        }
-        
-        .button-container {
-            display: flex;
-            flex-direction: column; /* buttons stacked */
-            align-items: center;    /* centered */
-            gap: 12px;              /* space between the buttons */
-            margin-top: 8px !important; /* reduce space above the buttons */
-        }
-
-        .chess-link {
-            text-decoration: none;
-        }
-
-        .chess-btn {
-            background-color: #2c3e50; /* Elegant dark slate color */
-            color: #ffffff;            /* Crisp white text */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 16px;           /* Readable text size */
-            font-weight: 600;          /* Semi-bold text */
-            padding: 12px 24px;        /* Spacing inside the button */
-            border: none;              /* Removes the ugly default border */
-            border-radius: 6px;        /* Smooth rounded corners */
-            cursor: pointer;           /* Shows a pointer hand icon on hover */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-            transition: all 0.3s ease; /* Makes hover animations smooth */
-        }
-
-        .chess-btn:hover {
-            background-color: #34495e; /* Slightly lighter shade on hover */
-            transform: translateY(-2px); /* Lifts the button up slightly */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Deepens the shadow */
-        }
-
-        .chess-btn:active {
-            transform: translateY(0);  /* Pushes it back down */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shrinks the shadow */
-        }
-        
-   </style>
+        .alert-warn { background: #fce8e6; border: 1px solid #f28b82; color: #a51d24; padding: 15px; border-radius: 6px; text-align: center; font-weight: 600; }
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
+
     <aside>
         <div class="logo">GC(V)M</div>
-        
         <div class="auth-container">
             <div id="login-section" class="auth-input-group">
                 <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
@@ -336,28 +167,26 @@
                     <button class="auth-btn secondary" onclick="registerUser()">Register</button>
                 </div>
             </div>
-            
             <div id="profile-section" class="hidden">
                 <div class="user-info">
                     Logged in as:<br>
                     <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
-                    <button id="admin-view-btn" class="admin-action-btn hidden" onclick="toggleAdminPanel()">Open Admin Panel</button>
                     <span class="logout-link" onclick="logoutUser()">Log out</span>
                 </div>
             </div>
         </div>
-
         <nav>
             <a href="index.html">Homepage</a>
+            <a href="profileview.html">My Profile</a>
             <a href="Training.html" class="active">Training</a>
             <a href="Coaches.html">Coaches</a>
             <details>
-              <summary>Shards currency ⌵</summary>
-              <div class="sub-menu">
-                <a href="Shardsintro.html">How to get Shards?</a>
-                <a href="Daily puzzle.html">Daily puzzle</a>
-                <a href="Shards shop.html">Shards shop</a>
-              </div>
+                <summary>Shards currency ⌵</summary>
+                <div class="sub-menu">
+                    <a href="Shardsintro.html">How to get Shards?</a>
+                    <a href="Daily puzzle.html">Daily puzzle</a>
+                    <a href="Shards shop.html">Shards shop</a>
+                </div>
             </details>
             <a href="Leaders.html">Leaders</a>
             <a href="Current games.html">Current games</a>
@@ -365,149 +194,125 @@
             <a href="GoTM.html">Game of the month</a>
             <a href="Jobs.html">Special mentions/Jobs</a>
             <details>
-              <summary>Updates/News ⌵</summary>
-              <div class="sub-menu">
-                <a href="Updates.html">Updates</a>
-                <a href="News.html">Newspaper</a>
-              </div>    
+                <summary>Updates/News ⌵</summary>
+                <div class="sub-menu">
+                    <a href="Updates.html">Updates</a>
+                    <a href="News.html">Newspaper</a>
+                </div>    
             </details>
             <a href="Contact.html">Contact</a>
         </nav>
     </aside>
-        
+
     <main>
-        <div class="banner">                
-            <h1>GCVM - Training</h1>
+        <div class="banner">
+            <h1>Chess Training Hub</h1>
         </div>
 
         <div class="content">
-            <p><strong>Welcome to our (beta) training feature!</strong></p>
-            <p>Here you can learn basics about chess, strategies, tips, etc. without the need of coaches! You can buy passwords of some locked sections <a href="Shards shop.html">here</a> with Shards!</p>
-            <p><strong>Locked sections:</strong></p>
+            <div id="logged-out-warning" class="alert-warn">
+                Please log in through the sidebar to access the training dashboard!
+            </div>
 
-            <div class="button-container">
-               <a href="https://script.google.com/macros/s/AKfycbxb7JuQgINZp9hX8J6DBFRJM0g2upYwx9h4NoL-d1PZSLOc44yb4Zn4MEVNGkVMNGLYZA/exec" target="_blank" rel="noopener noreferrer" class="chess-link">
-                  <button type="button" class="chess-btn">
-                      Universal Standard Chess Training Tips
-                  </button>
-               </a>
+            <div id="training-content" class="hidden">
+                <p class="intro-text">
+                    Welcome to the GCVM Chess Training Hub. Whether you want to master endings, sharp your tactics, or play against masters, select your training mode below and boost your chess skills.
+                </p>
 
-               <a href="LINK_NAAR_HORDE_TRAINING" target="_blank" rel="noopener noreferrer" class="chess-link">
-                  <button type="button" class="chess-btn">
-                      Horde variant training tips
-                  </button>
-               </a>
+                <div class="training-grid">
+                    <div class="training-card">
+                        <div>
+                            <h3 class="card-title">Study Theory</h3>
+                            <p class="card-desc">Deepen your opening knowledge, understand strategic middle-games, and master fundamental endgames with community chess studies.</p>
+                        </div>
+                        <a href="https://lichess.org/study" target="_blank" class="card-btn">Open Lichess Studies</a>
+                    </div>
+
+                    <div class="training-card">
+                        <div>
+                            <h3 class="card-title">Practice Coordinates</h3>
+                            <p class="card-desc">Train your sight of the board. Speed up your notation recognition which is vital for calculating lines and reading chess books.</p>
+                        </div>
+                        <a href="https://lichess.org/training/coordinate" target="_blank" class="card-btn">Practice Coordinates</a>
+                    </div>
+
+                    <div class="training-card">
+                        <div>
+                            <h3 class="card-title">Play vs Computer</h3>
+                            <p class="card-desc">Test new ideas or practice standard endgames in a stress-free environment against the powerful Stockfish engine.</p>
+                        </div>
+                        <a href="https://lichess.org/analysis" target="_blank" class="card-btn">Open Analysis Board</a>
+                    </div>
+
+                    <div class="training-card">
+                        <div>
+                            <h3 class="card-title">Solve Puzzles</h3>
+                            <p class="card-desc">Sharpen your tactical vision with curated tactical puzzles adapted to your personal skill level rating.</p>
+                        </div>
+                        <a href="https://lichess.org/training" target="_blank" class="card-btn">Solve Tactics</a>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
-        // JOUW SUPABASE PROJECT GEGEVENS
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
-
-        // Verbinding opstarten via de unieke variabele om crashes te voorkomen
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Bij het laden controleren of de browser de actieve sessie heeft onthouden
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
             const currentRole = localStorage.getItem('gcvm_db_role');
+            
             if (currentSession) {
-                showStyle(currentSession, currentRole);
+                showSidebarLoggedIn(currentSession, currentRole);
+                document.getElementById('logged-out-warning').classList.add('hidden');
+                document.getElementById('training-content').classList.remove('hidden');
             }
         };
 
-        // REGISTREREN IN DE ONLINE DATABASE
-        async function registerUser() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
-
-            if (!username || !password) {
-                alert("Please fill in both fields!");
-                return;
-            }
-
-            try {
-                // Check of de gebruiker al online bestaat
-                const { data: existingUser } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('username')
-                    .eq('username', username)
-                    .maybeSingle();
-
-                if (existingUser) {
-                    alert("This username is already registered online!");
-                    return;
-                }
-
-                // Voeg toe aan de online tabel
-                const { error } = await supabaseClient
-                    .from('gcvm_users')
-                    .insert([{ username: username, password: password, role: 'user' }]);
-
-                if (error) throw error;
-
-                alert("Account created successfully in the cloud! You can now log in.");
-                document.getElementById('password-input').value = "";
-            } catch (err) {
-                alert("Database error during registration: " + err.message);
-            }
-        }
-
-        // INLOGGEN VIA ONLINE DATABASE
         async function loginUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-
-            if (!username || !password) {
-                alert("Please fill in both fields!");
-                return;
-            }
+            if (!username || !password) return alert("Fill in all fields!");
 
             try {
-                const { data: user, error } = await supabaseClient
+                const { data: users, error } = await supabaseClient
                     .from('gcvm_users')
                     .select('*')
-                    .eq('username', username)
-                    .eq('password', password)
-                    .maybeSingle();
+                    .ilike('username', username)
+                    .eq('password', password);
+                
+                if (error || !users || users.length === 0) { alert("Invalid credentials!"); return; }
 
-                if (error || !user) {
-                    alert("Invalid online username or password!");
-                    return;
-                }
-
-                if (user.is_banned) {
-                    alert("This account has been banned from the website.");
-                    return;
-                }
-
-                // Sla de sessie-informatie op in de browser
+                const user = users[0];
                 localStorage.setItem('gcvm_db_session', user.username);
                 localStorage.setItem('gcvm_db_role', user.role);
-
-                showStyle(user.username, user.role);
-            } catch (err) {
-                alert("Database error during login: " + err.message);
-            }
+                window.location.reload();
+            } catch (err) { alert(err.message); }
         }
 
-        function showStyle(username, role) {
+        async function registerUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+            if (!username || !password) return alert("Fill in all fields!");
+
+            try {
+                const { error } = await supabaseClient
+                    .from('gcvm_users')
+                    .insert([{ username, password, role: 'user', bio: '', flair: '' }]);
+                
+                if (error) throw error;
+                alert("Account created! You can now log in.");
+            } catch (err) { alert("Error: " + err.message); }
+        }
+
+        function showSidebarLoggedIn(username, role) {
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('profile-section').classList.remove('hidden');
             document.getElementById('displayed-username').innerText = username;
-
-            if (role === 'admin') {
-                document.getElementById('admin-badge').classList.remove('hidden');
-                document.getElementById('admin-view-btn').classList.remove('hidden');
-            }
-        }
-
-        function toggleAdminPanel() {
-            // Aangezien de gebruikerstabel fysiek enkel op de homepage staat, sturen we de admin door
-            alert("Redirecting you to the main Homepage Dashboard to manage users.");
-            window.location.href = "index.html";
+            if (role === 'admin') document.getElementById('admin-badge').classList.remove('hidden');
         }
 
         function logoutUser() {
