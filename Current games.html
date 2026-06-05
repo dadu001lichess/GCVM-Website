@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Daily Shards puzzle!</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         * {
             margin: 0;
@@ -17,7 +20,7 @@
             background-color: white; 
             color: #3c4043; 
             padding: 20px;
-            margin-left: 280px;
+            display: flex;
         }
 
         aside {
@@ -38,8 +41,113 @@
             font-size: 22px;
             font-weight: 300;
             color: white;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             letter-spacing: 0.5px;
+        }
+
+        .auth-container {
+            margin-bottom: 25px;
+        }
+
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #3c4043;
+            border-radius: 4px;
+            background-color: #303134;
+            color: white;
+            font-size: 13px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .auth-input::placeholder {
+            color: #80868b;
+        }
+
+        .auth-btn-container {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .auth-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+
+        .auth-btn:hover {
+            background-color: #1557b0;
+        }
+
+        .auth-btn.secondary {
+            background-color: #3c4043;
+            color: #bdc1c6;
+        }
+
+        .auth-btn.secondary:hover {
+            background-color: #4f5357;
+            color: white;
+        }
+
+        .user-info {
+            color: #bdc1c6;
+            font-size: 14px;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .user-info strong {
+            color: #8ab4f8;
+            font-size: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 6px;
+            background-color: #34a853;
+            color: white;
+            border-radius: 10px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .logout-link {
+            display: inline-block;
+            color: #f28b82;
+            text-decoration: none;
+            font-size: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+
+        nav {
+            border-top: 1px solid #3c4043;
+            padding-top: 15px;
+        }
+
+        .hidden {
+            display: none !important;
         }
 
         nav a, nav summary {
@@ -80,38 +188,27 @@
             font-size: 14px;
             padding: 8px 0;
         }
-   </style>
-</head>
-    <body>
-        <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* We verwijderen de flexbox van de body om scrollbars te voorkomen */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #FFFFFF; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; /* Dit dwingt de scrollbar weg */
+
+        main {
+            margin-left: 280px; 
+            width: calc(100% - 280px);
+            min-height: 100vh;
         }
-        
+
         .game-container {
             text-align: center;
             background-color: #f9f9f9;
-            padding: 15px; /* Iets minder padding om ruimte te besparen */
+            padding: 15px; 
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin: 10px auto; /* Centreert horizontaal en geeft wat ruimte boven */
-            width: fit-content; /* Zorgt dat de box niet breder is dan de inhoud */
+            margin: 40px auto; 
+            width: fit-content; 
         }
 
         h2 {
             margin-top: 0;
             margin-bottom: 15px;
-            font-size: 1.2rem; /* Iets kleiner voor betere fit */
+            font-size: 1.2rem; 
             font-weight: 500;
             color: #333333;
         }
@@ -119,24 +216,34 @@
         iframe {
             border: 1px solid #ddd;
             border-radius: 4px;
-            display: block; /* Voorkomt witruimte onder de iframe */
+            display: block; 
         }
-    </style>
+   </style>
 </head>
-    <div class="game-container">
-        <h2> -Top Rated Lichess Game- </h2>
-        
-        <iframe 
-            src="https://lichess.org/tv/frame?theme=brown&bg=gray" 
-            width="400" 
-            height="444" 
-            allowtransparency="true" 
-            frameborder="0"
-            title="Lichess TV">
-        </iframe>
-    </div>
+<body>
+
     <aside>
         <div class="logo">GC(V)M</div>
+        
+        <div class="auth-container">
+            <div id="login-section" class="auth-input-group">
+                <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
+                <input type="password" id="password-input" class="auth-input" placeholder="Password...">
+                <div class="auth-btn-container">
+                    <button class="auth-btn" onclick="loginUser()">Login</button>
+                    <button class="auth-btn secondary" onclick="registerUser()">Register</button>
+                </div>
+            </div>
+            
+            <div id="profile-section" class="hidden">
+                <div class="user-info">
+                    Logged in as:<br>
+                    <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
+                    <span class="logout-link" onclick="logoutUser()">Log out</span>
+                </div>
+            </div>
+        </div>
+
         <nav>
             <a href="index.html">Homepage</a>
             <a href="Training.html">Training</a>
@@ -149,9 +256,7 @@
                 <a href="Shards shop.html">Shards shop</a>
               </div>
             </details>
-            <a href="Leaders.html">Leaders</a>
-            <a href="Current games.html">Current games</a>
-            <a href="MoTM.html">MoTM</a>
+            <a href="Current games.html" class="active">Current games</a>
             <a href="GoTM.html">Game of the month</a>
             <a href="Jobs.html">Special mentions/Jobs</a>
             <details>
@@ -161,7 +266,143 @@
                 <a href="News.html">Newspaper</a>
               </div>    
             </details>
-            <a href="Contact.html">Contact</a>
+            <details>
+              <summary>Community ⌵</summary>
+              <div class="sub-menu">
+                <a href="Leaders.html">Mods/Leaders</a>
+                <a href="Contact.html">Contact</a>
+                <a href="MoTM.html">MoTM</a>
+              </div>    
+            </details>
         </nav>
     </aside>
-    </body>
+
+    <main>
+        <div class="game-container">
+            <h2> -Top Rated Lichess Game- </h2>
+            
+            <iframe 
+                src="https://lichess.org/tv/frame?theme=brown&bg=gray" 
+                width="400" 
+                height="444" 
+                allowtransparency="true" 
+                frameborder="0"
+                title="Lichess TV">
+            </iframe>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        window.onload = function() {
+            const currentSession = localStorage.getItem('gcvm_db_session');
+            const currentRole = localStorage.getItem('gcvm_db_role');
+            if (currentSession) {
+                showStyle(currentSession, currentRole);
+                updateOnlineStatus(currentSession);
+                setInterval(() => updateOnlineStatus(currentSession), 60000);
+            }
+        };
+
+        async function updateOnlineStatus(username) {
+            try {
+                await supabaseClient
+                    .from('gcvm_users')
+                    .update({ last_seen: new Date().toISOString() })
+                    .eq('username', username);
+            } catch(e) { console.error(e); }
+        }
+
+        async function registerUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+
+            if (!username || !password) {
+                alert("Please fill in both fields!");
+                return;
+            }
+
+            try {
+                const { data: existingUser } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('username')
+                    .eq('username', username)
+                    .maybeSingle();
+
+                if (existingUser) {
+                    alert("This username is already registered online!");
+                    return;
+                }
+
+                const { error } = await supabaseClient
+                    .from('gcvm_users')
+                    .insert([{ username: username, password: password, role: 'user', bio: 'Hello! I am a proud member of GC(V)M.' }]);
+
+                if (error) throw error;
+
+                alert("Account created successfully in the cloud! You can now log in.");
+                document.getElementById('password-input').value = "";
+            } catch (err) {
+                alert("Database error during registration: " + err.message);
+            }
+        }
+
+        async function loginUser() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+
+            if (!username || !password) {
+                alert("Please fill in both fields!");
+                return;
+            }
+
+            try {
+                const { data: user, error } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .maybeSingle();
+
+                if (error || !user) {
+                    alert("Invalid online username or password!");
+                    return;
+                }
+
+                if (user.is_banned) {
+                    alert("This account has been banned from the website.");
+                    return;
+                }
+
+                localStorage.setItem('gcvm_db_session', user.username);
+                localStorage.setItem('gcvm_db_role', user.role);
+
+                showStyle(user.username, user.role);
+                updateOnlineStatus(user.username);
+            } catch (err) {
+                alert("Database error during login: " + err.message);
+            }
+        }
+
+        function showStyle(username, role) {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('profile-section').classList.remove('hidden');
+            document.getElementById('displayed-username').innerText = username;
+
+            if (role === 'admin') {
+                document.getElementById('admin-badge').classList.remove('hidden');
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('gcvm_db_session');
+            localStorage.removeItem('gcvm_db_role');
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
