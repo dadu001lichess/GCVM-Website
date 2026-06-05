@@ -153,7 +153,6 @@
             padding: 40px;
         }
 
-        /* LIGHT PROFILE GRID STYLE */
         .profile-grid {
             display: grid;
             grid-template-columns: 280px 1fr;
@@ -244,7 +243,7 @@
             line-height: 1.6;
             color: #3c4043;
             font-size: 15px;
-            white-space: pre-wrap; /* Behoudt enters/alinea's uit de bio */
+            white-space: pre-wrap;
         }
 
         .progress-graph-box {
@@ -436,8 +435,8 @@
                     <select id="flair-select" class="editor-select">
                         <option value="">No Flair</option>
                         <option value="👑">👑 King</option>
-                        <option value="🦄">🦄 Horsey</option>
-                        <option value="🔮">🔮 Magician</option>
+                        <option value="🦄">🦄 Knight</option>
+                        <option value="🔮">🔮 Variant Master</option>
                         <option value="🎯">🎯 Tactician</option>
                         <option value="🛡️">🛡️ Defender</option>
                     </select>
@@ -493,8 +492,9 @@
                         <div class="profile-top-header">
                             <div>
                                 <h2 class="user-header-title">
-                                    <span class="status-dot-indicator online" id="view-status-dot"></span>
+                                    <span class="status-dot-indicator offline" id="view-status-dot"></span>
                                     <span id="view-username">Username</span>
+                                    <span id="view-status-text" style="font-size:12px; color:#70757a; font-weight:normal; margin-left:5px;"></span>
                                     <span id="view-flair" class="flair-badge-display hidden">👑</span>
                                 </h2>
                             </div>
@@ -515,11 +515,12 @@
                         </div>
                     </div>
 
-                </div> </div>
+                </div>
+            </div>
         </div>
     </main>
 
-<script>
+    <script>
         // Supabase initialisatie
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
@@ -527,30 +528,25 @@
 
         let currentViewingUser = "";
 
-        // Startfunctie bij het laden van de pagina
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
             const currentRole = localStorage.getItem('gcvm_db_role');
             
             if (currentSession) {
-                // Toon de ingelogde staat in de sidebar
                 showStyle(currentSession, currentRole);
                 
-                // Activeer de profiel interface en verberg de waarschuwing
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('profile-page-content').classList.remove('hidden');
                 
-                // Laad standaard direct het profiel van de ingelogde speler zelf in
+                // Direct profiel inladen
                 loadProfileData(currentSession);
 
-                // Online status direct doorgeven en elke minuut herhalen
+                // Online status bijwerken
                 updateOnlineTimestamp(currentSession);
                 setInterval(() => updateOnlineTimestamp(currentSession), 60000);
             }
         };
 
-        // Update de 'last_seen' kolom live in de database
-// Update de 'last_seen' kolom live in de database
         async function updateOnlineTimestamp(username) {
             try {
                 await supabaseClient
@@ -562,7 +558,6 @@
             }
         }
 
-// Haalt profielgegevens op uit Supabase
         async function loadProfileData(username) {
             currentViewingUser = username;
             const activeUser = localStorage.getItem('gcvm_db_session');
@@ -570,7 +565,7 @@
             try {
                 const { data: user, error } = await supabaseClient
                     .from('gcvm_users')
-                    .select('username', 'bio', 'flair', 'last_seen') // Alles met kleine letters!
+                    .select('username', 'bio', 'flair', 'last_seen')
                     .eq('username', username)
                     .maybeSingle();
 
@@ -581,10 +576,11 @@
                     return;
                 }
 
-                // Vul de HTML-elementen met de databasegegevens
+                // FIX: Schrijf de naam direct naar het losse element zonder herhaaldelijke overschrijvingen
+                document.getElementById('view-username').innerText = user.username;
                 document.getElementById('view-bio').innerText = user.bio || "This member hasn't written a biography yet.";
                 
-                // Verwerk de Flair badge
+                // Verwerk Flair
                 const flairBox = document.getElementById('view-flair');
                 if (user.flair && user.flair.trim() !== "") {
                     flairBox.innerText = user.flair;
@@ -593,14 +589,14 @@
                     flairBox.classList.add('hidden');
                 }
 
-                // Online / Offline status & "Last online" tekst berekenen
+                // Online / Offline status indicator en tekst scheiden van de naam-div
                 const dot = document.getElementById('view-status-dot');
+                const statusText = document.getElementById('view-status-text');
                 
                 if (user.last_seen) {
                     const lastSeenDate = new Date(user.last_seen);
-                    const limit = new Date(Date.now() - 5 * 60 * 1000); // 5 minuten online-venster
+                    const limit = new Date(Date.now() - 5 * 60 * 1000);
                     
-                    // Maak een nette Nederlandse datum/tijd weergave
                     const netjesGeformatteerd = lastSeenDate.toLocaleString('nl-NL', { 
                         day: '2-digit', month: '2-digit', year: 'numeric', 
                         hour: '2-digit', minute: '2-digit' 
@@ -608,17 +604,20 @@
 
                     if (lastSeenDate > limit) {
                         dot.className = "status-dot-indicator online";
-                        document.getElementById('view-username').innerHTML = `${user.username} <span style="font-size:12px; color:#34a853; font-weight:normal; margin-left:10px;">(Online)</span>`;
+                        statusText.innerHTML = `(Online)`;
+                        statusText.style.color = "#34a853";
                     } else {
                         dot.className = "status-dot-indicator offline";
-                        document.getElementById('view-username').innerHTML = `${user.username} <span style="font-size:12px; color:#70757a; font-weight:normal; margin-left:10px;">(Last online: ${netjesGeformatteerd})</span>`;
+                        statusText.innerHTML = `(Last online: ${netjesGeformatteerd})`;
+                        statusText.style.color = "#70757a";
                     }
                 } else {
                     dot.className = "status-dot-indicator offline";
-                    document.getElementById('view-username').innerHTML = `${user.username} <span style="font-size:12px; color:#70757a; font-weight:normal; margin-left:10px;">(Last online: never)</span>`;
+                    statusText.innerHTML = `(Last online: never)`;
+                    statusText.style.color = "#70757a";
                 }
 
-                // Controleer of de gebruiker naar zijn EIGEN profiel kijkt (hoofdletterongevoelig)
+                // FIX: Altijd vergelijken met kleine letters om hoofdletter-mismatches uit te sluiten
                 const settingsBtn = document.getElementById('edit-settings-trigger');
                 if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
                     settingsBtn.classList.remove('hidden');
@@ -634,7 +633,6 @@
             }
         }
 
-        // Slaat de gewijzigde Bio en Flair op in Supabase
         async function saveProfileSettings() {
             const username = localStorage.getItem('gcvm_db_session');
             const newBio = document.getElementById('bio-textarea-input').value;
@@ -645,7 +643,7 @@
             try {
                 const { error } = await supabaseClient
                     .from('gcvm_users')
-                    .update({ bio: newBio, flair: newFlair }) // Kleine letters!
+                    .update({ bio: newBio, flair: newFlair })
                     .eq('username', username);
 
                 if (error) throw error;
@@ -658,7 +656,7 @@
                 console.error("Gedetailleerde database fout:", err);
             }
         }
-        // Start de zoekfunctie voor andere leden via de bovenste zoekbalk
+
         function searchOtherMember() {
             const name = document.getElementById('memberSearchField').value.trim();
             if (name) {
@@ -668,13 +666,11 @@
             }
         }
 
-        // Toont of verbergt het instellingenpaneel
         function toggleSettings() {
             const panel = document.getElementById('settings-panel');
             panel.classList.toggle('hidden');
         }
 
-        // --- AUTH & SIDEBAR LOGICA ---
         async function loginUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
