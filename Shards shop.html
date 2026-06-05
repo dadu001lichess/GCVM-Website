@@ -15,12 +15,6 @@
             background-color: white;
         }
         
-        hr {
-            border: none;
-            border-top: 1px solid #dadce0;
-            margin: 20px 0;
-        }
-
         .banner {
             height: 200px; 
             background-color: #f1f3f4;
@@ -41,29 +35,27 @@
         .content {
             max-width: 800px;
             margin: 0 auto; 
-            padding: 40px 40px;
-            text-align: left;
-        }
-
-        .content.1 {
-            padding-top: 40px;
-            padding-bottom: 10px;
+            padding: 60px 40px;
         }
 
         .content h2 {
             font-size: 28px;
             font-weight: 300;
             color: #202124;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         .content p {
             font-size: 16px;
             line-height: 1.6;
             color: #3c4043;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
+        .content a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
         * {
             margin: 0;
             padding: 0;
@@ -100,6 +92,7 @@
             letter-spacing: 0.5px;
         }
 
+        /* Strakke styling voor de loginbox in de zijbalk */
         .auth-container {
             margin-bottom: 25px;
         }
@@ -261,82 +254,6 @@
             font-size: 14px;
             padding: 8px 0;
         }
-
-        /* Shop Elementen */
-        .shop-form {
-            background-color: #f8f9fa;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 30px;
-        }
-
-        .shop-input {
-            width: 100%;
-            max-width: 300px;
-            padding: 10px 14px;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            font-size: 14px;
-            outline: none;
-            margin-bottom: 10px;
-        }
-
-        .shop-input:focus {
-            border-color: #1a73e8;
-        }
-
-        .item-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-top: 20px;
-        }
-
-        .shop-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            background: white;
-            border: 1px solid #dadce0;
-            border-radius: 6px;
-        }
-
-        .item-info h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #202124;
-            margin-bottom: 4px;
-        }
-
-        .item-info p {
-            font-size: 14px;
-            color: #5f6368;
-            margin: 0;
-        }
-
-        .buy-btn {
-            background-color: #34a853;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .buy-btn:hover {
-            background-color: #2b8a43;
-        }
-
-        #statusMessage {
-            font-weight: 600;
-            margin-top: 10px;
-            font-size: 14px;
-        }
    </style>
 </head>
 <body>
@@ -393,236 +310,273 @@
         
     <main>
         <div class="banner">
-            <h1>GCVM - Shards shop!</h1>
+            <h1>GCVM - Shards shop</h1>
         </div>
 
-        <div class="content 1">
-            <h2>Welcome to the official team shop!</h2>
-            <p>Here you can spend your earned Shards on cool items and perks. To buy an item, please type your Lichess username in the verification box first, then click "Buy" on the item you want.</p>
-            
-            <div class="shop-form">
-                <p><strong>Step 1: Enter your Lichess Username</strong></p>
-                <input type="text" id="usernameInput" class="shop-input" placeholder="Lichess Username...">
-                <div id="statusMessage"></div>
-            </div>
-
-            <hr>
-            <h2>Available Items:</h2>
-            
-            <div class="item-list">
-                <div class="shop-item">
-                    <div class="item-info">
-                        <h3>Daily Free Shards</h3>
-                        <p>Get 5 free Shards immediately! Can be claimed once every day.</p>
+        <div class="content">
+            <div style="background: #24292e; padding: 30px; border-radius: 8px; color: #d1d5da; font-family: 'Inter', -apple-system, sans-serif; border: 1px solid #444d56; max-width: 450px; margin: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+                
+                <h2 style="color: #ffffff; margin-top: 0; font-weight: 600; letter-spacing: -0.5px; border-bottom: 1px solid #444d56; padding-bottom: 15px; font-size: 24px; text-align: center;">Shards Shop</h2>
+                
+                <div style="margin: 20px 0; text-align: left;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 0.85em; color: #959da5; text-transform: uppercase; font-weight: bold;">Lichess Username</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="usernameInput" placeholder="Enter Lichess username..." style="flex-grow: 1; padding: 12px; border-radius: 6px; border: 1px solid #444d56; background: #1f2328; color: white; outline: none; transition: border 0.3s;">
+                        <button onclick="checkBalance()" style="background: #444d56; color: #eeeeee; border: none; border-radius: 6px; padding: 0 15px; cursor: pointer; font-size: 0.8em; white-space: nowrap; transition: background 0.2s;">Check Balance</button>
                     </div>
-                    <button class="buy-btn" onclick="purchaseItem('Daily Free Shards', 0)">Claim (0 Shards)</button>
+                    <div id="balanceDisplay" style="margin-top: 10px; font-weight: bold; color: #c9d1d9; font-size: 0.9em;"></div>
                 </div>
 
-                <div class="shop-item">
-                    <div class="item-info">
-                        <h3>Analysis Session</h3>
-                        <p>Get a comprehensive analysis session of one of your games by a high-rated player.</p>
-                    </div>
-                    <button class="buy-btn" onclick="purchaseItem('Analysis Session', 50)">Buy (50 Shards)</button>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    
+                    <button onclick="buyItem('Daily 5 free Shards', 0)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
+                        <span>Daily 5 free Shards</span>
+                        <span style="color: #959da5;">0 Shards</span>
+                    </button>
+
+                    <button onclick="buyItem('Tournament Perms for one day', 200)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
+                        <span>Tournament Perms for one day</span>
+                        <span style="color: #959da5;">200 Shards</span>
+                    </button>
+                    
+                    <button onclick="buyItem('Analysis Session', 100)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
+                        <span>Analysis Session</span>
+                        <span style="color: #959da5;">100 Shards</span>
+                    </button>
+
+                    <button onclick="buyItem('Team Message', 500)" style="background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between;">
+                        <span>Team Message</span>
+                        <span style="color: #959da5;">500 Shards</span>
+                    </button>
+
+                    <details style="width: 100%;"> 
+                        <summary style="font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; list-style: none;">
+                            <span>Training Passwords</span>
+                            <span style="color: #959da5; font-size: 0.8em;">▼</span>
+                        </summary>
+                        <div style="width: 100%; padding: 10px 0 0 20px; display: flex; flex-direction: column; gap: 8px;">
+                            <button onclick="buyItem('Universal training password', 1000)" style="font-family: 'Inter', -apple-system, sans-serif; background: #1f2328; color: #e1e4e8; padding: 12px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; width: 100%;">
+                                <span>Universal Training Password</span>
+                                <span style="color: #959da5;">1000 Shards</span>
+                            </button>
+                        </div>
+                    </details> 
+
+                    <details style="width: 100%;"> 
+                        <summary style="font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; background: #2f363d; color: #e1e4e8; padding: 14px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; list-style: none;">
+                            <span>Promotions</span>
+                            <span style="color: #959da5; font-size: 0.8em;">▼</span>
+                        </summary>
+                        <div style="width: 100%; padding: 10px 0 0 20px; display: flex; flex-direction: column; gap: 8px;">
+                            <button onclick="buyItem('Study promotion', 100)" style="font-family: 'Inter', -apple-system, sans-serif; background: #1f2328; color: #e1e4e8; padding: 12px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; width: 100%;">
+                                <span>Study promotion</span>
+                                <span style="color: #959da5;">100 Shards</span>
+                            </button>
+                            <button onclick="buyItem('Blog promotion', 100)" style="font-family: 'Inter', -apple-system, sans-serif; background: #1f2328; color: #e1e4e8; padding: 12px; border: 1px solid #444d56; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; text-align: left; display: flex; justify-content: space-between; width: 100%;">
+                                <span>Blog promotion</span>
+                                <span style="color: #959da5;">100 Shards</span>
+                            </button>
+                        </div>
+                    </details>
                 </div>
 
-                <div class="shop-item">
-                    <div class="item-info">
-                        <h3>Promote your Study</h3>
-                        <p>Have your Lichess study promoted across the team updates and announcement sectors.</p>
-                    </div>
-                    <button class="buy-btn" onclick="purchaseItem('Promote your Study', 75)">Buy (75 Shards)</button>
-                </div>
-
-                <div class="shop-item">
-                    <div class="item-info">
-                        <h3>Training Sector Password</h3>
-                        <p>Gain private credentials and passwords to enter advanced training sectors.</p>
-                    </div>
-                    <button class="buy-btn" onclick="purchaseItem('Training Sector Password', 100)">Buy (100 Shards)</button>
-                </div>
+                <div id="statusMessage" style="margin-top: 20px; font-size: 0.9em; min-height: 24px; color: #959da5; line-height: 1.4; text-align: left;"></div>
             </div>
         </div>
     </main>
 
     <script>
-        // JOUW SUPABASE PROJECT GEGEVENS
-        const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
+    // JOUW SUPABASE PROJECT GEGEVENS
+    const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
 
-        // Verbinding opstarten via Supabase
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Verbinding opstarten via Supabase
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Google Apps Script URL voor afhandeling orders
-        const scriptURL = "https://script.google.com/macros/s/AKfycbwPz22X-jAnwDlyE69WbC8eDREtK9_g5_p4E9O69fMInWfS8WstBAn7X0-Gv9T8gUIs/exec";
+    // Google Script en Spreadsheets URL's voor Shop verwerking
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyULPDUd_5admFfsVefPZsCvQVTkhryaoj-Q1s80Nt0MkXcR4uK0sQ6yPoNwVbTUeub/exec";
+    const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTm7tdaXaidF8Cm2yQS0hwOCJhjnnLT1JdGr79IJU0HkER-MigtjsLKCEiQIlY9fIGUGkSli07zeS3R/pub?gid=2015825906&single=true&output=csv";
 
-        // Bij het laden controleren of de browser de actieve sessie heeft onthouden
-        window.onload = function() {
-            const currentSession = localStorage.getItem('gcvm_db_session');
-            const currentRole = localStorage.getItem('gcvm_db_role');
-            if (currentSession) {
-                showStyle(currentSession, currentRole);
-                document.getElementById('usernameInput').value = currentSession;
-            }
-        };
+    // Bij het laden actieve sessie ophalen
+    window.onload = function() {
+        const currentSession = localStorage.getItem('gcvm_db_session');
+        const currentRole = localStorage.getItem('gcvm_db_role');
+        if (currentSession) {
+            showStyle(currentSession, currentRole);
+            document.getElementById('usernameInput').value = currentSession;
+        }
+    };
 
-        // REGISTREREN IN DE ONLINE DATABASE
-        async function registerUser() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
+    // REGISTREREN IN DATABASE
+    async function registerUser() {
+        const username = document.getElementById('username-input').value.trim();
+        const password = document.getElementById('password-input').value.trim();
 
-            if (!username || !password) {
-                alert("Please fill in both fields!");
+        if (!username || !password) {
+            alert("Please fill in both fields!");
+            return;
+        }
+
+        try {
+            const { data: existingUser } = await supabaseClient
+                .from('gcvm_users')
+                .select('username')
+                .eq('username', username)
+                .maybeSingle();
+
+            if (existingUser) {
+                alert("This username is already registered online!");
                 return;
             }
 
-            try {
-                const { data: existingUser } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('username')
-                    .eq('username', username)
-                    .maybeSingle();
+            const { error } = await supabaseClient
+                .from('gcvm_users')
+                .insert([{ username: username, password: password, role: 'user' }]);
 
-                if (existingUser) {
-                    alert("This username is already registered online!");
-                    return;
-                }
+            if (error) throw error;
 
-                const { error } = await supabaseClient
-                    .from('gcvm_users')
-                    .insert([{ username: username, password: password, role: 'user' }]);
+            alert("Account created successfully in the cloud! You can now log in.");
+            document.getElementById('password-input').value = "";
+        } catch (err) {
+            alert("Database error during registration: " + err.message);
+        }
+    }
 
-                if (error) throw error;
+    // INLOGGEN VIA ONLINE DATABASE
+    async function loginUser() {
+        const username = document.getElementById('username-input').value.trim();
+        const password = document.getElementById('password-input').value.trim();
 
-                alert("Account created successfully in the cloud! You can now log in.");
-                document.getElementById('password-input').value = "";
-            } catch (err) {
-                alert("Database error during registration: " + err.message);
-            }
+        if (!username || !password) {
+            alert("Please fill in both fields!");
+            return;
         }
 
-        // INLOGGEN VIA ONLINE DATABASE
-        async function loginUser() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
+        try {
+            const { data: user, error } = await supabaseClient
+                .from('gcvm_users')
+                .select('*')
+                .eq('username', username)
+                .eq('password', password)
+                .maybeSingle();
 
-            if (!username || !password) {
-                alert("Please fill in both fields!");
+            if (error || !user) {
+                alert("Invalid online username or password!");
                 return;
             }
 
-            try {
-                const { data: user, error } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('*')
-                    .eq('username', username)
-                    .eq('password', password)
-                    .maybeSingle();
-
-                if (error || !user) {
-                    alert("Invalid online username or password!");
-                    return;
-                }
-
-                if (user.is_banned) {
-                    alert("This account has been banned from the website.");
-                    return;
-                }
-
-                localStorage.setItem('gcvm_db_session', user.username);
-                localStorage.setItem('gcvm_db_role', user.role);
-
-                showStyle(user.username, user.role);
-                document.getElementById('usernameInput').value = user.username;
-            } catch (err) {
-                alert("Database error during login: " + err.message);
+            if (user.is_banned) {
+                alert("This account has been banned from the website.");
+                return;
             }
+
+            localStorage.setItem('gcvm_db_session', user.username);
+            localStorage.setItem('gcvm_db_role', user.role);
+
+            showStyle(user.username, user.role);
+            document.getElementById('usernameInput').value = user.username;
+        } catch (err) {
+            alert("Database error during login: " + err.message);
         }
+    }
 
-        function showStyle(username, role) {
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('profile-section').classList.remove('hidden');
-            document.getElementById('displayed-username').innerText = username;
+    function showStyle(username, role) {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('profile-section').classList.remove('hidden');
+        document.getElementById('displayed-username').innerText = username;
 
-            if (role === 'admin') {
-                document.getElementById('admin-badge').classList.remove('hidden');
-                document.getElementById('admin-view-btn').classList.remove('hidden');
+        if (role === 'admin') {
+            document.getElementById('admin-badge').classList.remove('hidden');
+            document.getElementById('admin-view-btn').classList.remove('hidden');
+        }
+    }
+
+    function toggleAdminPanel() {
+        alert("Redirecting you to the main Homepage Dashboard to manage users.");
+        window.location.href = "index.html";
+    }
+
+    function logoutUser() {
+        localStorage.removeItem('gcvm_db_session');
+        localStorage.removeItem('gcvm_db_role');
+        window.location.reload();
+    }
+
+    // --- BALANS & INTEGRATIE LOGICA SHOP ---
+    async function getBalance(username) {
+        try {
+            const response = await fetch(csvURL);
+            const text = await response.text();
+            const rows = text.split(/\r?\n/).map(row => row.split(','));
+            
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i][0] && rows[i][0].replace(/"/g, "").trim().toLowerCase() === username.toLowerCase()) {
+                    return parseInt(rows[i][1]);
+                }
             }
-        }
+            return null;
+        } catch (e) { return "error"; }
+    }
 
-        function toggleAdminPanel() {
-            alert("Redirecting you to the main Homepage Dashboard to manage users.");
-            window.location.href = "index.html";
-        }
-
-        function logoutUser() {
-            localStorage.removeItem('gcvm_db_session');
-            localStorage.removeItem('gcvm_db_role');
-            window.location.reload();
-        }
-
-        // --- SHOP APPS SCRIPT KOPPELING LOGICA ---
+    async function checkBalance() {
+        const name = document.getElementById('usernameInput').value.trim();
+        const display = document.getElementById('balanceDisplay');
+        if(!name) { display.innerText = "Enter a name first!"; return; }
         
-        async function getBalance(username) {
-            try {
-                const response = await fetch(`${scriptURL}?username=${encodeURIComponent(username)}`);
-                const text = await response.text();
-                if(text.trim() === "User not found") return null;
-                const num = parseFloat(text);
-                return isNaN(num) ? "error" : num;
-            } catch(e) {
-                return "error";
-            }
+        display.innerText = "Searching...";
+        const balance = await getBalance(name);
+        
+        if(balance === "error") display.innerText = "Error connecting.";
+        else if(balance === null) display.innerText = "User not found.";
+        else display.innerText = `Current Balance: ${balance} Shards`;
+    }
+
+    async function buyItem(itemName, itemPrice) {
+        const userField = document.getElementById('usernameInput');
+        const status = document.getElementById('statusMessage');
+        const member = userField.value.trim();
+
+        if(!member) {
+            status.style.color = "#f85149";
+            status.innerText = "Please enter your Lichess username first.";
+            return;
         }
 
-        async function purchaseItem(itemName, itemPrice) {
-            const userField = document.getElementById('usernameInput');
-            const status = document.getElementById('statusMessage');
-            const member = userField.value.trim();
+        status.style.color = "#d1d5da";
+        status.innerText = "Verifying...";
 
-            if(!member) {
-                status.style.color = "#d93025";
-                status.innerText = "Please enter your Lichess username first.";
-                return;
-            }
+        const userBalance = await getBalance(member);
 
-            status.style.color = "#5f6368";
-            status.innerText = "Verifying balance...";
-
-            if (itemPrice > 0) {
-                const userBalance = await getBalance(member);
-
-                if (userBalance === null || userBalance === "error") {
-                    status.style.color = "#d93025";
-                    status.innerText = "User not found in team-list spreadsheet.";
-                    return;
-                }
-
-                if (userBalance < itemPrice) {
-                    status.style.color = "#d93025";
-                    status.innerText = `Insufficient Shards (You currently have ${userBalance}).`;
-                    return;
-                }
-            }
-
-            status.style.color = "#1a73e8";
-            status.innerText = "Processing your order...";
-
-            try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({username: member, item: itemName, price: itemPrice})
-                });
-
-                status.style.color = "#34a853";
-                status.innerText = "Order successful! An Admin or the system will update your balance shortly.";
-            } catch (err) {
-                status.style.color = "#d93025";
-                status.innerText = "Error completing order. Please try again.";
-            }
+        if (userBalance === null || userBalance === "error") {
+            status.style.color = "#f85149";
+            status.innerText = "User not found in team-list.";
+            return;
         }
+
+        if (userBalance < itemPrice) {
+            status.style.color = "#f85149";
+            status.innerText = `Insufficient Shards (You have ${userBalance}).`;
+            return;
+        }
+
+        status.innerText = "Processing order...";
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({username: member, item: itemName, price: itemPrice})
+            });
+
+            status.style.color = "#79c0ff";
+            status.innerText = "Order successful! System/Admin will update your balance shortly.";
+            userField.value = ""; 
+            document.getElementById('balanceDisplay').innerText = "";
+        } catch(e) {
+            status.style.color = "#f85149";
+            status.innerText = "Error communicating with the shop server.";
+        }
+    }
     </script>
 </body>
 </html>
