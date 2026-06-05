@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCVM - Training</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>GC(V)M - Training</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -14,7 +14,6 @@
             margin: 0;
             display: flex;
             background-color: white;
-            color: #3c4043;
         }
 
         aside {
@@ -30,31 +29,116 @@
             z-index: 10;
         }
 
-        .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
-        .auth-container { margin-bottom: 25px; }
-        .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
-        
+        .logo {
+            color: white;
+            font-size: 22px;
+            font-weight: 300;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-container {
+            margin-bottom: 25px;
+        }
+
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
         .auth-input {
-            width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px;
-            background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none;
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #3c4043;
+            border-radius: 4px;
+            background-color: #303134;
+            color: white;
+            font-size: 13px;
+            box-sizing: border-box;
+            outline: none;
         }
 
-        .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
+        .auth-btn-container {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
         .auth-btn {
-            flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none;
-            border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;
+            flex: 1;
+            padding: 10px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
         }
-        .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
-        .user-info { color: #bdc1c6; font-size: 14px; }
-        .user-info strong { color: #8ab4f8; font-size: 15px; }
-        .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; }
-        .logout-link { color: #f28b82; font-size: 12px; margin-top: 8px; cursor: pointer; display: inline-block; }
 
-        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
-        nav a:hover, nav a.active { color: #8ab4f8; }
-        summary { color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; list-style: none; }
-        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; }
-        .sub-menu a { font-size: 14px; padding: 8px 0; }
+        .auth-btn.secondary {
+            background-color: #3c4043;
+            color: #bdc1c6;
+        }
+
+        .user-info {
+            color: #bdc1c6;
+            font-size: 14px;
+        }
+
+        .user-info strong {
+            color: #8ab4f8;
+            font-size: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 6px;
+            background-color: #34a853;
+            color: white;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+
+        .logout-link {
+            color: #f28b82;
+            font-size: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        nav a {
+            display: block;
+            color: #bdc1c6;
+            text-decoration: none;
+            padding: 12px 0;
+            font-size: 15px;
+        }
+
+        nav a:hover, nav a.active {
+            color: #8ab4f8;
+        }
+
+        summary {
+            color: #bdc1c6;
+            padding: 12px 0;
+            font-size: 15px;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .sub-menu {
+            padding-left: 20px;
+            border-left: 1px solid #3c4043;
+        }
+
+        .sub-menu a {
+            font-size: 14px;
+            padding: 8px 0;
+        }
 
         main {
             margin-left: 280px; 
@@ -150,8 +234,20 @@
             background-color: #1557b0;
         }
 
-        .alert-warn { background: #fce8e6; border: 1px solid #f28b82; color: #a51d24; padding: 15px; border-radius: 6px; text-align: center; font-weight: 600; }
-        .hidden { display: none !important; }
+        .alert-warn {
+            background-color: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #fad2cf;
+            padding: 16px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -266,7 +362,7 @@
             const currentRole = localStorage.getItem('gcvm_db_role');
             
             if (currentSession) {
-                showSidebarLoggedIn(currentSession, currentRole);
+                showStyle(currentSession, currentRole);
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('training-content').classList.remove('hidden');
             }
@@ -290,7 +386,7 @@
                 localStorage.setItem('gcvm_db_session', user.username);
                 localStorage.setItem('gcvm_db_role', user.role);
                 window.location.reload();
-            } catch (err) { alert(err.message); }
+            } catch (err) { alert("Database error during login: " + err.message); }
         }
 
         async function registerUser() {
@@ -308,7 +404,7 @@
             } catch (err) { alert("Error: " + err.message); }
         }
 
-        function showSidebarLoggedIn(username, role) {
+        function showStyle(username, role) {
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('profile-section').classList.remove('hidden');
             document.getElementById('displayed-username').innerText = username;
