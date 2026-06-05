@@ -310,7 +310,7 @@
                 if (error) throw error;
 
                 alert("Profile changes successfully saved to the cloud database!");
-                loadProfileData(username);
+                window.location.href = "profileview.html";
             } catch (err) {
                 alert("Failed to save: " + err.message);
             }
