@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCVM - Profile</title>
+    <title>GCVM - Profile Editor</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -61,7 +61,7 @@
         .banner h1 { font-size: 32px; font-weight: 400; margin: 0; color: #202124; }
         .content { max-width: 1000px; margin: 0 auto; padding: 40px; }
 
-        /* ZOEKBALK RECHTERBOVENHOEK */
+        /* RECHTERBOVENHOEK ZOEKBALK */
         .top-right-search {
             position: absolute;
             top: 40px;
@@ -90,7 +90,6 @@
         .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 10px; }
         .profile-title { font-size: 28px; margin: 0; font-weight: 400; }
 
-        /* CLEAN RESTRUSTURED BIO & FLAIR */
         .flair-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
         .edit-select { width: 220px; padding: 8px; border: 1px solid #dadce0; border-radius: 4px; font-family: inherit; font-size: 14px; }
         
@@ -239,7 +238,6 @@
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('profile-page-content').classList.remove('hidden');
                 
-                // Laad direct je eigen profiel
                 loadProfileData(currentSession);
             }
         };
@@ -248,7 +246,6 @@
             currentViewingUser = username;
             const activeUser = localStorage.getItem('gcvm_db_session');
 
-            // Titel aanpassen
             if(activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
                 document.getElementById('page-main-title').innerText = "Profile Editor";
             } else {
@@ -256,9 +253,10 @@
             }
 
             try {
+                // Strikt matching op kleine letters om kolom-synchronisatiefouten te omzeilen
                 const { data: users, error } = await supabaseClient
                     .from('gcvm_users')
-                    .select('username', 'bio', 'flair')
+                    .select('username, bio, flair')
                     .ilike('username', username);
 
                 if (error) throw error;
@@ -273,15 +271,12 @@
                 const flairSelect = document.getElementById('flair-select');
                 const saveBtn = document.getElementById('save-bio-btn');
 
-                // Vul de velden met data
                 bioBox.value = user.bio || "";
                 flairSelect.value = user.flair || "";
 
-                // Geef de naam weer met eventuele flair erachter
                 const displayFlair = user.flair ? ` [${user.flair}]` : "";
                 document.getElementById('view-username').innerText = user.username + displayFlair;
 
-                // CHECK: Ben jij dit zelf? Zo nee, blokkeer editen en verberg de save-knop
                 if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
                     bioBox.removeAttribute('disabled');
                     flairSelect.removeAttribute('disabled');
@@ -295,7 +290,7 @@
                     }
                 }
 
-            } catch(err) { console.error("Fout bij laden:", err); }
+            } catch(err) { console.error("Database loading error:", err); }
         }
 
         async function saveProfileSettings() {
@@ -306,6 +301,7 @@
             if (!username) return;
 
             try {
+                // Directe update aanroep met expliciete kleine kolomnamen
                 const { error } = await supabaseClient
                     .from('gcvm_users')
                     .update({ bio: newBio, flair: newFlair })
