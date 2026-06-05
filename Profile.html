@@ -61,7 +61,6 @@
         .banner h1 { font-size: 32px; font-weight: 400; margin: 0; color: #202124; }
         .content { max-width: 1000px; margin: 0 auto; padding: 40px; }
 
-        /* RECHTERBOVENHOEK ZOEKBALK */
         .top-right-search {
             position: absolute;
             top: 40px;
@@ -74,7 +73,6 @@
         .search-btn { background: #3c4043; color: white; border: none; padding: 0 14px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; }
         .search-btn:hover { background: #202124; }
 
-        /* GRID INDELING */
         .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; }
         .side-panel { border-right: 1px solid #dadce0; padding-right: 20px; }
         
@@ -90,16 +88,19 @@
         .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 10px; }
         .profile-title { font-size: 28px; margin: 0; font-weight: 400; }
 
-        .flair-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-        .edit-select { width: 220px; padding: 8px; border: 1px solid #dadce0; border-radius: 4px; font-family: inherit; font-size: 14px; }
+        /* Strakkere layout voor de Custom Flair selector */
+        .flair-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 5px; }
+        .edit-select { width: 100%; max-width: 320px; padding: 10px 12px; border: 1px solid #dadce0; border-radius: 4px; font-family: inherit; font-size: 14px; background-color: #fff; color: #3c4043; outline: none; }
+        .edit-select:focus { border-color: #1a73e8; }
         
         .bio-textarea { 
             width: 100%; height: 140px; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; 
-            resize: none; font-family: inherit; font-size: 15px; box-sizing: border-box; background-color: #fff; color: #3c4043;
+            resize: none; font-family: inherit; font-size: 15px; box-sizing: border-box; background-color: #fff; color: #3c4043; outline: none;
         }
+        .bio-textarea:focus { border-color: #1a73e8; }
         
-        .save-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 10px; }
-        .save-btn:hover { background: #1557b0; }
+        .save-btn { background: #34a853; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 10px; }
+        .save-btn:hover { background: #2c8c46; }
 
         .graph-placeholder {
             border: 1px solid #dadce0; border-radius: 6px; height: 150px; display: flex; align-items: center;
@@ -135,7 +136,7 @@
         </div>
         <nav>
             <a href="index.html">Homepage</a>
-            <a href="Profile.html" class="active">My Profile</a>
+            <a href="profileview.html" class="active">My Profile</a>
             <a href="Training.html">Training</a>
             <a href="Coaches.html">Coaches</a>
             <details>
@@ -194,25 +195,28 @@
                         </div>
 
                         <div class="flair-group">
-                            <label style="font-size:13px; font-weight:600;">Flair:</label>
+                            <label style="font-size:14px; font-weight:600; color:#202124;">Select your flair:</label>
                             <select id="flair-select" class="edit-select">
                                 <option value="">No Flair</option>
-                                <option value="👑">👑</option>
-                                <option value="🐴 Horsey">🐴 Horsey</option>
-                                <option value="🔮 ">🔮</option>
-                                <option value="🎯 ">🎯</option>
-                                <option value="🛡️ ">🛡️</option>
-                                <option value="🪽 ">🪽</option>
-                                <option value="🛠️ ">🛠️</option>
-                                <option value="⚔️ ">⚔️</option>
-                                <option value="🔐 ">🔐</option>
+                                <option value="⚔️ ">⚔️ </option>
+                                <option value="🛡️ ">🛡️ </option>
+                                <option value="🎓 ">🎓 </option>
+                                <option value="🧩 ">🧩 </option>
+                                <option value="⚡ ">⚡ </option>
+                                <option value="🚀 ">🚀 </option>
+                                <option value="🌌 ">🌌 </option>
+                                <option value="🍌 ">🍌 </option>
+                                <option value="☕ ">☕ </option>
+                                <option value="📈 ">📈 </option>
+                                <option value="🧠 ">🧠 </option>
+                                <option value="🐴 ">🐴 </option>
                             </select>
                         </div>
 
                         <div>
                             <h3 style="margin:0 0 10px 0; font-size:16px;">Biography:</h3>
                             <textarea id="bio-textarea-input" class="bio-textarea" placeholder="Write your bio here..."></textarea>
-                            <button id="save-bio-btn" class="save-btn" onclick="saveProfileSettings()">Save Profile Bio</button>
+                            <button id="save-bio-btn" class="save-btn" onclick="saveProfileSettings()">Save Changes</button>
                         </div>
 
                         <div>
@@ -232,8 +236,6 @@
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentViewingUser = "";
-
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
             const currentRole = localStorage.getItem('gcvm_db_role');
@@ -248,54 +250,28 @@
         };
 
         async function loadProfileData(username) {
-            currentViewingUser = username;
             const activeUser = localStorage.getItem('gcvm_db_session');
 
-            if(activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
-                document.getElementById('page-main-title').innerText = "Profile Editor";
-            } else {
-                document.getElementById('page-main-title').innerText = `${username}'s Profile`;
+            if (!activeUser || username.toLowerCase() !== activeUser.toLowerCase()) {
+                window.location.href = `profileview.html?user=${username}`;
+                return;
             }
 
             try {
-                // Strikt matching op kleine letters om kolom-synchronisatiefouten te omzeilen
                 const { data: users, error } = await supabaseClient
                     .from('gcvm_users')
                     .select('username, bio, flair')
                     .ilike('username', username);
 
                 if (error) throw error;
-
-                if (!users || users.length === 0) {
-                    alert("Member '" + username + "' not found!");
-                    return;
-                }
+                if (!users || users.length === 0) return;
 
                 const user = users[0];
-                const bioBox = document.getElementById('bio-textarea-input');
-                const flairSelect = document.getElementById('flair-select');
-                const saveBtn = document.getElementById('save-bio-btn');
+                document.getElementById('bio-textarea-input').value = user.bio || "";
+                document.getElementById('flair-select').value = user.flair || "";
+                document.getElementById('view-username').innerText = user.username;
 
-                bioBox.value = user.bio || "";
-                flairSelect.value = user.flair || "";
-
-                const displayFlair = user.flair ? ` [${user.flair}]` : "";
-                document.getElementById('view-username').innerText = user.username + displayFlair;
-
-                if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
-                    bioBox.removeAttribute('disabled');
-                    flairSelect.removeAttribute('disabled');
-                    saveBtn.classList.remove('hidden');
-                } else {
-                    bioBox.setAttribute('disabled', 'true');
-                    flairSelect.setAttribute('disabled', 'true');
-                    saveBtn.classList.add('hidden');
-                    if (bioBox.value.trim() === "") {
-                        bioBox.value = "This member hasn't written a biography yet.";
-                    }
-                }
-
-            } catch(err) { console.error("Database loading error:", err); }
+            } catch(err) { console.error(err); }
         }
 
         async function saveProfileSettings() {
@@ -306,7 +282,6 @@
             if (!username) return;
 
             try {
-                // Directe update aanroep met expliciete kleine kolomnamen
                 const { error } = await supabaseClient
                     .from('gcvm_users')
                     .update({ bio: newBio, flair: newFlair })
@@ -315,6 +290,8 @@
                 if (error) throw error;
 
                 alert("Profile changes successfully saved to the cloud database!");
+                
+                // DE JUISTE REDIRECT: Naar de weergavepagina!
                 window.location.href = "profileview.html";
             } catch (err) {
                 alert("Failed to save: " + err.message);
@@ -323,7 +300,7 @@
 
         function searchOtherMember() {
             const name = document.getElementById('memberSearchField').value.trim();
-            if (name) loadProfileData(name);
+            if (name) window.location.href = `profileview.html?user=${name}`;
         }
 
         async function loginUser() {
@@ -358,7 +335,7 @@
                     .insert([{ username, password, role: 'user', bio: '', flair: '' }]);
                 
                 if (error) throw error;
-                alert("Account created! You can now log in.");
+                alert("Account created!");
             } catch (err) { alert("Error: " + err.message); }
         }
 
@@ -372,7 +349,7 @@
         function logoutUser() {
             localStorage.removeItem('gcvm_db_session');
             localStorage.removeItem('gcvm_db_role');
-            window.location.reload();
+            window.location.href = "profileview.html";
         }
     </script>
 </body>
