@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCVM - Training</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -26,8 +26,6 @@
             overflow-y: auto;
             left: 0;
             top: 0;
-            z-index: 1000;
-            text-align: left;
         }
 
         .logo {
@@ -102,6 +100,7 @@
             color: #bdc1c6;
             font-size: 14px;
             line-height: 1.4;
+            text-align: left;
         }
 
         .user-info strong {
@@ -118,25 +117,6 @@
             border-radius: 10px;
             margin-left: 6px;
             vertical-align: middle;
-        }
-
-        .admin-action-btn {
-            display: block;
-            width: 100%;
-            padding: 8px;
-            margin-top: 10px;
-            background-color: #d93025;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .admin-action-btn:hover {
-            background-color: #b31412;
         }
 
         .logout-link {
@@ -157,42 +137,41 @@
             padding-top: 15px;
         }
 
-        nav a, nav summary {
+        nav a {
             display: block;
             color: #bdc1c6;
             text-decoration: none;
             padding: 12px 0;
             font-size: 15px;
             font-weight: 400;
-            cursor: pointer;
             transition: color 0.2s;
         }
 
-        nav a:hover, nav a.active, nav summary:hover {
+        nav a:hover, nav a.active {
             color: #8ab4f8;
         }
 
-        nav details {
-            margin: 0;
-        }
-
-        nav summary {
+        summary {
             list-style: none;
+            color: #bdc1c6;
+            padding: 12px 0;
+            font-size: 15px;
+            cursor: pointer;
             outline: none;
         }
 
-        nav summary::-webkit-details-marker {
+        summary::-webkit-details-marker {
             display: none;
         }
 
         .sub-menu {
-            padding-left: 20px;
-            border-left: 1px solid #3c4043;
+            padding-left: 20px; 
+            border-left: 1px solid #3c4043; 
             margin-bottom: 10px;
         }
 
         .sub-menu a {
-            font-size: 14px;
+            font-size: 14px; 
             padding: 8px 0;
         }
 
@@ -223,7 +202,6 @@
             max-width: 800px;
             margin: 0 auto; 
             padding: 60px 40px;
-            text-align: center;
         }
 
         .content p {
@@ -278,7 +256,7 @@
         .hidden {
             display: none !important;
         }
-   </style>
+    </style>
 </head>
 <body>
 
@@ -299,7 +277,6 @@
                 <div class="user-info">
                     Logged in as:<br>
                     <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
-                    <button id="admin-view-btn" class="admin-action-btn hidden" onclick="toggleAdminPanel()">Open Admin Panel</button>
                     <span class="logout-link" onclick="logoutUser()">Log out</span>
                 </div>
             </div>
@@ -317,9 +294,7 @@
                 <a href="Shards shop.html">Shards shop</a>
               </div>
             </details>
-            <a href="Leaders.html">Leaders</a>
             <a href="Current games.html">Current games</a>
-            <a href="MoTM.html">MoTM</a>
             <a href="GoTM.html">Game of the month</a>
             <a href="Jobs.html">Special mentions/Jobs</a>
             <details>
@@ -329,12 +304,19 @@
                 <a href="News.html">Newspaper</a>
               </div>    
             </details>
-            <a href="Contact.html">Contact</a>
+            <details>
+              <summary>Community ⌵</summary>
+              <div class="sub-menu">
+                <a href="Leaders.html">Mods/Leaders</a>
+                <a href="Contact.html">Contact</a>
+                <a href="MoTM.html">MoTM</a>
+              </div>    
+            </details>
         </nav>
     </aside>
-        
+
     <main>
-        <div class="banner">                
+        <div class="banner">
             <h1>GCVM - Training</h1>
         </div>
 
@@ -463,13 +445,7 @@
 
             if (role === 'admin') {
                 document.getElementById('admin-badge').classList.remove('hidden');
-                document.getElementById('admin-view-btn').classList.remove('hidden');
             }
-        }
-
-        function toggleAdminPanel() {
-            alert("Redirecting you to the main Homepage Dashboard to manage users.");
-            window.location.href = "index.html";
         }
 
         function logoutUser() {
