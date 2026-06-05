@@ -85,14 +85,14 @@
         .rating-sub { font-size: 11px; color: #70757a; }
 
         .main-panel { display: flex; flex-direction: column; gap: 25px; }
-        .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 10px; }
-        .profile-title { font-size: 28px; margin: 0; font-weight: 400; }
+        .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 15px; }
+        .profile-title { font-size: 28px; margin: 0 0 8px 0; font-weight: 400; }
 
-        /* PUUR VISUELE WEERGAVE VAN FLAIR EN BIO */
-        .flair-display-box { font-size: 16px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 8px 12px; border-radius: 4px; width: fit-content; }
+        /* Verbeterde, minimalistische flair-badge */
+        .flair-display-box { font-size: 14px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 6px 14px; border-radius: 20px; width: fit-content; margin-top: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .bio-display-text { font-size: 15px; line-height: 1.6; white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #dadce0; min-height: 100px; }
         
-        .edit-link-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 10px; text-decoration: none; display: inline-block; }
+        .edit-link-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 15px; text-decoration: none; display: inline-block; }
         .edit-link-btn:hover { background: #1557b0; }
 
         .graph-placeholder {
@@ -185,11 +185,7 @@
                     <div class="main-panel">
                         <div class="profile-header">
                             <h2 class="profile-title" id="view-username">Username</h2>
-                        </div>
-
-                        <div id="flair-display-row" class="hidden">
-                            <h3 style="margin:0 0 5px 0; font-size:14px; color:#70757a;">Team Title:</h3>
-                            <div id="flair-badge-text" class="flair-display-box">No Flair</div>
+                            <div id="flair-badge-text" class="flair-display-box hidden">No Flair</div>
                         </div>
 
                         <div>
@@ -225,7 +221,6 @@
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('profile-page-content').classList.remove('hidden');
                 
-                // Controleer of er via de URL gezocht is naar een specifieke user (bijv. profileview.html?user=GCVM)
                 const urlParams = new URLSearchParams(window.location.search);
                 const userParam = urlParams.get('user');
                 
@@ -256,18 +251,17 @@
 
                 const user = users[0];
                 
-                // Vul Bio en Flair in
-                document.getElementById('bio-text-container').innerText = user.bio.trim() !== "" ? user.bio : "This member hasn't written a biography yet.";
-                document.getElementById('view-username').innerText = user.username + (user.flair ? ` [${user.flair}]` : "");
+                document.getElementById('bio-text-container').innerText = user.bio && user.bio.trim() !== "" ? user.bio : "This member hasn't written a biography yet.";
+                document.getElementById('view-username').innerText = user.username;
 
-                if (user.flair) {
-                    document.getElementById('flair-display-row').classList.remove('hidden');
-                    document.getElementById('flair-badge-text').innerText = user.flair;
+                const flairBadge = document.getElementById('flair-badge-text');
+                if (user.flair && user.flair.trim() !== "") {
+                    flairBadge.innerText = user.flair;
+                    flairBadge.classList.remove('hidden');
                 } else {
-                    document.getElementById('flair-display-row').classList.add('hidden');
+                    flairBadge.classList.add('hidden');
                 }
 
-                // KNOP CHECK: Als jij dit bent, toon de "Edit Profile" knop!
                 const editBtn = document.getElementById('edit-profile-btn');
                 if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
                     editBtn.classList.remove('hidden');
@@ -281,7 +275,6 @@
         function searchOtherMember() {
             const name = document.getElementById('memberSearchField').value.trim();
             if (name) {
-                // Verander de URL-parameter om de gezochte gebruiker in te laden
                 window.location.search = `?user=${name}`;
             }
         }
