@@ -519,7 +519,7 @@
         </div>
     </main>
 
-    <script>
+<script>
         // Supabase initialisatie
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
@@ -561,7 +561,7 @@
             }
         }
 
-        // Haalt profielgegevens op uit Supabase (voor jezelf óf een ander gezocht lid)
+        // Haalt profielgegevens op uit Supabase
         async function loadProfileData(username) {
             currentViewingUser = username;
             const activeUser = localStorage.getItem('gcvm_db_session');
@@ -594,32 +594,32 @@
                 }
 
                 // Online / Offline status indicator berekenen (actief in de afgelopen 5 minuten)
-                const lastSeenDate = new Date(user.last_seen);
-                const limit = new Date(Date.now() - 5 * 60 * 1000);
                 const dot = document.getElementById('view-status-dot');
-                if (lastSeenDate > limit) {
-                    dot.className = "status-dot-indicator online";
+                if (user.last_seen) {
+                    const lastSeenDate = new Date(user.last_seen);
+                    const limit = new Date(Date.now() - 5 * 60 * 1000);
+                    if (lastSeenDate > limit) {
+                        dot.className = "status-dot-indicator online";
+                    } else {
+                        dot.className = "status-dot-indicator offline";
+                    }
                 } else {
                     dot.className = "status-dot-indicator offline";
                 }
 
                 // Controleer of de gebruiker naar zijn EIGEN profiel kijkt
                 const settingsBtn = document.getElementById('edit-settings-trigger');
-                if (username.toLowerCase() === activeUser.toLowerCase()) {
-                    // Toon de instellingen tandwiel-knop
+                if (activeUser && username.toLowerCase() === activeUser.toLowerCase()) {
                     settingsBtn.classList.remove('hidden');
-                    // Zet de huidige database-waarden alvast klaar in de invoervelden van het bewerkscherm
                     document.getElementById('bio-textarea-input').value = user.bio || "";
                     document.getElementById('flair-select').value = user.flair || "";
                 } else {
-                    // Verberg de knop en sluit het paneel als je bij iemand anders kijkt
                     settingsBtn.classList.add('hidden');
                     document.getElementById('settings-panel').classList.add('hidden');
                 }
 
             } catch(err) { 
                 console.error("Fout bij inladen profiel:", err); 
-                alert("Could not load profile details: " + err.message);
             }
         }
 
@@ -632,7 +632,6 @@
             if (!username) return;
 
             try {
-                // Voer de update uit op de rij waar username gelijk is aan de actieve sessie
                 const { error } = await supabaseClient
                     .from('gcvm_users')
                     .update({ bio: newBio, flair: newFlair })
@@ -640,10 +639,7 @@
 
                 if (error) throw error;
 
-                // Geef visuele bevestiging dat het gelukt is
                 alert("Profile changes successfully saved to the cloud database!");
-                
-                // Sluit het bewerkingspaneel en herlaad de pagina-data direct live
                 toggleSettings();
                 loadProfileData(username);
             } catch (err) {
