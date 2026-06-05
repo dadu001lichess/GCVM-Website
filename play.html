@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,7 +41,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* exact dezelfde auth styling als index.html */
+        /* Authentication Sidebar Styling */
         .auth-container { margin-bottom: 25px; }
         .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
         .auth-input {
@@ -79,7 +79,6 @@
             box-sizing: border-box;
         }
 
-        /* Lobby & Match layouts */
         .lobby-container, .game-container { max-width: 800px; margin: 0 auto; }
         .btn { padding: 10px 20px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
         .btn:hover { background-color: #1557b0; }
@@ -89,7 +88,8 @@
         .setup-box { background-color: #f8f9fa; border: 1px solid #dadce0; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
         .select-style { padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #dadce0; margin-right: 10px; }
 
-        #my-board { width: 400px; margin: 20px 0; }
+        /* Chessboard custom layout styles */
+        #my-board { width: 450px; margin: 20px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
         .clocks-container { display: flex; gap: 40px; margin-bottom: 15px; font-size: 18px; font-weight: 600; }
         .clock { background: #f1f3f4; padding: 8px 16px; border-radius: 4px; border: 1px solid #dadce0; }
         .clock.active-turn { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
@@ -158,42 +158,49 @@
 
     <main>
         <div id="lobby-view" class="lobby-container">
-            <h2>GC(V)M Live Schaaklobby</h2>
+            <h2>GC(V)M Live Chess Lobby</h2>
             
             <div id="lobby-auth-must" class="setup-box" style="background-color: #fce8e6; border-color: #f28b82;">
-                ⚠️ Je moet eerst aan de linkerkant inloggen om uitdagingen te maken of te accepteren!
+                ⚠️ You must log in using the panel on the left sidebar before creating or accepting chess challenges!
+            </div>
+
+            <div id="resume-box" class="setup-box hidden" style="background-color: #e6f4ea; border-color: #34a853;">
+                <h3 style="color: #137333; margin-top: 0;">🔄 Active Match Detected!</h3>
+                <p>You have an ongoing live match in progress right now.</p>
+                <button class="btn" style="background-color: #34a853;" onclick="resumeActiveMatch()">Back to Game</button>
             </div>
 
             <div id="lobby-controls" class="setup-box hidden">
-                <h3>Kies je tijdcontrole</h3>
+                <h3>Choose Time Control</h3>
                 <select id="time-control-select" class="select-style">
                     <option value="3+2">Blitz (3 min + 2s inc)</option>
                     <option value="5+0">Blitz (5 min)</option>
                     <option value="10+0" selected>Rapid (10 min)</option>
                     <option value="15+10">Rapid (15 min + 10s inc)</option>
                 </select>
-                <button class="btn" onclick="createNewChallenge()">🔥 Nieuwe uitdaging plaatsen</button>
+                <button id="create-challenge-btn" class="btn" onclick="createNewChallenge()">🔥 Post New Challenge</button>
+                <p id="challenge-warning" style="color: #e67c73; margin-top: 10px; font-weight: 600;" class="hidden">You already have an active pending challenge in the lobby!</p>
             </div>
 
             <div class="lobby-list">
-                <h3>Openstaande uitdagingen</h3>
-                <div id="challenges-list">Geen actieve uitdagingen beschikbaar.</div>
+                <h3>Open Challenges</h3>
+                <div id="challenges-list">No active challenges available. Post one above!</div>
             </div>
         </div>
 
         <div id="game-view" class="game-container hidden">
-            <h2>Wedstrijd aan de gang (<span id="match-time-label">10+0</span>)</h2>
-            <p id="players-info">Wit: ... vs Zwart: ...</p>
+            <h2>Live Match (<span id="match-time-label">10+0</span>)</h2>
+            <p id="players-info">White: ... vs Black: ...</p>
             
             <div class="clocks-container">
-                <div id="white-clock-box" class="clock">Wit: <span id="white-time-display">--:--</span></div>
-                <div id="black-clock-box" class="clock">Zwart: <span id="black-time-display">--:--</span></div>
+                <div id="white-clock-box" class="clock">White: <span id="white-time-display">--:--</span></div>
+                <div id="black-clock-box" class="clock">Black: <span id="black-time-display">--:--</span></div>
             </div>
 
             <div id="my-board"></div>
             
-            <p id="turn-indicator" style="font-weight: 600; color: #202124;">Laden...</p>
-            <button class="btn" style="background-color: #d93025;" onclick="leaveGame()">Lobby verlaten</button>
+            <p id="turn-indicator" style="font-weight: 600; color: #202124;">Loading match layout...</p>
+            <button class="btn" style="background-color: #d93025;" onclick="leaveGame()">Return to Lobby</button>
         </div>
     </main>
 
@@ -212,6 +219,7 @@
 
         let whiteTimeLeft = 0;
         let blackTimeLeft = 0;
+        let activeMatchData = null; // Caches an active match if one is found
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
@@ -220,12 +228,13 @@
                 showStyle(currentSession, currentRole);
                 updateOnlineStatus(currentSession);
                 setInterval(() => updateOnlineStatus(currentSession), 60000);
+                checkForOngoingGames();
             }
             loadLobby();
             listenToLobby();
         };
 
-        // --- AUTHENTICATIE LOGICA DIRECT UIT INDEX.HTML ---
+        // --- ACCOUNT AUTHENTICATION LOGIC ---
         async function updateOnlineStatus(username) {
             try {
                 await supabaseClient.from('gcvm_users').update({ last_seen: new Date().toISOString() }).eq('username', username);
@@ -241,7 +250,7 @@
                 if (existingUser) { alert("This username is already registered online!"); return; }
                 const { error } = await supabaseClient.from('gcvm_users').insert([{ username: username, password: password, role: 'user', bio: 'Hello!' }]);
                 if (error) throw error;
-                alert("Account created! You can now log in.");
+                alert("Account created successfully! You can now log in.");
                 document.getElementById('password-input').value = "";
             } catch (err) { alert("Error: " + err.message); }
         }
@@ -279,24 +288,68 @@
             window.location.reload();
         }
 
-        // --- MULTIPLAYER SCHAAK & LOBBY LOGICA ---
+        // --- RECOVERY LOGIC (BACK TO GAME FEATURE) ---
+        async function checkForOngoingGames() {
+            if (!currentUser) return;
+            
+            // Look for any game in progress where the logged-in user is playing
+            const { data, error } = await supabaseClient
+                .from('gcvm_games')
+                .select('*')
+                .eq('status', 'playing')
+                .or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`)
+                .maybeSingle();
+
+            if (!error && data) {
+                activeMatchData = data;
+                document.getElementById('resume-box').classList.remove('hidden');
+            } else {
+                document.getElementById('resume-box').classList.add('hidden');
+            }
+        }
+
+        function resumeActiveMatch() {
+            if (!activeMatchData) return;
+            myColor = (activeMatchData.white_player === currentUser) ? 'w' : 'b';
+            initGame(activeMatchData);
+        }
+
+        // --- LOBBY PAIRING MATCHMAKING ---
         async function loadLobby() {
             const { data, error } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
-            if (!error) displayChallenges(data);
+            if (!error) {
+                displayChallenges(data);
+                checkMyActiveChallenges(data);
+            }
+        }
+
+        function checkMyActiveChallenges(games) {
+            if (!currentUser) return;
+            const hasActive = games.some(g => g.white_player === currentUser);
+            
+            if (hasActive) {
+                document.getElementById('create-challenge-btn').disabled = true;
+                document.getElementById('create-challenge-btn').style.opacity = "0.5";
+                document.getElementById('challenge-warning').classList.remove('hidden');
+            } else {
+                document.getElementById('create-challenge-btn').disabled = false;
+                document.getElementById('create-challenge-btn').style.opacity = "1";
+                document.getElementById('challenge-warning').classList.add('hidden');
+            }
         }
 
         function displayChallenges(games) {
             const container = document.getElementById('challenges-list');
             container.innerHTML = "";
-            if (games.length === 0) { container.innerHTML = "Geen actieve uitdagingen beschikbaar."; return; }
+            if (games.length === 0) { container.innerHTML = "No active challenges available right now."; return; }
 
             games.forEach(g => {
                 const div = document.createElement('div');
                 div.className = "lobby-item";
                 const isMine = g.white_player === currentUser;
                 div.innerHTML = `
-                    <span>Uitdaging van <strong>${g.white_player}</strong> (${g.time_control})</span>
-                    ${(!isMine && currentUser) ? `<button class="btn" onclick="joinGame('${g.id}')">Speel mee</button>` : isMine ? `<span>(Wachten...)</span>` : `<span>(Log in om te spelen)</span>`}
+                    <span>Challenge from <strong>${g.white_player}</strong> (${g.time_control})</span>
+                    ${(!isMine && currentUser) ? `<button class="btn" onclick="joinGame('${g.id}')">Play</button>` : isMine ? `<button class="btn" style="background-color: #d93025;" onclick="cancelChallenge('${g.id}')">Cancel</button>` : `<span>(Log in)</span>`}
                 `;
                 container.appendChild(div);
             });
@@ -309,6 +362,8 @@
         }
 
         async function createNewChallenge() {
+            if (document.getElementById('create-challenge-btn').disabled) return;
+
             const tc = document.getElementById('time-control-select').value;
             const baseMinutes = parseInt(tc.split('+')[0]);
             const startSeconds = baseMinutes * 60;
@@ -325,7 +380,14 @@
             currentGameId = data.id;
             myColor = 'w';
             listenToSpecificGame(data.id);
-            alert("Uitdaging geplaatst! Wacht tot iemand op 'Speel mee' klikt...");
+            loadLobby();
+        }
+
+        async function cancelChallenge(gameId) {
+            await supabaseClient.from('gcvm_games').delete().eq('id', gameId);
+            currentGameId = null;
+            myColor = null;
+            loadLobby();
         }
 
         async function joinGame(gameId) {
@@ -341,19 +403,24 @@
                 black_time: startSeconds
             }).eq('id', gameId).select().single();
 
-            if (error) return alert("Helaas, de uitdaging is niet meer beschikbaar.");
+            if (error) return alert("Sorry, this challenge is no longer available.");
             myColor = 'b';
             initGame(data);
         }
 
         function listenToSpecificGame(gameId) {
             if (gameSubscription) gameSubscription.unsubscribe();
-            gameSubscription = supabaseClient.channel(`game:${gameId}`).on('postgres_changes', { event: 'UPDATE', filter: `id=eq.${gameId}`, table: 'gcvm_games', schema: 'public' }, (payload) => {
+            gameSubscription = supabaseClient.channel(`game:${gameId}`).on('postgres_changes', { event: '*', filter: `id=eq.${gameId}`, table: 'gcvm_games', schema: 'public' }, (payload) => {
                 const updatedGame = payload.new;
+                
+                if (payload.eventType === 'DELETE') {
+                    leaveGame();
+                    return;
+                }
+
                 if (updatedGame.status === 'playing' && document.getElementById('game-view').classList.contains('hidden')) {
                     initGame(updatedGame);
                 } else if (updatedGame.status === 'playing') {
-                    // Update bord als tegenstander een zet deed
                     if(updatedGame.fen !== game.fen()) {
                         game.load(updatedGame.fen);
                         board.position(updatedGame.fen);
@@ -362,16 +429,23 @@
                     blackTimeLeft = updatedGame.black_time;
                     updateClockDisplays();
                     updateTurnIndicator();
+                } else if (updatedGame.status.endsWith('_won') || updatedGame.status === 'draw') {
+                    // Match concluded over database update
+                    game.load(updatedGame.fen);
+                    board.position(updatedGame.fen);
+                    clearInterval(clockInterval);
+                    displayGameEndMessage(updatedGame.status);
                 }
             }).subscribe();
         }
 
+        // --- LIVE IN-GAME ACTIONS & TIMERS ---
         function initGame(gameData) {
             currentGameId = gameData.id;
             document.getElementById('lobby-view').classList.add('hidden');
             document.getElementById('game-view').classList.remove('hidden');
             document.getElementById('match-time-label').innerText = gameData.time_control;
-            document.getElementById('players-info').innerText = `Wit: ${gameData.white_player} vs Zwart: ${gameData.black_player}`;
+            document.getElementById('players-info').innerText = `White: ${gameData.white_player} vs Black: ${gameData.black_player}`;
             
             game.load(gameData.fen);
             whiteTimeLeft = gameData.white_time;
@@ -383,13 +457,19 @@
                 position: gameData.fen,
                 orientation: myColor === 'w' ? 'white' : 'black',
                 onDragStart: onDragStart,
-                onDrop: onDrop
+                onDrop: onDrop,
+                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
             };
             board = Chessboard('my-board', config);
-            updateTurnIndicator();
-            startLocalClock();
+            
+            if (gameData.status.endsWith('_won') || gameData.status === 'draw') {
+                displayGameEndMessage(gameData.status);
+            } else {
+                updateTurnIndicator();
+                startLocalClock();
+            }
 
-            if (myColor === 'w') listenToSpecificGame(currentGameId);
+            listenToSpecificGame(currentGameId);
         }
 
         function onDragStart (source, piece) {
@@ -403,7 +483,6 @@
             const move = game.move({ from: source, to: target, promotion: 'q' });
             if (move === null) return 'snapback';
 
-            // Bereken increment indien van toepassing
             const tc = document.getElementById('match-time-label').innerText;
             const increment = parseInt(tc.split('+')[1]) || 0;
 
@@ -411,13 +490,26 @@
             if (currentTurnBeforeMove === 'b' && myColor === 'b') blackTimeLeft += increment;
 
             updateClockDisplays();
-            updateTurnIndicator();
+            
+            let gameStatusUpdate = 'playing';
+            if (game.in_checkmate()) {
+                gameStatusUpdate = (myColor === 'w') ? 'white_won' : 'black_won';
+            } else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition()) {
+                gameStatusUpdate = 'draw';
+            }
 
-            // Sync naar de database
+            if (gameStatusUpdate !== 'playing') {
+                clearInterval(clockInterval);
+                displayGameEndMessage(gameStatusUpdate);
+            } else {
+                updateTurnIndicator();
+            }
+
             await supabaseClient.from('gcvm_games').update({ 
                 fen: game.fen(),
                 white_time: whiteTimeLeft,
                 black_time: blackTimeLeft,
+                status: gameStatusUpdate,
                 last_move_at: new Date().toISOString()
             }).eq('id', currentGameId);
         }
@@ -425,25 +517,29 @@
         function updateTurnIndicator() {
             const turnBoxW = document.getElementById('white-clock-box');
             const turnBoxB = document.getElementById('black-clock-box');
-            
-            if (game.game_over()) {
-                document.getElementById('turn-indicator').innerText = "Game Over! Remise of mat.";
-                clearInterval(clockInterval);
-                return;
-            }
 
             if (game.turn() === 'w') {
                 turnBoxW.classList.add('active-turn');
                 turnBoxB.classList.remove('active-turn');
-                document.getElementById('turn-indicator').innerText = "Beurt: Wit";
+                document.getElementById('turn-indicator').innerText = "Turn: White";
             } else {
                 turnBoxB.classList.add('active-turn');
                 turnBoxW.classList.remove('active-turn');
-                document.getElementById('turn-indicator').innerText = "Beurt: Zwart";
+                document.getElementById('turn-indicator').innerText = "Turn: Black";
             }
         }
 
-        // --- KLOK LOGICA (AFTELLEN) ---
+        function displayGameEndMessage(status) {
+            let msg = "Game Over! ";
+            if (status === 'white_won') msg += "White wins!";
+            else if (status === 'black_won') msg += "Black wins!";
+            else msg += "The match ended in a draw.";
+            
+            document.getElementById('turn-indicator').innerText = msg;
+            document.getElementById('white-clock-box').classList.remove('active-turn');
+            document.getElementById('black-clock-box').classList.remove('active-turn');
+        }
+
         function startLocalClock() {
             if (clockInterval) clearInterval(clockInterval);
             clockInterval = setInterval(() => {
@@ -474,7 +570,7 @@
         async function handleTimeOut(loserColor) {
             clearInterval(clockInterval);
             const statusText = loserColor === 'w' ? 'black_won' : 'white_won';
-            document.getElementById('turn-indicator').innerText = `Tijd is op! ${loserColor === 'w' ? 'Zwart' : 'Wit'} wint op tijd.`;
+            displayGameEndMessage(statusText);
             await supabaseClient.from('gcvm_games').update({ status: statusText }).eq('id', currentGameId);
         }
 
@@ -483,6 +579,8 @@
             if (clockInterval) clearInterval(clockInterval);
             document.getElementById('game-view').classList.add('hidden');
             document.getElementById('lobby-view').classList.remove('hidden');
+            activeMatchData = null;
+            checkForOngoingGames();
             loadLobby();
         }
     </script>
