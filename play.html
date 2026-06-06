@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,43 +14,188 @@
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
 
     <style>
-        body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; }
-        
-        /* MATCH MET JOUW ORIGINELE SIDEBAR LAY-OUT */
-        aside { width: 280px; background-color: #202124; height: 100vh; position: fixed; padding: 40px 24px; box-sizing: border-box; overflow-y: auto; left: 0; top: 0; z-index: 10; }
-        .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
-        .auth-container { margin-bottom: 25px; color: #bdc1c6; font-size: 14px; }
-        .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
-        .auth-input { width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px; background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none; }
-        .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
-        .auth-btn { flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; text-align: center; }
-        .auth-btn:hover { background-color: #1557b0; }
-        .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
-        
-        .user-info { color: #bdc1c6; font-size: 14px; line-height: 1.4; }
-        .user-info strong { color: #8ab4f8; font-size: 15px; display: block; margin-top: 4px; }
-        .logout-link { display: inline-block; color: #f28b82; text-decoration: none; font-size: 12px; margin-top: 8px; cursor: pointer; }
-        
-        nav { border-top: 1px solid #3c4043; padding-top: 15px; }
-        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; transition: color 0.2s; }
-        nav a:hover, nav a.active { color: #8ab4f8; }
-        
-        /* Dropdowns & Details styling uit jouw navigatie */
-        details { margin: 4px 0; }
-        summary { color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; list-style: none; outline: none; display: flex; justify-content: space-between; align-items: center; }
-        summary::-webkit-details-marker { display: none; }
-        summary::after { content: ' ⌃'; transform: rotate(180deg); display: inline-block; font-size: 10px; transition: transform 0.2s; }
-        details[open] summary::after { transform: rotate(0deg); }
-        .dropdown-content { padding-left: 15px; display: flex; flex-direction: column; }
-        .dropdown-content a { padding: 8px 0; font-size: 14px; }
+        /* EXACTE STYLING GEKOPIEERD UIT JOUW INDEX.HTML */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: white;
+        }
 
-        /* HOOFDSCHERM */
-        main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; padding: 40px; box-sizing: border-box; }
+        aside {
+            width: 280px;
+            background-color: #202124; 
+            height: 100vh;
+            position: fixed;
+            padding: 40px 24px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            left: 0;
+            top: 0;
+        }
+
+        .logo {
+            color: white;
+            font-size: 22px;
+            font-weight: 300;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-container {
+            margin-bottom: 25px;
+        }
+
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #3c4043;
+            border-radius: 4px;
+            background-color: #303134;
+            color: white;
+            font-size: 13px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .auth-input::placeholder {
+            color: #80868b;
+        }
+
+        .auth-btn-container {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .auth-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+
+        .auth-btn:hover {
+            background-color: #1557b0;
+        }
+
+        .auth-btn.secondary {
+            background-color: #3c4043;
+            color: #bdc1c6;
+        }
+
+        .auth-btn.secondary:hover {
+            background-color: #4f5357;
+            color: white;
+        }
+
+        .user-info {
+            color: #bdc1c6;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .user-info strong {
+            color: #8ab4f8;
+            font-size: 15px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 10px;
+            padding: 2px 6px;
+            background-color: #34a853;
+            color: white;
+            border-radius: 10px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .logout-link {
+            display: inline-block;
+            color: #f28b82;
+            text-decoration: none;
+            font-size: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+
+        nav {
+            border-top: 1px solid #3c4043;
+            padding-top: 15px;
+        }
+
+        nav a {
+            display: block;
+            color: #bdc1c6;
+            text-decoration: none;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            color: #8ab4f8;
+        }
+
+        summary {
+            list-style: none;
+            color: #bdc1c6;
+            padding: 12px 0;
+            font-size: 15px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .sub-menu {
+            padding-left: 20px;
+            border-left: 1px solid #3c4043;
+            margin-bottom: 10px;
+        }
+
+        .sub-menu a {
+            font-size: 14px;
+            padding: 8px 0;
+        }
+
+        /* SCHAAKBORD & HOOFDSCHERM STYLING */
+        main {
+            margin-left: 280px; 
+            width: calc(100% - 280px);
+            min-height: 100vh;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
         .lobby-container, .game-container { max-width: 1000px; margin: 0 auto; }
         .btn { padding: 10px 20px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
         .btn:hover { background-color: #1557b0; }
         .btn.secondary-action { background-color: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; margin-right: 8px; }
+        .btn.secondary-action:hover { background-color: #e8eaed; }
         .btn.danger-action { background-color: #d93025; color: white; margin-right: 8px; }
+        .btn.danger-action:hover { background-color: #b31412; }
         
         .lobby-list { margin-top: 20px; border: 1px solid #dadce0; border-radius: 8px; padding: 15px; background-color: #f8f9fa; }
         .lobby-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
@@ -91,7 +236,7 @@
         <div class="logo">GC(V)M</div>
         <div class="auth-container">
             <div id="login-section" class="auth-input-group">
-                <input type="text" id="username-input" class="auth-input" placeholder="Username...">
+                <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
                 <input type="password" id="password-input" class="auth-input" placeholder="Password...">
                 <div class="auth-btn-container">
                     <button class="auth-btn" onclick="loginUser()">Login</button>
@@ -99,7 +244,12 @@
                 </div>
             </div>
             <div id="profile-section" class="hidden">
-                <div class="user-info">Logged in as: <strong id="displayed-username">...</strong><span class="logout-link" onclick="logoutUser()">Log out</span></div>
+                <div class="user-info">
+                    Logged in as:<br>
+                    <strong id="displayed-username">...</strong>
+                    <span id="admin-badge" class="badge hidden">Admin</span><br>
+                    <span class="logout-link" onclick="logoutUser()">Log out</span>
+                </div>
             </div>
         </div>
         <nav>
@@ -108,34 +258,17 @@
             <a href="profileview.html">Profile</a>
             <a href="Training.html">Training</a>
             <a href="Coaches.html">Coaches</a>
-            
             <details>
-                <summary>Shards currency</summary>
-                <div class="dropdown-content">
-                    <a href="shards.html">What are shards?</a>
-                    <a href="leaderboard.html">Leaderboard</a>
+                <summary>Shards currency ⌵</summary>
+                <div class="sub-menu">
+                    <a href="Shardsintro.html">How to get Shards?</a>
+                    <a href="Daily puzzle.html">Daily puzzle</a>
+                    <a href="Shards shop.html">Shards shop</a>
                 </div>
             </details>
-
-            <a href="currentgames.html">Current games</a>
-            <a href="gameofthemonth.html">Game of the month</a>
-            <a href="specialmentions.html">Special mentions/Jobs</a>
-
-            <details>
-                <summary>Updates/News</summary>
-                <div class="dropdown-content">
-                    <a href="changelog.html">Changelog</a>
-                    <a href="news.html">News</a>
-                </div>
-            </details>
-
-            <details>
-                <summary>Community</summary>
-                <div class="dropdown-content">
-                    <a href="contact.html">Contact</a>
-                    <a href="about.html">About us</a>
-                </div>
-            </details>
+            <a href="Current games.html">Current games</a>
+            <a href="GoTM.html">Game of the month</a>
+            <a href="Jobs.html">Special mentions/Jobs</a>
         </nav>
     </aside>
 
@@ -150,9 +283,9 @@
             <div id="lobby-controls" class="setup-box hidden">
                 <h3>Choose Time Control</h3>
                 <select id="time-control-select" class="select-style">
-                    <option value="10+0">Rapid (10 min)</option>
+                    <option value="10+0" selected>Rapid (10 min)</option>
                     <option value="5+0">Blitz (5 min)</option>
-                    <option value="3+2" selected>Blitz (3+2)</option>
+                    <option value="3+2">Blitz (3 min + 2s inc)</option>
                 </select>
                 <button id="create-challenge-btn" class="btn" onclick="createNewChallenge()">🔥 Post New Challenge</button>
             </div>
@@ -160,7 +293,7 @@
         </div>
 
         <div id="game-view" class="game-container hidden">
-            <h2>Live Match (<span id="match-time-label">3+2</span>)</h2>
+            <h2>Live Match (<span id="match-time-label">10+0</span>)</h2>
             <p id="players-info">White: ... vs Black: ...</p>
             
             <div class="game-layout">
@@ -209,10 +342,12 @@
         let game = new Chess(), gameSubscription = null, clockInterval = null;
         let whiteTimeLeft = 0, blackTimeLeft = 0, activeMatchData = null;
 
+        // AUTHENTICATIE MET DE EXACTE SESSY-LOGICA UIT JOUW INDEX.HTML
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
+            const currentRole = localStorage.getItem('gcvm_db_role');
             if (currentSession) {
-                showStyle(currentSession, localStorage.getItem('gcvm_db_role'));
+                showStyle(currentSession, currentRole);
                 checkForOngoingGames();
             }
             loadLobby();
@@ -242,11 +377,20 @@
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('profile-section').classList.remove('hidden');
             document.getElementById('displayed-username').innerText = username;
+            
+            if (role === 'admin') {
+                document.getElementById('admin-badge').classList.remove('hidden');
+            }
+            
             document.getElementById('lobby-auth-must').classList.add('hidden');
             document.getElementById('lobby-controls').classList.remove('hidden');
         }
 
-        function logoutUser() { localStorage.clear(); window.location.reload(); }
+        function logoutUser() {
+            localStorage.removeItem('gcvm_db_session');
+            localStorage.removeItem('gcvm_db_role');
+            window.location.reload();
+        }
 
         async function checkForOngoingGames() {
             const { data } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'playing').or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`).maybeSingle();
