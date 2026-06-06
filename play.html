@@ -305,72 +305,78 @@
         // ==========================================
         // LOBBY & SYSTEM REALTIME LISTENERS
         // ==========================================
-        async function loadOpenChallenges() {
-            if (isReviewMode || currentStatus === 'playing') return;
-            try {
-                const typeFilter = document.getElementById('filterType').value;
-                const speedFilter = document.getElementById('filterSpeed').value;
+async function loadOpenChallenges() {
+    if (isReviewMode || currentStatus === 'playing') return;
+    try {
+        const typeFilter = document.getElementById('filterType').value;
+        const speedFilter = document.getElementById('filterSpeed').value;
 
-                let { data: challenges, error } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
-                if (error) throw error;
+        let { data: challenges, error } = await supabaseClient
+            .from('gcvm_games')
+            .select('*')
+            .eq('status', 'waiting');
+            
+        if (error) throw error;
 
-                const container = document.getElementById('challenges-container');
-                container.innerHTML = "";
+        const container = document.getElementById('challenges-container');
+        container.innerHTML = "";
 
-                let finalChallenges = challenges || [];
-                
-                if (typeFilter === 'rated') finalChallenges = finalChallenges.filter(g => g.is_rated === true);
-                if (typeFilter === 'casual') finalChallenges = finalChallenges.filter(g => g.is_rated === false);
+        let finalChallenges = challenges || [];
+        
+        if (typeFilter === 'rated') finalChallenges = finalChallenges.filter(g => g.is_rated === true);
+        if (typeFilter === 'casual') finalChallenges = finalChallenges.filter(g => g.is_rated === false);
 
-                if (speedFilter !== 'all') {
-                    finalChallenges = finalChallenges.filter(g => {
-                        const mins = parseInt(g.time_control?.split('+')[0]) || 10;
-                        if (speedFilter === 'bullet') return mins < 3;
-                        if (speedFilter === 'blitz') return mins >= 3 && mins < 10;
-                        if (speedFilter === 'rapid') return mins >= 10 && mins < 29;
-                        if (speedFilter === 'classical') return mins >= 29;
-                        return true;
-                    });
-                }
-
-                if (finalChallenges.length === 0) {
-                    container.innerHTML = `<p style="font-size:13px; color:#70757a; margin:0;">No active challenges listed.</p>`;
-                    return;
-                }
-
-                finalChallenges.forEach(c => {
-                    const mode = c.is_rated ? "Rated" : "Casual";
-                    const item = document.createElement('div');
-                    item.className = "challenge-item";
-
-                    const isMine = (c.white_player === currentUser || c.black_player === currentUser);
-                    const creator = c.white_player || c.black_player || "Anonymous";
-
-                    if (isMine) {
-                        item.style.backgroundColor = "#fff9c4"; 
-                        item.style.borderLeft = "4px solid #fbc02d";
-                        item.innerHTML = `
-                            <div>
-                                <strong style="color:#b68500;">Your Broadcast</strong>
-                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
-                            </div>
-                            <button class="btn danger" style="width:auto; padding:6px 12px; font-size:12px;" onclick="cancelChallenge(${c.id})">Cancel ❌</button>
-                        `;
-                    } else {
-                        item.innerHTML = `
-                            <div>
-                                <strong style="color:#1a73e8;">${creator}</strong>
-                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
-                            </div>
-                            <button class="btn" style="width:auto; padding:6px 12px; font-size:12px;" onclick="acceptChallenge(${c.id})">Accept Match ⚔</button>
-                        `;
-                    }
-                    container.appendChild(item);
-                });
-
-            } catch (err) { console.error("Lobby load error: ", err); }
+        if (speedFilter !== 'all') {
+            finalChallenges = finalChallenges.filter(g => {
+                const mins = parseInt(g.time_control?.split('+')[0]) || 10;
+                if (speedFilter === 'bullet') return mins < 3;
+                if (speedFilter === 'blitz') return mins >= 3 && mins < 10;
+                if (speedFilter === 'rapid') return mins >= 10 && mins < 29;
+                if (speedFilter === 'classical') return mins >= 29;
+                return true;
+            });
         }
 
+        if (finalChallenges.length === 0) {
+            container.innerHTML = `<p style="font-size:13px; color:#70757a; margin:0;">No active challenges listed.</p>`;
+            return;
+        }
+
+        finalChallenges.forEach(c => {
+            const mode = c.is_rated ? "Rated" : "Casual";
+            const item = document.createElement('div');
+            item.className = "challenge-item";
+
+            const isMine = (c.white_player === currentUser || c.black_player === currentUser);
+            const creator = c.white_player || c.black_player || "Anonymous";
+
+            // CRUCIALE FIX: We zetten hier \' om c.id heen zodat het als string wordt verzonden en niet als rekensom!
+            if (isMine) {
+                item.style.backgroundColor = "#fff9c4"; 
+                item.style.borderLeft = "4px solid #fbc02d";
+                item.innerHTML = `
+                    <div>
+                        <strong style="color:#b68500;">Your Broadcast</strong>
+                        <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
+                    </div>
+                    <button class="btn danger" style="width:auto; padding:6px 12px; font-size:12px;" onclick="cancelChallenge('${c.id}')">Cancel ❌</button>
+                `;
+            } else {
+                item.innerHTML = `
+                    <div>
+                        <strong style="color:#1a73e8;">${creator}</strong>
+                        <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
+                    </div>
+                    <button class="btn" style="width:auto; padding:6px 12px; font-size:12px;" onclick="acceptChallenge('${c.id}')">Accept Match ⚔</button>
+                `;
+            }
+            container.appendChild(item);
+        });
+
+    } catch (err) { 
+        console.error("Lobby load error: ", err); 
+    }
+}
         function listenForLobbyChanges() {
             supabaseClient.channel('lobby-global-room')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'gcvm_games' }, () => {
