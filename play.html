@@ -173,6 +173,7 @@
         let currentGameId = null;
         let myColor = 'w'; 
         let currentStatus = 'waiting';
+        let channelSubscription = null;
         
         let isReviewMode = false;
         let reviewMovesList = []; 
@@ -193,6 +194,7 @@
                 loadOpenChallenges();
                 setInterval(loadOpenChallenges, 4000); 
                 checkActiveLiveGame();
+                listenForLobbyChanges(); // Luister live naar lobby updates
             }
         };
 
@@ -216,7 +218,7 @@
         }
 
         // ==========================================
-        // REVIEW COMPONENT
+        // REVIEW COMPONENT (Using database columns)
         // ==========================================
         async function initReviewMode(gameId) {
             isReviewMode = true;
@@ -259,7 +261,7 @@
                 if (game.move_history && Array.isArray(game.move_history) && game.move_history.length > 0) {
                     reviewMovesList = game.move_history;
                 } else if (game.pgn_log && game.pgn_log.trim() !== "") {
-                    reviewMovesList = game.pgn_log.trim().split(/\s+/);
+                    reviewMovesList = game.pgn_log.trim().split(" ");
                 } else {
                     reviewMovesList = [];
                 }
@@ -301,7 +303,7 @@
         }
 
         // ==========================================
-        // ENGINE: BROADCAST, CANCEL & JOIN CHALLENGES
+        // LOBBY & SYSTEM REALTIME LISTENERS
         // ==========================================
         async function loadOpenChallenges() {
             if (isReviewMode || currentStatus === 'playing') return;
@@ -309,7 +311,6 @@
                 const typeFilter = document.getElementById('filterType').value;
                 const speedFilter = document.getElementById('filterSpeed').value;
 
-                // Haal alle wachtende uitdagingen op
                 let { data: challenges, error } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
                 if (error) throw error;
 
@@ -318,8 +319,7 @@
 
                 let finalChallenges = challenges || [];
                 
-                // Pas filters toe in JavaScript om crashes door ontbrekende database-kolommen te voorkomen
-                if (typeFilter === 'rated') finalChallenges = finalChallenges.filter(g => g.is_rated === true || g.is_rated === null);
+                if (typeFilter === 'rated') finalChallenges = finalChallenges.filter(g => g.is_rated === true);
                 if (typeFilter === 'casual') finalChallenges = finalChallenges.filter(g => g.is_rated === false);
 
                 if (speedFilter !== 'all') {
@@ -339,7 +339,7 @@
                 }
 
                 finalChallenges.forEach(c => {
-                    const mode = c.is_rated !== false ? "Rated" : "Casual";
+                    const mode = c.is_rated ? "Rated" : "Casual";
                     const item = document.createElement('div');
                     item.className = "challenge-item";
 
@@ -371,14 +371,20 @@
             } catch (err) { console.error("Lobby load error: ", err); }
         }
 
+        function listenForLobbyChanges() {
+            supabaseClient.channel('lobby-global-room')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'gcvm_games' }, () => {
+                    loadOpenChallenges();
+                    checkActiveLiveGame();
+                }).subscribe();
+        }
+
         async function cancelChallenge(gameId) {
             try {
                 const { error } = await supabaseClient.from('gcvm_games').delete().eq('id', gameId);
                 if (error) throw error;
                 loadOpenChallenges();
-            } catch(err) { 
-                alert("Database rejection during Cancel operation:\n" + err.message); 
-            }
+            } catch(err) { alert(err.message); }
         }
 
         async function acceptChallenge(gameId) {
@@ -389,13 +395,9 @@
                 }).eq('id', gameId);
                 
                 if (error) throw error;
-                
-                // Direct doorsturen en live zetten!
                 currentStatus = 'playing';
                 checkActiveLiveGame();
-            } catch(err) { 
-                alert("Database rejection during Accept operation:\n" + err.message); 
-            }
+            } catch(err) { alert(err.message); }
         }
 
         async function createNewChallenge() {
@@ -410,7 +412,6 @@
 
             const isRated = document.getElementById('rated-select').value === "true";
 
-            // We sturen alle mogelijke varianten van opslag mee om typesafety-fouten te omzeilen
             const challengePayload = {
                 white_player: currentUser,
                 status: 'waiting',
@@ -422,18 +423,14 @@
             };
 
             try {
-                const { data, error } = await supabaseClient.from('gcvm_games').insert([challengePayload]).select();
+                const { error } = await supabaseClient.from('gcvm_games').insert([challengePayload]);
                 if (error) throw error;
-                
-                alert("Your challenge has been broadcasted to the lobby successfully!");
                 loadOpenChallenges();
-            } catch (err) {
-                alert("Database rejection during Broadcast operation:\n" + err.message);
-            }
+            } catch (err) { alert(err.message); }
         }
 
         // ==========================================
-        // GAMEPLAY ENGINE
+        // LIVE GAMEPLAY ENGINE
         // ==========================================
         async function checkActiveLiveGame() {
             try {
@@ -444,6 +441,8 @@
 
                 if (games && games.length > 0) {
                     const game = games[0];
+                    if (currentGameId === game.id) return; // Al geladen
+                    
                     currentGameId = game.id;
                     currentStatus = 'playing';
                     myColor = (game.white_player === currentUser) ? 'w' : 'b';
@@ -473,8 +472,9 @@
                     board.orientation(myColor === 'w' ? 'white' : 'black');
                     renderLiveMoveLogs();
 
-                    // Activeer real-time listener voor zetten van tegenstander
-                    supabaseClient.channel(`live-room-${currentGameId}`)
+                    if (channelSubscription) channelSubscription.unsubscribe();
+
+                    channelSubscription = supabaseClient.channel(`live-room-${currentGameId}`)
                         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games', filter: `id=eq.${currentGameId}` }, payload => {
                             const updated = payload.new;
                             if (updated.status !== 'playing') {
@@ -487,7 +487,7 @@
                             }
                         }).subscribe();
                 }
-            } catch(e) { console.error("Live loop issue:", e); }
+            } catch(e) { console.error("Live verification fault:", e); }
         }
 
         function renderLiveMoveLogs() {
@@ -515,7 +515,6 @@
             currentMoves.push(move.san);
             const pgnString = currentMoves.join(" ");
 
-            // Pas het bord lokaal direct aan voor optimale snelheid
             board.position(gameLogic.fen());
             renderLiveMoveLogs();
 
@@ -527,7 +526,7 @@
                     pgn_log: pgnString
                 }).eq('id', currentGameId);
             } catch(err) {
-                console.error("Move update blocked: ", err);
+                console.error("Transmission error: ", err);
             }
         }
 
