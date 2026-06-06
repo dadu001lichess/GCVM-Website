@@ -379,30 +379,50 @@
                 }).subscribe();
         }
 
-        async function cancelChallenge(gameId) {
-            try {
-                const { error } = await supabaseClient.from('gcvm_games').delete().eq('id', gameId);
-                if (error) throw error;
-                loadOpenChallenges();
-            } catch(err) { alert(err.message); }
-        }
+async function cancelChallenge(gameId) {
+    try {
+        const { error } = await supabaseClient
+            .from('gcvm_games')
+            .delete()
+            .eq('id', gameId);
+            
+        if (error) throw error;
+        alert("Challenge successfully cancelled!");
+        loadOpenChallenges();
+    } catch(err) { 
+        alert("Supabase Error during cancel: " + err.message); 
+    }
+}
 
-        async function acceptChallenge(gameId) {
-            try {
-                // VEILIGHEID: Verwijder eerst eventuele openstaande uitdagingen van jezelf, zodat je database schoon is!
-                await supabaseClient.from('gcvm_games').delete().eq('white_player', currentUser).eq('status', 'waiting');
+async function acceptChallenge(gameId) {
+    try {
+        // We proberen eerst je eigen oude wachtende uitdagingen op te ruimen
+        // Mocht dit mislukken door RLS, loggen we het alleen in de console zodat de app niet crasht
+        const { error: deleteError } = await supabaseClient
+            .from('gcvm_games')
+            .delete()
+            .eq('white_player', currentUser)
+            .eq('status', 'waiting');
+            
+        if (deleteError) console.warn("Could not clear old challenges:", deleteError.message);
 
-                // Accepteer nu de geselecteerde match
-                const { error } = await supabaseClient.from('gcvm_games').update({
-                    black_player: currentUser,
-                    status: 'playing'
-                }).eq('id', gameId);
-                
-                if (error) throw error;
-                currentStatus = 'playing';
-                checkActiveLiveGame();
-            } catch(err) { alert("Could not accept challenge: " + err.message); }
-        }
+        // Nu updaten we de game die je wilt joinen
+        const { error } = await supabaseClient
+            .from('gcvm_games')
+            .update({
+                black_player: currentUser,
+                status: 'playing'
+            })
+            .eq('id', gameId);
+        
+        if (error) throw error;
+        
+        currentStatus = 'playing';
+        checkActiveLiveGame();
+    } catch(err) { 
+        alert("Supabase Error during join: " + err.message); 
+    }
+}
 
         async function createNewChallenge() {
             try {
