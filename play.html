@@ -537,11 +537,13 @@
                 
                 updateClockDisplays();
                 updateTurnIndicator();
-                renderChatLog(updatedGame.chat_log);
+                
+                const currentChatLog = Array.isArray(updatedGame.chat_log) ? updatedGame.chat_log : [];
+                renderChatLog(currentChatLog);
                 renderMovesTable(); 
                 updatePlaybackButtons();
                 
-                // --- IN-LAYOUT BALKEN SYNCEN ---
+                // --- SLIMME IN-LAYOUT NOTIFICATIE DETECTIE VIA DE CHATSTREAM ---
                 const zone = document.getElementById('game-notification-zone');
                 zone.innerHTML = ""; 
 
@@ -549,52 +551,56 @@
                     enableGameControls();
                     startLocalClock();
 
-                    // 1. Remise vlag controleren
-                    if (updatedGame.draw_offered_by) {
-                        const banner = document.createElement('div');
-                        banner.className = "notification-banner";
-                        if (updatedGame.draw_offered_by === currentUser) {
-                            banner.innerHTML = `<span>⏳ Draw offer sent. Waiting for opponent to respond...</span>`;
-                        } else {
-                            banner.innerHTML = `
-                                <span>${updatedGame.draw_offered_by} offers a draw.</span>
-                                <div class="notification-buttons">
-                                    <button class="action-btn accept" onclick="respondDraw(true)">Accept</button>
-                                    <button class="action-btn decline" onclick="respondDraw(false)">Decline</button>
-                                </div>
-                            `;
-                        }
-                        zone.appendChild(banner);
-                    }
+                    // Controleer het allerlaatste systeembericht in de chatlog array
+                    if (currentChatLog.length > 0) {
+                        const lastMsg = currentChatLog[currentChatLog.length - 1];
 
-                    // 2. Takeback vlag controleren
-                    if (updatedGame.takeback_requested_by) {
-                        const banner = document.createElement('div');
-                        banner.className = "notification-banner";
-                        if (updatedGame.takeback_requested_by === currentUser) {
-                            banner.innerHTML = `<span>⏳ Takeback requested. Waiting for opponent...</span>`;
-                        } else {
-                            banner.innerHTML = `
-                                <span>${updatedGame.takeback_requested_by} requests a takeback.</span>
-                                <div class="notification-buttons">
-                                    <button class="action-btn accept" onclick="respondTakeback(true)">Allow</button>
-                                    <button class="action-btn decline" onclick="respondTakeback(false)">Deny</button>
-                                </div>
-                            `;
+                        // 1. Draw offer actie via chat-vlag
+                        if (lastMsg.text === "[SYSTEM_DRAW_OFFER]") {
+                            const banner = document.createElement('div');
+                            banner.className = "notification-banner";
+                            if (lastMsg.sender === currentUser) {
+                                banner.innerHTML = `<span>⏳ Draw offer sent. Waiting for opponent...</span>`;
+                            } else {
+                                banner.innerHTML = `
+                                    <span>🤝 ${lastMsg.sender} offers a draw.</span>
+                                    <div class="notification-buttons">
+                                        <button class="action-btn accept" onclick="respondDraw(true)">Accept</button>
+                                        <button class="action-btn decline" onclick="respondDraw(false)">Decline</button>
+                                    </div>
+                                `;
+                            }
+                            zone.appendChild(banner);
                         }
-                        zone.appendChild(banner);
+
+                        // 2. Takeback actie via chat-vlag
+                        if (lastMsg.text === "[SYSTEM_TAKEBACK_REQUEST]") {
+                            const banner = document.createElement('div');
+                            banner.className = "notification-banner";
+                            if (lastMsg.sender === currentUser) {
+                                banner.innerHTML = `<span>⏳ Takeback requested. Waiting for opponent...</span>`;
+                            } else {
+                                banner.innerHTML = `
+                                    <span>🔄 ${lastMsg.sender} requests a takeback.</span>
+                                    <div class="notification-buttons">
+                                        <button class="action-btn accept" onclick="respondTakeback(true)">Allow</button>
+                                        <button class="action-btn decline" onclick="respondTakeback(false)">Deny</button>
+                                    </div>
+                                `;
+                            }
+                            zone.appendChild(banner);
+                        }
                     }
                 } else {
-                    // Match afgelopen
                     disableGameControls();
                     const banner = document.createElement('div');
                     if (currentStatus === 'draw') {
                         banner.className = "notification-banner alert-success";
-                        banner.innerHTML = "<span>Match ended: The game resulted in a draw!</span>";
+                        banner.innerHTML = "<span>🤝 Match ended: The game resulted in a draw!</span>";
                     } else {
                         banner.className = "notification-banner alert-danger";
                         const winner = (currentStatus === 'white_won') ? updatedGame.white_player : updatedGame.black_player;
-                        banner.innerHTML = `<span>Match ended: <strong>${winner}</strong> won the game!</span>`;
+                        banner.innerHTML = `<span>🏆 Match ended: <strong>${winner}</strong> won the game!</span>`;
                     }
                     zone.appendChild(banner);
                     displayGameEndMessage(currentStatus);
@@ -783,11 +789,15 @@
             document.getElementById('playback-live').disabled = (playbackIndex === -1);
         }
 
+        // CHATLOG RENDERING (Verbergt systeemberichten voor schone look)
         function renderChatLog(chatLog) {
             const arr = Array.isArray(chatLog) ? chatLog : [];
             const box = document.getElementById('chat-messages-box');
             box.innerHTML = "";
             arr.forEach(msg => {
+                // Systeemberichten verbergen voor een schone UI
+                if (msg.text === "[SYSTEM_DRAW_OFFER]" || msg.text === "[SYSTEM_TAKEBACK_REQUEST]" || msg.text === "[SYSTEM_DECLINED]") return;
+
                 const div = document.createElement('div');
                 div.className = `chat-bubble ${msg.sender === currentUser ? 'me' : 'opponent'}`;
                 div.innerHTML = `<strong>${msg.sender}:</strong> ${msg.text}`;
@@ -842,52 +852,61 @@
             document.getElementById('black-clock-box').className = 'clock';
         }
 
-        // REMISE AANBIEDEN (Nu met directe lokale feedback)
+        // DRAW OFFER VIA CHATLOG KANAAL
         async function offerDraw() {
             if (currentStatus !== 'playing') return;
-            
-            // Toon direct een banner op eigen scherm voor directe feedback!
-            const zone = document.getElementById('game-notification-zone');
-            zone.innerHTML = `<div class="notification-banner"><span>⏳ Sending draw offer to database...</span></div>`;
-            
-            await supabaseClient.from('gcvm_games').update({ draw_offered_by: currentUser }).eq('id', currentGameId);
+            const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
+            let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
+            log.push({ sender: currentUser, text: "[SYSTEM_DRAW_OFFER]" });
+            await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
         }
 
         async function respondDraw(accepted) {
             if (accepted) {
-                await supabaseClient.from('gcvm_games').update({ status: 'draw', draw_offered_by: null }).eq('id', currentGameId);
+                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
+                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
+                log.push({ sender: currentUser, text: "🤝 Match drawn by mutual agreement." });
+                await supabaseClient.from('gcvm_games').update({ status: 'draw', chat_log: log }).eq('id', currentGameId);
             } else {
-                await supabaseClient.from('gcvm_games').update({ draw_offered_by: null }).eq('id', currentGameId);
+                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
+                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
+                log.push({ sender: currentUser, text: "[SYSTEM_DECLINED]" });
+                await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
             }
         }
 
-        // TAKEBACK AANVRAGEN (Nu met directe lokale feedback)
+        // TAKEBACK REQUEST VIA CHATLOG KANAAL
         async function requestTakeback() {
             if (currentStatus !== 'playing') return;
             if (globalMovesList.length === 0) return;
-            
-            // Toon direct een banner op eigen scherm voor directe feedback!
-            const zone = document.getElementById('game-notification-zone');
-            zone.innerHTML = `<div class="notification-banner"><span>⏳ Sending takeback request...</span></div>`;
-            
-            await supabaseClient.from('gcvm_games').update({ takeback_requested_by: currentUser }).eq('id', currentGameId);
+            const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
+            let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
+            log.push({ sender: currentUser, text: "[SYSTEM_TAKEBACK_REQUEST]" });
+            await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
         }
 
         async function respondTakeback(allowed) {
             if (allowed && globalMovesList.length > 0) {
                 let newMovesList = [...globalMovesList];
-                newMovesList.pop(); 
+                newMovesList.pop(); // Verwijder de laatste zet
 
                 const reconstruction = new Chess();
                 newMovesList.forEach(m => reconstruction.move(m));
 
+                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
+                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
+                log.push({ sender: currentUser, text: "🔄 Takeback allowed. Last move undone." });
+
                 await supabaseClient.from('gcvm_games').update({ 
                     moves_list: newMovesList,
                     fen: reconstruction.fen(),
-                    takeback_requested_by: null
+                    chat_log: log
                 }).eq('id', currentGameId);
             } else {
-                await supabaseClient.from('gcvm_games').update({ takeback_requested_by: null }).eq('id', currentGameId);
+                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
+                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
+                log.push({ sender: currentUser, text: "[SYSTEM_DECLINED]" });
+                await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
             }
         }
 
@@ -896,10 +915,10 @@
             const btn = document.getElementById('resign-btn');
             
             if (btn.innerText === "Resign") {
-                btn.innerText = "Confirm Resign?";
+                btn.innerText = "Confirm Resign? 🔥";
                 btn.style.backgroundColor = "#b31412";
                 setTimeout(() => {
-                    if (btn.innerText === "Confirm Resign?") {
+                    if (btn.innerText === "Confirm Resign? 🔥") {
                         btn.innerText = "Resign";
                         btn.style.backgroundColor = "#d93025";
                     }
