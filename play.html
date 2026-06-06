@@ -14,268 +14,48 @@
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
 
     <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            margin: 0;
-            display: flex;
-            background-color: white;
-        }
-
-        aside {
-            width: 280px;
-            background-color: #202124; 
-            height: 100vh;
-            position: fixed;
-            padding: 40px 24px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            left: 0;
-            top: 0;
-        }
-
-        .logo {
-            color: white;
-            font-size: 22px;
-            font-weight: 300;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-        }
-
-        .auth-container {
-            margin-bottom: 25px;
-        }
-
-        .auth-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #3c4043;
-            border-radius: 4px;
-            background-color: #303134;
-            color: white;
-            font-size: 13px;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        .auth-input::placeholder {
-            color: #80868b;
-        }
-
-        .auth-btn-container {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .auth-btn {
-            flex: 1;
-            padding: 10px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            transition: background-color 0.2s;
-        }
-
-        .auth-btn:hover {
-            background-color: #1557b0;
-        }
-
-        .auth-btn.secondary {
-            background-color: #3c4043;
-            color: #bdc1c6;
-        }
-
-        .auth-btn.secondary:hover {
-            background-color: #4f5357;
-            color: white;
-        }
-
-        .user-info {
-            color: #bdc1c6;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .user-info strong {
-            color: #8ab4f8;
-            font-size: 15px;
-        }
-
-        .badge {
-            display: inline-block;
-            font-size: 10px;
-            padding: 2px 6px;
-            background-color: #34a853;
-            color: white;
-            border-radius: 10px;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
-
-        .logout-link {
-            display: inline-block;
-            color: #f28b82;
-            text-decoration: none;
-            font-size: 12px;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-
-        .logout-link:hover {
-            text-decoration: underline;
-        }
-
-        nav {
-            border-top: 1px solid #3c4043;
-            padding-top: 15px;
-        }
-
-        nav a {
-            display: block;
-            color: #bdc1c6;
-            text-decoration: none;
-            padding: 12px 0;
-            font-size: 15px;
-            font-weight: 400;
-            transition: color 0.2s;
-        }
-
-        nav a:hover, nav a.active {
-            color: #8ab4f8;
-        }
-
-        summary {
-            list-style: none;
-            color: #bdc1c6;
-            padding: 12px 0;
-            font-size: 15px;
-            cursor: pointer;
-            outline: none;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .sub-menu {
-            padding-left: 20px;
-            border-left: 1px solid #3c4043;
-            margin-bottom: 10px;
-        }
-
-        .sub-menu a {
-            font-size: 14px;
-            padding: 8px 0;
-        }
-
-        main {
-            margin-left: 280px; 
-            width: calc(100% - 280px);
-            min-height: 100vh;
-            padding: 40px;
-            box-sizing: border-box;
-        }
-
+        body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; }
+        aside { width: 280px; background-color: #202124; height: 100vh; position: fixed; padding: 40px 24px; box-sizing: border-box; overflow-y: auto; left: 0; top: 0; }
+        .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
+        .auth-container { margin-bottom: 25px; }
+        .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
+        .auth-input { width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px; background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none; }
+        .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
+        .auth-btn { flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; text-align: center; }
+        .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
+        .user-info { color: #bdc1c6; font-size: 14px; line-height: 1.4; }
+        .user-info strong { color: #8ab4f8; font-size: 15px; }
+        .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; }
+        .logout-link { display: inline-block; color: #f28b82; text-decoration: none; font-size: 12px; margin-top: 8px; cursor: pointer; }
+        nav { border-top: 1px solid #3c4043; padding-top: 15px; }
+        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
+        nav a:hover, nav a.active { color: #8ab4f8; }
+        summary { color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; }
+        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; margin-bottom: 10px; }
+        .sub-menu a { font-size: 14px; padding: 8px 0; }
+        
+        main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; padding: 40px; box-sizing: border-box; }
         .lobby-container, .game-container { max-width: 1000px; margin: 0 auto; }
         .btn { padding: 10px 20px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .btn:hover:not(:disabled) { background-color: #1557b0; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn.secondary-action { background-color: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; margin-right: 8px; }
-        .btn.secondary-action:hover:not(:disabled) { background-color: #e8eaed; }
         .btn.danger-action { background-color: #d93025; color: white; margin-right: 8px; }
-        .btn.danger-action:hover:not(:disabled) { background-color: #b31412; }
         
         .lobby-list { margin-top: 20px; border: 1px solid #dadce0; border-radius: 8px; padding: 15px; background-color: #f8f9fa; }
         .lobby-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
         .setup-box { background-color: #f8f9fa; border: 1px solid #dadce0; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
-        .select-style { padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #dadce0; margin-right: 10px; }
+        .select-style { padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #dadce0; margin-right: 10px; background: white; }
 
-        /* NOTIFICATIEBALKEN STYLE */
-        .notification-banner {
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #856404;
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .notification-banner.alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-        .notification-banner.alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-        .notification-buttons {
-            display: flex;
-            gap: 8px;
-        }
-        .action-btn {
-            padding: 4px 12px;
-            border-radius: 4px;
-            border: none;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .action-btn.accept { background-color: #28a745; color: white; }
-        .action-btn.decline { background-color: #dc3545; color: white; }
-
+        .notification-banner { background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px 16px; border-radius: 6px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; }
+        .notification-banner.alert-danger { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .notification-banner.alert-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        
         .game-layout { display: flex; gap: 30px; align-items: flex-start; margin-top: 15px; }
         .board-wrapper { width: 450px; }
         #my-board { width: 450px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
         .clocks-container { display: flex; gap: 20px; margin-bottom: 15px; font-size: 16px; font-weight: 600; }
         .clock { flex: 1; text-align: center; background: #f1f3f4; padding: 8px 12px; border-radius: 4px; border: 1px solid #dadce0; }
         .clock.active-turn { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
-
-        .playback-controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-            background: #f1f3f4;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #dadce0;
-        }
-        .playback-btn {
-            padding: 6px 16px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            border: 1px solid #dadce0;
-            background: white;
-            color: #3c4043;
-            transition: all 0.2s;
-        }
-        .playback-btn:hover:not(:disabled) {
-            background: #e8eaed;
-            color: black;
-        }
-        .playback-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
 
         .right-panel-wrapper { flex: 1; display: flex; flex-direction: column; gap: 20px; height: 500px; }
         .chat-wrapper { flex: 1; border: 1px solid #dadce0; border-radius: 8px; display: flex; flex-direction: column; background-color: #f8f9fa; min-height: 250px; }
@@ -289,12 +69,9 @@
         .chat-send-btn { margin-left: 6px; padding: 6px 12px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; }
 
         .moves-table-container { height: 200px; border: 1px solid #dadce0; border-radius: 8px; background: white; overflow-y: auto; }
-        .moves-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-        .moves-table th { background-color: #202124; color: white; padding: 8px; position: sticky; top: 0; }
+        .moves-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .moves-table th { background-color: #202124; color: white; padding: 8px; text-align: left; }
         .moves-table td { padding: 6px 8px; border-bottom: 1px solid #f1f3f4; }
-        .moves-table td.active-move { background-color: #fff3cd; font-weight: 600; border-radius: 2px; }
-        .moves-table tr:nth-child(even) { background-color: #f8f9fa; }
-        
         .game-controls { margin-top: 20px; display: flex; align-items: center; }
         .hidden { display: none !important; }
     </style>
@@ -322,36 +99,22 @@
             </div>
         </div>
         <nav>
-            <a href="index.html" class="active">Homepage</a>
+            <a href="index.html">Homepage</a>
+            <a href="play.html" class="active">Play Game</a>
             <a href="profileview.html">Profile</a>
             <a href="Training.html">Training</a>
             <a href="Coaches.html">Coaches</a>
             <details>
-              <summary>Shards currency ⌵</summary>
-              <div class="sub-menu">
-                <a href="Shardsintro.html">How to get Shards?</a>
-                <a href="Daily puzzle.html">Daily puzzle</a>
-                <a href="Shards shop.html">Shards shop</a>
-              </div>
+                <summary>Shards currency ⌵</summary>
+                <div class="sub-menu">
+                    <a href="Shardsintro.html">How to get Shards?</a>
+                    <a href="Daily puzzle.html">Daily puzzle</a>
+                    <a href="Shards shop.html">Shards shop</a>
+                </div>
             </details>
             <a href="Current games.html">Current games</a>
             <a href="GoTM.html">Game of the month</a>
             <a href="Jobs.html">Special mentions/Jobs</a>
-            <details>
-              <summary>Updates/News ⌵</summary>
-              <div class="sub-menu">
-                <a href="Updates.html">Updates</a>
-                <a href="News.html">Newspaper</a>
-              </div>    
-            </details>
-            <details>
-              <summary>Community ⌵</summary>
-              <div class="sub-menu">
-                <a href="Leaders.html">Mods/Leaders</a>
-                <a href="Contact.html">Contact</a>
-                <a href="MoTM.html">MoTM</a>
-              </div>    
-            </details>
         </nav>
     </aside>
 
@@ -359,24 +122,37 @@
         <div id="lobby-view" class="lobby-container">
             <h2>GC(V)M Live Chess Lobby</h2>
             <div id="lobby-auth-must" class="setup-box" style="background-color: #fce8e6; border-color: #f28b82;">⚠️ You must log in on the left panel before playing!</div>
-            <div id="resume-box" class="setup-box hidden" style="background-color: #e6f4ea; border-color: #34a853;">
-                <h3>🔄 Active Match Detected!</h3>
-                <button class="btn" style="background-color: #34a853;" onclick="resumeActiveMatch()">Back to Game</button>
-            </div>
+            
             <div id="lobby-controls" class="setup-box hidden">
-                <h3>Choose Time Control</h3>
-                <select id="time-control-select" class="select-style">
-                    <option value="10+0" selected>Rapid (10 min)</option>
-                    <option value="5+0">Blitz (5 min)</option>
-                    <option value="3+2">Blitz (3 min + 2s inc)</option>
+                <h3>Create a New Custom Challenge</h3>
+                
+                <label style="font-weight:600; display:block; margin-bottom:5px;">Time Control:</label>
+                <select id="time-control-select" class="select-style" style="margin-bottom:15px;">
+                    <option value="1+0">Bullet (1 min)</option>
+                    <option value="2+1">Bullet (2 min + 1s)</option>
+                    <option value="3+0">Blitz (3 min)</option>
+                    <option value="3+2">Blitz (3 min + 2s)</option>
+                    <option value="5+0" selected>Blitz (5 min)</option>
+                    <option value="10+0">Rapid (10 min)</option>
+                    <option value="15+10">Rapid (15 min + 10s)</option>
+                    <option value="30+0">Classical (30 min)</option>
                 </select>
+
+                <label style="font-weight:600; display:block; margin-bottom:5px;">Game Type:</label>
+                <select id="rated-select" class="select-style" style="margin-bottom:15px;">
+                    <option value="true" selected>🏆 Rated (Affects Profile Stats)</option>
+                    <option value="false">☕ Unrated (Casual Practice)</option>
+                </select>
+
+                <br>
                 <button id="create-challenge-btn" class="btn" onclick="createNewChallenge()">🔥 Post New Challenge</button>
             </div>
+            
             <div class="lobby-list"><h3>Open Challenges</h3><div id="challenges-list">No active challenges.</div></div>
         </div>
 
         <div id="game-view" class="game-container hidden">
-            <h2>Live Match (<span id="match-time-label">10+0</span>)</h2>
+            <h2>Live Match (<span id="match-time-label">5+0</span>) [<span id="match-rated-label">Rated</span>]</h2>
             <p id="players-info">White: ... vs Black: ...</p>
             
             <div id="game-notification-zone"></div>
@@ -388,14 +164,6 @@
                         <div id="black-clock-box" class="clock">Black: <span id="black-time-display">--:--</span></div>
                     </div>
                     <div id="my-board"></div>
-                    
-                    <div class="playback-controls">
-                        <button id="playback-start" class="playback-btn" onclick="playbackMove('start')">⏮ First</button>
-                        <button id="playback-prev" class="playback-btn" onclick="playbackMove('prev')">◀ Prev</button>
-                        <button id="playback-next" class="playback-btn" onclick="playbackMove('next')">Next ▶</button>
-                        <button id="playback-live" class="playback-btn" onclick="playbackMove('live')">⏭ Live</button>
-                    </div>
-
                     <p id="turn-indicator">Loading match...</p>
                 </div>
 
@@ -412,7 +180,7 @@
                     <div class="moves-table-container">
                         <table class="moves-table">
                             <thead><tr><th>Move</th><th>White</th><th>Black</th></tr></thead>
-                            <tbody id="moves-table-body"><tr><td colspan="3" style="text-align:center; color:#80868b;">No moves made yet</td></tr></tbody>
+                            <tbody id="moves-table-body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -434,19 +202,13 @@
 
         let currentUser = null, currentGameId = null, myColor = null, board = null;
         let game = new Chess(), gameSubscription = null, clockInterval = null;
-        let whiteTimeLeft = 0, blackTimeLeft = 0, activeMatchData = null;
-        
-        let globalMovesList = [];
-        let playbackIndex = -1; 
-        let currentStatus = 'playing';
+        let whiteTimeLeft = 0, blackTimeLeft = 0, currentStatus = 'playing', globalMovesList = [];
+        let hasProcessedEnd = false; // Voorkomt dubbele stats verwerking
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
             const currentRole = localStorage.getItem('gcvm_db_role');
-            if (currentSession) {
-                showStyle(currentSession, currentRole);
-                checkForOngoingGames();
-            }
+            if (currentSession) showStyle(currentSession, currentRole);
             loadLobby();
             supabaseClient.channel('lobby_channel').on('postgres_changes', { event: '*', table: 'gcvm_games', schema: 'public' }, () => loadLobby()).subscribe();
         };
@@ -465,7 +227,7 @@
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
             if (!username || !password) return alert("Fill fields!");
-            await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user' }]);
+            await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', games_played: 0, wins: 0, losses: 0, draws: 0, rated_games: 0 }]);
             alert("Account created!");
         }
 
@@ -479,18 +241,7 @@
             document.getElementById('lobby-controls').classList.remove('hidden');
         }
 
-        function logoutUser() {
-            localStorage.removeItem('gcvm_db_session');
-            localStorage.removeItem('gcvm_db_role');
-            window.location.reload();
-        }
-
-        async function checkForOngoingGames() {
-            const { data } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'playing').or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`).maybeSingle();
-            if (data) { activeMatchData = data; document.getElementById('resume-box').classList.remove('hidden'); }
-        }
-
-        function resumeActiveMatch() { if (activeMatchData) { myColor = (activeMatchData.white_player === currentUser) ? 'w' : 'b'; initGame(activeMatchData); } }
+        function logoutUser() { localStorage.removeItem('gcvm_db_session'); localStorage.removeItem('gcvm_db_role'); window.location.reload(); }
 
         async function loadLobby() {
             const { data } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
@@ -505,7 +256,8 @@
                 const div = document.createElement('div');
                 div.className = "lobby-item";
                 const isMine = g.white_player === currentUser;
-                div.innerHTML = `<span>Challenge from <strong>${g.white_player}</strong> (${g.time_control})</span>
+                const typeLabel = g.is_rated ? "Rated" : "Unrated";
+                div.innerHTML = `<span>Challenge from <strong>${g.white_player}</strong> (${g.time_control} • ${typeLabel})</span>
                     ${(!isMine && currentUser) ? `<button class="btn" onclick="joinGame('${g.id}')">Play</button>` : isMine ? `<button class="btn" style="background-color:#d93025;" onclick="cancelChallenge('${g.id}')">Cancel</button>` : ''}`;
                 container.appendChild(div);
             });
@@ -513,8 +265,15 @@
 
         async function createNewChallenge() {
             const tc = document.getElementById('time-control-select').value;
+            const isRated = document.getElementById('rated-select').value === "true";
             const startSec = parseInt(tc.split('+')[0]) * 60;
-            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ white_player: currentUser, status: 'waiting', time_control: tc, white_time: startSec, black_time: startSec, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', chat_log: [], moves_list: [] }]).select().single();
+            
+            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ 
+                white_player: currentUser, status: 'waiting', time_control: tc, is_rated: isRated,
+                white_time: startSec, black_time: startSec, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 
+                chat_log: [], moves_list: [] 
+            }]).select().single();
+            
             if (error) return alert(error.message);
             currentGameId = data.id; myColor = 'w'; initGame(data);
         }
@@ -523,427 +282,29 @@
 
         async function joinGame(gameId) {
             const { data } = await supabaseClient.from('gcvm_games').update({ black_player: currentUser, status: 'playing', last_move_at: new Date().toISOString() }).eq('id', gameId).select().single();
-            myColor = 'b'; 
-            initGame(data);
-        }
-
-        function listenToSpecificGame(gameId) {
-            if (gameSubscription) supabaseClient.removeChannel(gameSubscription);
-            
-            gameSubscription = supabaseClient.channel(`game_updates_${gameId}`)
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games', filter: `id=eq.${gameId}` }, (payload) => {
-                const updatedGame = payload.new;
-                currentStatus = updatedGame.status;
-                clearInterval(clockInterval);
-                
-                globalMovesList = Array.isArray(updatedGame.moves_list) ? updatedGame.moves_list : Object.values(updatedGame.moves_list || {});
-                game.load(updatedGame.fen);
-                
-                if (playbackIndex === -1) {
-                    board.position(updatedGame.fen, true);
-                }
-                
-                whiteTimeLeft = updatedGame.white_time;
-                blackTimeLeft = updatedGame.black_time;
-                adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
-                
-                document.getElementById('players-info').innerText = `White: ${updatedGame.white_player} vs Black: ${updatedGame.black_player || 'Waiting...'}`;
-                
-                updateClockDisplays();
-                updateTurnIndicator();
-                
-                const currentChatLog = Array.isArray(updatedGame.chat_log) ? updatedGame.chat_log : [];
-                renderChatLog(currentChatLog);
-                renderMovesTable(); 
-                updatePlaybackButtons();
-                
-                // --- SLIMME IN-LAYOUT NOTIFICATIE DETECTIE VIA DE CHATSTREAM ---
-                const zone = document.getElementById('game-notification-zone');
-                zone.innerHTML = ""; 
-
-                if (currentStatus === 'playing') {
-                    enableGameControls();
-                    startLocalClock();
-
-                    // Controleer het allerlaatste systeembericht in de chatlog array
-                    if (currentChatLog.length > 0) {
-                        const lastMsg = currentChatLog[currentChatLog.length - 1];
-
-                        // 1. Draw offer actie via chat-vlag
-                        if (lastMsg.text === "[SYSTEM_DRAW_OFFER]") {
-                            const banner = document.createElement('div');
-                            banner.className = "notification-banner";
-                            if (lastMsg.sender === currentUser) {
-                                banner.innerHTML = `<span>⏳ Draw offer sent. Waiting for opponent...</span>`;
-                            } else {
-                                banner.innerHTML = `
-                                    <span>🤝 ${lastMsg.sender} offers a draw.</span>
-                                    <div class="notification-buttons">
-                                        <button class="action-btn accept" onclick="respondDraw(true)">Accept</button>
-                                        <button class="action-btn decline" onclick="respondDraw(false)">Decline</button>
-                                    </div>
-                                `;
-                            }
-                            zone.appendChild(banner);
-                        }
-
-                        // 2. Takeback actie via chat-vlag
-                        if (lastMsg.text === "[SYSTEM_TAKEBACK_REQUEST]") {
-                            const banner = document.createElement('div');
-                            banner.className = "notification-banner";
-                            if (lastMsg.sender === currentUser) {
-                                banner.innerHTML = `<span>⏳ Takeback requested. Waiting for opponent...</span>`;
-                            } else {
-                                banner.innerHTML = `
-                                    <span>🔄 ${lastMsg.sender} requests a takeback.</span>
-                                    <div class="notification-buttons">
-                                        <button class="action-btn accept" onclick="respondTakeback(true)">Allow</button>
-                                        <button class="action-btn decline" onclick="respondTakeback(false)">Deny</button>
-                                    </div>
-                                `;
-                            }
-                            zone.appendChild(banner);
-                        }
-                    }
-                } else {
-                    disableGameControls();
-                    const banner = document.createElement('div');
-                    if (currentStatus === 'draw') {
-                        banner.className = "notification-banner alert-success";
-                        banner.innerHTML = "<span>🤝 Match ended: The game resulted in a draw!</span>";
-                    } else {
-                        banner.className = "notification-banner alert-danger";
-                        const winner = (currentStatus === 'white_won') ? updatedGame.white_player : updatedGame.black_player;
-                        banner.innerHTML = `<span>🏆 Match ended: <strong>${winner}</strong> won the game!</span>`;
-                    }
-                    zone.appendChild(banner);
-                    displayGameEndMessage(currentStatus);
-                }
-            }).subscribe();
-        }
-
-        function disableGameControls() {
-            document.getElementById('draw-btn').disabled = true;
-            document.getElementById('resign-btn').disabled = true;
-            document.getElementById('takeback-btn').disabled = true;
-        }
-
-        function enableGameControls() {
-            document.getElementById('draw-btn').disabled = false;
-            document.getElementById('resign-btn').disabled = false;
-            document.getElementById('takeback-btn').disabled = false;
-        }
-
-        function adjustTimeForPassedLapse(lastMoveAtIso, currentFen) {
-            if (!lastMoveAtIso) return;
-            const elapsed = Math.floor((new Date().getTime() - new Date(lastMoveAtIso).getTime()) / 1000);
-            if (elapsed > 0 && globalMovesList.length > 0) {
-                if (new Chess(currentFen).turn() === 'w') whiteTimeLeft = Math.max(0, whiteTimeLeft - elapsed);
-                else blackTimeLeft = Math.max(0, blackTimeLeft - elapsed);
-            }
+            myColor = 'b'; initGame(data);
         }
 
         function initGame(gameData) {
-            currentGameId = gameData.id;
-            currentStatus = gameData.status;
-
+            currentGameId = gameData.id; currentStatus = gameData.status; hasProcessedEnd = false;
             document.getElementById('lobby-view').classList.add('hidden');
             document.getElementById('game-view').classList.remove('hidden');
             document.getElementById('match-time-label').innerText = gameData.time_control;
-            document.getElementById('players-info').innerText = `White: ${gameData.white_player} vs Black: ${gameData.black_player || 'Waiting...'}`;
+            document.getElementById('match-rated-label').innerText = gameData.is_rated ? "Rated" : "Unrated";
             
-            globalMovesList = Array.isArray(gameData.moves_list) ? gameData.moves_list : Object.values(gameData.moves_list || {});
-            playbackIndex = -1; 
-
+            globalMovesList = Array.isArray(gameData.moves_list) ? gameData.moves_list : [];
             game.load(gameData.fen);
-            whiteTimeLeft = gameData.white_time;
-            blackTimeLeft = gameData.black_time;
+            whiteTimeLeft = gameData.white_time; blackTimeLeft = gameData.black_time;
             
-            adjustTimeForPassedLapse(gameData.last_move_at, gameData.fen);
-            updateClockDisplays();
-            renderChatLog(gameData.chat_log);
-            renderMovesTable();
-            updatePlaybackButtons();
+            updateClockDisplays(); renderChatLog(gameData.chat_log); renderMovesTable();
 
             board = Chessboard('my-board', {
-                draggable: true,
-                position: gameData.fen,
-                orientation: myColor === 'w' ? 'white' : 'black',
+                draggable: true, position: gameData.fen, orientation: myColor === 'w' ? 'white' : 'black',
                 onDragStart: (src, piece) => {
-                    if (currentStatus !== 'playing') return false; 
-                    if (playbackIndex !== -1) return false; 
-                    if (game.game_over()) return false;
+                    if (currentStatus !== 'playing' || game.turn() !== myColor) return false;
                     if ((myColor === 'w' && piece.search(/^b/) !== -1) || (myColor === 'b' && piece.search(/^w/) !== -1)) return false;
-                    if (game.turn() !== myColor) return false;
                 },
-                onDrop: onDrop,
-                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+                onDrop: onDrop, pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
             });
 
-            if (currentStatus === 'playing') { 
-                updateTurnIndicator(); 
-                startLocalClock(); 
-                enableGameControls();
-            } else {
-                disableGameControls();
-                displayGameEndMessage(currentStatus);
-            }
-            listenToSpecificGame(currentGameId);
-        }
-
-        async function onDrop(source, target) {
-            if (currentStatus !== 'playing') return 'snapback';
-            const move = game.move({ from: source, to: target, promotion: 'q' });
-            if (move === null) return 'snapback';
-
-            const cleanSanMove = move.san; 
-
-            const tc = document.getElementById('match-time-label').innerText;
-            const inc = parseInt(tc.split('+')[1]) || 0;
-            if (myColor === 'w') whiteTimeLeft += inc; else blackTimeLeft += inc;
-
-            let statusUpdate = 'playing';
-            if (game.in_checkmate()) statusUpdate = (myColor === 'w') ? 'white_won' : 'black_won';
-            else if (game.in_draw() || game.in_stalemate()) statusUpdate = 'draw';
-
-            globalMovesList.push(cleanSanMove);
-
-            await supabaseClient.from('gcvm_games').update({ 
-                fen: game.fen(), 
-                white_time: whiteTimeLeft, 
-                black_time: blackTimeLeft, 
-                status: statusUpdate, 
-                moves_list: globalMovesList,
-                last_move_at: new Date().toISOString() 
-            }).eq('id', currentGameId);
-
-            renderMovesTable();
-            updatePlaybackButtons();
-        }
-
-        function renderMovesTable() {
-            const tbody = document.getElementById('moves-table-body');
-            tbody.innerHTML = "";
-
-            if (globalMovesList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#80868b;">No moves made yet</td></tr>`;
-                return;
-            }
-
-            for (let i = 0; i < globalMovesList.length; i += 2) {
-                const moveNum = Math.floor(i / 2) + 1;
-                const whiteMove = globalMovesList[i] || "";
-                const blackMove = globalMovesList[i + 1] || "";
-
-                const tr = document.createElement('tr');
-                const whiteId = `move-cell-${i}`;
-                const blackId = `move-cell-${i + 1}`;
-
-                tr.innerHTML = `
-                    <td><strong>${moveNum}.</strong></td>
-                    <td id="${whiteId}" class="${playbackIndex === i ? 'active-move' : ''}">${whiteMove}</td>
-                    <td id="${blackId}" class="${playbackIndex === (i + 1) ? 'active-move' : ''}">${blackMove}</td>
-                `;
-                tbody.appendChild(tr);
-            }
-            
-            if (playbackIndex === -1) {
-                const container = tbody.parentElement.parentElement;
-                container.scrollTop = container.scrollHeight;
-            }
-        }
-
-        function playbackMove(action) {
-            if (globalMovesList.length === 0) return;
-
-            if (action === 'start') {
-                playbackIndex = 0;
-            } else if (action === 'prev') {
-                if (playbackIndex === -1) {
-                    playbackIndex = globalMovesList.length - 1;
-                } else if (playbackIndex > 0) {
-                    playbackIndex--;
-                }
-            } else if (action === 'next') {
-                if (playbackIndex !== -1) {
-                    if (playbackIndex < globalMovesList.length - 1) {
-                        playbackIndex++;
-                    } else {
-                        playbackIndex = -1; 
-                    }
-                }
-            } else if (action === 'live') {
-                playbackIndex = -1;
-            }
-
-            const tempGame = new Chess();
-            const targetLimit = (playbackIndex === -1) ? globalMovesList.length : playbackIndex + 1;
-            
-            for (let x = 0; x < targetLimit; x++) {
-                tempGame.move(globalMovesList[x]);
-            }
-
-            board.position(tempGame.fen(), true);
-            
-            renderMovesTable();
-            updatePlaybackButtons();
-            
-            if (playbackIndex !== -1) {
-                document.getElementById('turn-indicator').innerText = `Viewing move ${playbackIndex + 1}/${globalMovesList.length}`;
-            } else {
-                updateTurnIndicator();
-            }
-        }
-
-        function updatePlaybackButtons() {
-            const total = globalMovesList.length;
-            document.getElementById('playback-start').disabled = (total === 0 || playbackIndex === 0);
-            document.getElementById('playback-prev').disabled = (total === 0 || playbackIndex === 0);
-            document.getElementById('playback-next').disabled = (total === 0 || playbackIndex === -1);
-            document.getElementById('playback-live').disabled = (playbackIndex === -1);
-        }
-
-        // CHATLOG RENDERING (Verbergt systeemberichten voor schone look)
-        function renderChatLog(chatLog) {
-            const arr = Array.isArray(chatLog) ? chatLog : [];
-            const box = document.getElementById('chat-messages-box');
-            box.innerHTML = "";
-            arr.forEach(msg => {
-                // Systeemberichten verbergen voor een schone UI
-                if (msg.text === "[SYSTEM_DRAW_OFFER]" || msg.text === "[SYSTEM_TAKEBACK_REQUEST]" || msg.text === "[SYSTEM_DECLINED]") return;
-
-                const div = document.createElement('div');
-                div.className = `chat-bubble ${msg.sender === currentUser ? 'me' : 'opponent'}`;
-                div.innerHTML = `<strong>${msg.sender}:</strong> ${msg.text}`;
-                box.appendChild(div);
-            });
-            box.scrollTop = box.scrollHeight;
-        }
-
-        async function sendChatMessage() {
-            const input = document.getElementById('chat-msg-input');
-            if (!input.value.trim()) return;
-            const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-            let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
-            log.push({ sender: currentUser, text: input.value.trim() });
-            input.value = "";
-            await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
-        }
-
-        function updateTurnIndicator() {
-            if (playbackIndex !== -1) return;
-            if (currentStatus !== 'playing') return;
-            document.getElementById('turn-indicator').innerText = game.turn() === 'w' ? "Turn: White" : "Turn: Black";
-            document.getElementById('white-clock-box').className = game.turn() === 'w' ? 'clock active-turn' : 'clock';
-            document.getElementById('black-clock-box').className = game.turn() === 'b' ? 'clock active-turn' : 'clock';
-        }
-
-        function startLocalClock() {
-            if (clockInterval) clearInterval(clockInterval);
-            clockInterval = setInterval(() => {
-                if (currentStatus !== 'playing') return;
-                if (game.turn() === 'w') { if (whiteTimeLeft > 0) whiteTimeLeft--; else handleTimeOut('w'); }
-                else { if (blackTimeLeft > 0) blackTimeLeft--; else handleTimeOut('b'); }
-                updateClockDisplays();
-            }, 1000);
-        }
-
-        function updateClockDisplays() {
-            const fmt = (s) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
-            document.getElementById('white-time-display').innerText = fmt(whiteTimeLeft);
-            document.getElementById('black-time-display').innerText = fmt(blackTimeLeft);
-        }
-
-        async function handleTimeOut(color) {
-            clearInterval(clockInterval);
-            const res = color === 'w' ? 'black_won' : 'white_won';
-            await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
-        }
-
-        function displayGameEndMessage(status) {
-            document.getElementById('turn-indicator').innerText = status === 'draw' ? "Match ended in a draw!" : `${status === 'white_won' ? 'White' : 'Black'} won the match!`;
-            document.getElementById('white-clock-box').className = 'clock';
-            document.getElementById('black-clock-box').className = 'clock';
-        }
-
-        // DRAW OFFER VIA CHATLOG KANAAL
-        async function offerDraw() {
-            if (currentStatus !== 'playing') return;
-            const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-            let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
-            log.push({ sender: currentUser, text: "[SYSTEM_DRAW_OFFER]" });
-            await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
-        }
-
-        async function respondDraw(accepted) {
-            if (accepted) {
-                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
-                log.push({ sender: currentUser, text: "🤝 Match drawn by mutual agreement." });
-                await supabaseClient.from('gcvm_games').update({ status: 'draw', chat_log: log }).eq('id', currentGameId);
-            } else {
-                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
-                log.push({ sender: currentUser, text: "[SYSTEM_DECLINED]" });
-                await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
-            }
-        }
-
-        // TAKEBACK REQUEST VIA CHATLOG KANAAL
-        async function requestTakeback() {
-            if (currentStatus !== 'playing') return;
-            if (globalMovesList.length === 0) return;
-            const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-            let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
-            log.push({ sender: currentUser, text: "[SYSTEM_TAKEBACK_REQUEST]" });
-            await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
-        }
-
-        async function respondTakeback(allowed) {
-            if (allowed && globalMovesList.length > 0) {
-                let newMovesList = [...globalMovesList];
-                newMovesList.pop(); // Verwijder de laatste zet
-
-                const reconstruction = new Chess();
-                newMovesList.forEach(m => reconstruction.move(m));
-
-                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
-                log.push({ sender: currentUser, text: "🔄 Takeback allowed. Last move undone." });
-
-                await supabaseClient.from('gcvm_games').update({ 
-                    moves_list: newMovesList,
-                    fen: reconstruction.fen(),
-                    chat_log: log
-                }).eq('id', currentGameId);
-            } else {
-                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
-                log.push({ sender: currentUser, text: "[SYSTEM_DECLINED]" });
-                await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
-            }
-        }
-
-        async function resignMatch() {
-            if (currentStatus !== 'playing') return;
-            const btn = document.getElementById('resign-btn');
-            
-            if (btn.innerText === "Resign") {
-                btn.innerText = "Confirm Resign? 🔥";
-                btn.style.backgroundColor = "#b31412";
-                setTimeout(() => {
-                    if (btn.innerText === "Confirm Resign? 🔥") {
-                        btn.innerText = "Resign";
-                        btn.style.backgroundColor = "#d93025";
-                    }
-                }, 4000); 
-            } else {
-                const res = myColor === 'w' ? 'black_won' : 'white_won';
-                await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
-            }
-        }
-
-        function leaveGame() { clearInterval(clockInterval); window.location.reload(); }
-    </script>
-</body>
-</html>
+            if (currentStatus === 'playing') { updateTurnIndicator(); startLocalClock();
