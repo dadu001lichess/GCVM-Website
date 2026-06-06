@@ -528,54 +528,91 @@
             initGame(data);
         }
 
-        /* STRICT FORCE HARD SYNC LISTENER FIXED */
-        function listenToSpecificGame(gameId) {
-            if (gameSubscription) {
-                supabaseClient.removeChannel(gameSubscription);
+/* GEOPTIMALISEERDE REALTIME SYNCHRONISATIE */
+function listenToSpecificGame(gameId) {
+    // 1. Sluit een eventueel actieve oude verbinding om conflicten te voorkomen
+    if (gameSubscription) {
+        console.log("Oude realtime verbinding verbreken...");
+        supabaseClient.removeChannel(gameSubscription);
+    }
+    
+    console.log("Nieuwe realtime verbinding opstarten voor game:", gameId);
+
+    // 2. Maak een nieuw kanaal aan en luister specifiek naar UPDATES op gcvm_games
+    gameSubscription = supabaseClient.channel(`game_updates_${gameId}`)
+    .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'gcvm_games', 
+        filter: `id=eq.${gameId}` 
+    }, (payload) => {
+        console.log("DATABASE UPDATE ONTVANGEN!", payload);
+        const updatedGame = payload.new;
+        
+        if (updatedGame.status === 'playing') {
+            // Als het bordscherm nog verborgen was, start het dan nu
+            if (document.getElementById('game-view').classList.contains('hidden')) {
+                initGame(updatedGame);
+                return;
             }
             
-            gameSubscription = supabaseClient.channel(`game_updates_${gameId}`)
-            .on('postgres_changes', { event: 'UPDATE', filter: `id=eq.${gameId}`, table: 'gcvm_games', schema: 'public' }, (payload) => {
-                const updatedGame = payload.new;
-                
-                if (updatedGame.status === 'playing') {
-                    if (document.getElementById('game-view').classList.contains('hidden')) {
-                        initGame(updatedGame);
-                        return;
-                    }
-                    
-                    // Force complete reload to sync opponents move immediately
-                    game.load(updatedGame.fen);
-                    board.position(updatedGame.fen);
-                    
-                    whiteTimeLeft = updatedGame.white_time;
-                    blackTimeLeft = updatedGame.black_time;
-                    adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
-                    
-                    if (updatedGame.draw_offer && updatedGame.draw_offer !== myColor) {
-                        document.getElementById('accept-draw-btn').classList.remove('hidden');
-                    } else if (!updatedGame.draw_offer) {
-                        document.getElementById('accept-draw-btn').classList.add('hidden');
-                    }
-                    
-                    updateClockDisplays();
-                    updateTurnIndicator();
-                    renderChatLog(updatedGame.chat_log);
-                    
-                    startLocalClock();
-                } else if (updatedGame.status.endsWith('_won') || updatedGame.status === 'draw') {
-                    clearInterval(clockInterval);
-                    game.load(updatedGame.fen);
-                    board.position(updatedGame.fen);
-                    displayGameEndMessage(updatedGame.status);
-                    renderChatLog(updatedGame.chat_log);
-                }
-            })
-            .on('postgres_changes', { event: 'DELETE', filter: `id=eq.${gameId}`, table: 'gcvm_games', schema: 'public' }, () => {
-                leaveGame();
-            })
-            .subscribe();
+            // Dwing de schaak-engine (chess.js) om de nieuwe FEN in te laden
+            game.load(updatedGame.fen);
+            
+            // Dwing het visuele bord (chessboard.js) om de stukken direct te verplaatsen (zonder animatie-vertraging)
+            board.position(updatedGame.fen, false);
+            
+            // Synchroniseer de klokken direct met de database-tijdstippen
+            whiteTimeLeft = updatedGame.white_time;
+            blackTimeLeft = updatedGame.black_time;
+            
+            if (typeof adjustTimeForPassedLapse === "function") {
+                adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
+            }
+            
+            // Remise aanbiedingen verwerken indien van toepassing
+            if (updatedGame.draw_offer && updatedGame.draw_offer !== myColor) {
+                document.getElementById('accept-draw-btn')?.classList.remove('hidden');
+            } else if (!updatedGame.draw_offer) {
+                document.getElementById('accept-draw-btn')?.classList.add('hidden');
+            }
+            
+            // Interface updates refreshen
+            updateClockDisplays();
+            updateTurnIndicator();
+            
+            if (typeof renderChatLog === "function") {
+                renderChatLog(updatedGame.chat_log);
+            }
+            
+            // Start de lokale klok-aftelling opnieuw voor de speler die nu aan de beurt is
+            startLocalClock();
+            
+        } else if (updatedGame.status.endsWith('_won') || updatedGame.status === 'draw') {
+            clearInterval(clockInterval);
+            game.load(updatedGame.fen);
+            board.position(updatedGame.fen);
+            if (typeof displayGameEndMessage === "function") {
+                displayGameEndMessage(updatedGame.status);
+            }
+            if (typeof renderChatLog === "function") {
+                renderChatLog(updatedGame.chat_log);
+            }
         }
+    })
+    .on('postgres_changes', { 
+        event: 'DELETE', 
+        schema: 'public', 
+        table: 'gcvm_games', 
+        filter: `id=eq.${gameId}` 
+    }, () => {
+        console.log("Game is verwijderd uit de database.");
+        leaveGame();
+    })
+    .subscribe((status) => {
+        console.log("Supabase Realtime Verbindingsstatus:", status);
+    });
+}
 
         function adjustTimeForPassedLapse(lastMoveAtIso, currentFen) {
             if (!lastMoveAtIso) return;
