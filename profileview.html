@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCVM - Profile View</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
         body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; color: #3c4043; }
         aside { width: 280px; background-color: #202124; height: 100vh; position: fixed; padding: 40px 24px; box-sizing: border-box; overflow-y: auto; left: 0; top: 0; z-index: 10; }
@@ -22,35 +20,30 @@
         .user-info strong { color: #8ab4f8; font-size: 15px; }
         .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; }
         .logout-link { color: #f28b82; font-size: 12px; margin-top: 8px; cursor: pointer; display: inline-block; }
-
         nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
         nav a:hover, nav a.active { color: #8ab4f8; }
-
         main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; box-sizing: border-box; position: relative; }
         .banner { height: 120px; background-color: #f1f3f4; display: flex; align-items: center; padding-left: 40px; border-bottom: 1px solid #dadce0; }
         .banner h1 { font-size: 32px; font-weight: 400; margin: 0; color: #202124; }
         .content { max-width: 1000px; margin: 0 auto; padding: 40px; }
-
         .top-right-search { position: absolute; top: 40px; right: 40px; display: flex; gap: 8px; z-index: 5; }
         .search-input { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 200px; }
         .search-btn { background: #3c4043; color: white; border: none; padding: 0 14px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; }
-
         .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; }
         .side-panel { border-right: 1px solid #dadce0; padding-right: 20px; }
-        
         .rating-card { background: #f8f9fa; border: 1px solid #dadce0; padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .rating-name { font-weight: 600; font-size: 14px; }
-        .rating-val { color: #1a73e8; font-weight: 600; font-size: 16px; }
+        .rating-val { color: #1a73e8; font-weight: 600; font-size: 16px; cursor: help; }
         .rating-sub { font-size: 11px; color: #70757a; margin-top: 2px; }
-
         .main-panel { display: flex; flex-direction: column; gap: 25px; }
         .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 15px; }
         .profile-title { font-size: 28px; margin: 0 0 8px 0; font-weight: 400; }
-
         .flair-display-box { font-size: 14px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 6px 14px; border-radius: 20px; width: fit-content; margin-top: 5px; }
         .bio-display-text { font-size: 15px; line-height: 1.6; white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #dadce0; min-height: 100px; }
         .edit-link-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 15px; text-decoration: none; display: inline-block; }
-
+        .filter-select { padding: 6px 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; background: white; outline: none; margin-bottom: 10px; }
+        .review-btn { background: #1a73e8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block; }
+        .review-btn:hover { background: #1557b0; }
         .alert-warn { background: #fce8e6; border: 1px solid #f28b82; color: #a51d24; padding: 15px; border-radius: 6px; text-align: center; font-weight: 600; }
         .hidden { display: none !important; }
     </style>
@@ -69,11 +62,7 @@
                 </div>
             </div>
             <div id="profile-section" class="hidden">
-                <div class="user-info">
-                    Logged in as:<br>
-                    <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
-                    <span class="logout-link" onclick="logoutUser()">Log out</span>
-                </div>
+                <div class="user-info">Logged in as:<br><strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br><span class="logout-link" onclick="logoutUser()">Log out</span></div>
             </div>
         </div>
         <nav>
@@ -94,9 +83,7 @@
         </div>
 
         <div class="content">
-            <div id="logged-out-warning" class="alert-warn">
-                Please log in through the sidebar to view member profiles!
-            </div>
+            <div id="logged-out-warning" class="alert-warn">Please log in through the sidebar to view member profiles!</div>
 
             <div id="profile-page-content" class="hidden">
                 <div class="profile-grid">
@@ -109,7 +96,7 @@
                                 <div class="rating-name">Classical (≥29m)</div>
                                 <div class="rating-sub"><span id="count-classical">0</span> games</div>
                             </div>
-                            <div class="rating-val" id="rating-classical">1500</div>
+                            <div class="rating-val" id="rating-classical" title="Loading...">1500</div>
                         </div>
 
                         <div class="rating-card">
@@ -117,7 +104,7 @@
                                 <div class="rating-name">Rapid (&lt;29m)</div>
                                 <div class="rating-sub"><span id="count-rapid">0</span> games</div>
                             </div>
-                            <div class="rating-val" id="rating-rapid">1500</div>
+                            <div class="rating-val" id="rating-rapid" title="Loading...">1500</div>
                         </div>
 
                         <div class="rating-card">
@@ -125,7 +112,7 @@
                                 <div class="rating-name">Blitz (&lt;10m)</div>
                                 <div class="rating-sub"><span id="count-blitz">0</span> games</div>
                             </div>
-                            <div class="rating-val" id="rating-blitz">1500</div>
+                            <div class="rating-val" id="rating-blitz" title="Loading...">1500</div>
                         </div>
 
                         <div class="rating-card">
@@ -133,7 +120,7 @@
                                 <div class="rating-name">Bullet (&lt;3m)</div>
                                 <div class="rating-sub"><span id="count-bullet">0</span> games</div>
                             </div>
-                            <div class="rating-val" id="rating-bullet">1500</div>
+                            <div class="rating-val" id="rating-bullet" title="Loading...">1500</div>
                         </div>
 
                         <div class="rating-card" style="display: block;">
@@ -158,7 +145,16 @@
                         </div>
 
                         <div>
-                            <h3 style="margin:0 0 10px 0; font-size:16px;">Match History</h3>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <h3 style="margin:0; font-size:16px;">Match History</h3>
+                                <select id="historyFilter" class="filter-select" onchange="filterHistory()">
+                                    <option value="all">All Games</option>
+                                    <option value="rated">Rated Only</option>
+                                    <option value="casual">Casual Only</option>
+                                    <option value="wins">Victories</option>
+                                    <option value="losses">Defeats</option>
+                                </select>
+                            </div>
                             <div id="history-list-box" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
                                 <p style="color: #70757a; font-size: 14px;">No matches recorded yet.</p>
                             </div>
@@ -173,6 +169,9 @@
         const SUPABASE_URL = 'https://bonjvtqfndaxproxxacl.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let globalGamesCache = [];
+        let globalTargetUser = "";
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
@@ -192,9 +191,9 @@
         async function loadProfileView(username) {
             const activeUser = localStorage.getItem('gcvm_db_session');
             document.getElementById('page-main-title').innerText = `${username}'s Profile`;
+            globalTargetUser = username;
 
             try {
-                // We halen alle gebruikers op om een veilige case-insensitive match te doen
                 const { data: users, error } = await supabaseClient.from('gcvm_users').select('*');
                 if (error) throw error;
 
@@ -205,7 +204,6 @@
                     return;
                 }
 
-                // Vul de biografie en flairs in met de gevonden database data
                 document.getElementById('view-username').innerText = user.username;
                 document.getElementById('bio-text-container').innerText = user.bio && user.bio.trim() !== "" ? user.bio : "This member hasn't written a biography yet.";
                 
@@ -224,7 +222,11 @@
                     editBtn.classList.add('hidden');
                 }
 
-                await fetchAndCalculateStats(user.username);
+                // Stel de globale rating & RD in als fallback/provisional check
+                const userRD = user.rd !== undefined && user.rd !== null ? user.rd : 350;
+                const showQuestionMark = userRD > 110 ? "?" : "";
+                
+                await fetchAndCalculateStats(user.username, showQuestionMark, userRD);
 
             } catch(err) { 
                 console.error(err); 
@@ -232,7 +234,7 @@
             }
         }
 
-        async function fetchAndCalculateStats(targetUsername) {
+        async function fetchAndCalculateStats(targetUsername, qMark, currentRD) {
             try {
                 const { data: games, error } = await supabaseClient
                     .from('gcvm_games')
@@ -242,6 +244,7 @@
                 if (error) throw error;
 
                 const finishedGames = games ? games.filter(g => g.status !== 'playing' && g.status !== 'waiting') : [];
+                globalGamesCache = finishedGames; // Sla op voor filtering
                 const totalGames = finishedGames.length;
 
                 let timeControls = {
@@ -256,7 +259,7 @@
                     document.getElementById('stat-total').innerText = "0";
                     document.getElementById('stat-white-pct').innerText = "0%";
                     document.getElementById('stat-black-pct').innerText = "0%";
-                    updateRatingUI(timeControls);
+                    updateRatingUI(timeControls, qMark, currentRD);
                     renderMatchHistoryList([], targetUsername);
                     return;
                 }
@@ -273,7 +276,6 @@
                         wins++;
                     }
 
-                    // Tijdscategorie bepalen
                     let tc = 'rapid'; 
                     if (game.time_control) {
                         const parts = game.time_control.split('+');
@@ -287,7 +289,6 @@
                         else tc = 'classical';
                     }
 
-                    // Als is_rated herkend wordt als false is het casual, anders (true óf leeg/oud) is het Rated!
                     if (game.is_rated !== false) {
                         timeControls[tc].count++;
                         if (isWhite && game.white_rating) timeControls[tc].rating = game.white_rating;
@@ -300,28 +301,50 @@
                 document.getElementById('stat-white-pct').innerText = `${((whiteCount / totalGames) * 100).toFixed(1)}%`;
                 document.getElementById('stat-black-pct').innerText = `${((blackCount / totalGames) * 100).toFixed(1)}%`;
 
-                updateRatingUI(timeControls);
+                updateRatingUI(timeControls, qMark, currentRD);
                 renderMatchHistoryList(finishedGames, targetUsername);
 
             } catch (err) { console.error(err); }
         }
 
-        function updateRatingUI(timeControls) {
-            document.getElementById('count-classical').innerText = timeControls.classical.count;
-            document.getElementById('rating-classical').innerText = timeControls.classical.rating;
-            document.getElementById('count-rapid').innerText = timeControls.rapid.count;
-            document.getElementById('rating-rapid').innerText = timeControls.rapid.rating;
-            document.getElementById('count-blitz').innerText = timeControls.blitz.count;
-            document.getElementById('rating-blitz').innerText = timeControls.blitz.rating;
-            document.getElementById('count-bullet').innerText = timeControls.bullet.count;
-            document.getElementById('rating-bullet').innerText = timeControls.bullet.rating;
+        function updateRatingUI(timeControls, qMark, currentRD) {
+            const types = ['classical', 'rapid', 'blitz', 'bullet'];
+            types.forEach(t => {
+                document.getElementById(`count-${t}`).innerText = timeControls[t].count;
+                // Als er nog geen games in die categorie zijn gespeeld, behoudt het z'an onzekerheidsteken (?)
+                const displayMark = timeControls[t].count === 0 ? "?" : qMark;
+                const targetEl = document.getElementById(`rating-${t}`);
+                targetEl.innerText = timeControls[t].rating + displayMark;
+                targetEl.title = timeControls[t].count === 0 ? "Provisional (RD: 350)" : `Rating Deviation: ±${Math.round(currentRD)}`;
+            });
+        }
+
+        function filterHistory() {
+            const val = document.getElementById('historyFilter').value;
+            let filtered = [...globalGamesCache];
+
+            if (val === 'rated') filtered = filtered.filter(g => g.is_rated !== false);
+            else if (val === 'casual') filtered = filtered.filter(g => g.is_rated === false);
+            else if (val === 'wins') {
+                filtered = filtered.filter(g => {
+                    const isWhite = g.white_player && g.white_player.toLowerCase() === globalTargetUser.toLowerCase();
+                    return (g.status === 'white_won' && isWhite) || (g.status === 'black_won' && !isWhite);
+                });
+            } else if (val === 'losses') {
+                filtered = filtered.filter(g => {
+                    const isWhite = g.white_player && g.white_player.toLowerCase() === globalTargetUser.toLowerCase();
+                    return (g.status === 'white_won' && !isWhite) || (g.status === 'black_won' && isWhite);
+                });
+            }
+
+            renderMatchHistoryList(filtered, globalTargetUser);
         }
 
         function renderMatchHistoryList(gamesList, targetUsername) {
             const box = document.getElementById('history-list-box');
             box.innerHTML = "";
             if (gamesList.length === 0) {
-                box.innerHTML = `<p style="color: #70757a; font-size: 14px;">No matches recorded yet.</p>`;
+                box.innerHTML = `<p style="color: #70757a; font-size: 14px;">No matches found matching criteria.</p>`;
                 return;
             }
             gamesList.sort((a, b) => b.id - a.id); 
@@ -339,17 +362,28 @@
                     resultLabel = "Defeat 💥"; cardBorderColor = "#d93025";
                 }
 
+                // Haal elo change op uit de database
+                let changeText = "";
+                if (match.is_rated !== false) {
+                    const diff = isWhite ? match.white_rating_change : match.black_rating_change;
+                    if (diff !== undefined && diff !== null) {
+                        if (diff > 0) changeText = ` <span style="color:#34a853; font-weight:bold;">(+${diff})</span>`;
+                        else if (diff < 0) changeText = ` <span style="color:#d93025; font-weight:bold;">(${diff})</span>`;
+                        else changeText = ` <span style="color:#70757a;">(0)</span>`;
+                    }
+                }
+
                 const matchCard = document.createElement('div');
                 matchCard.style = `border:1px solid ${cardBorderColor}; border-left:5px solid ${cardBorderColor}; padding:14px 18px; border-radius:6px; background:white; display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;`;
                 matchCard.innerHTML = `
                     <div>
-                        <span style="font-size:11px; font-weight:600; text-transform:uppercase; padding:3px 8px; border-radius:4px; background:#f1f3f4; color:#3c4043;">${resultLabel}</span>
+                        <span style="font-size:11px; font-weight:600; text-transform:uppercase; padding:3px 8px; border-radius:4px; background:#f1f3f4; color:#3c4043;">${resultLabel}${changeText}</span>
                         <span style="font-size:11px; font-weight:600; margin-left:5px; padding:3px 8px; border-radius:4px; background:${match.is_rated !== false ? '#e8f0fe':'#f5f5f5'}; color:${match.is_rated !== false ? '#1a73e8':'#616161'};">[${modeText}]</span>
                         <div style="margin-top:8px; font-size:15px; color:#202124;">Playing as <strong>${isWhite ? 'White':'Black'}</strong> against <span style="color:#1a73e8; font-weight:600;">${opponent || 'Unknown'}</span></div>
                     </div>
-                    <div style="text-align:right; font-size:13px; color:#70757a;">
-                        <div>Game ID: #${match.id}</div>
-                        <div style="font-size:11px; margin-top:4px;">TC: ${match.time_control || 'Custom'}</div>
+                    <div style="text-align:right; font-size:13px; color:#70757a; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                        <div>Game ID: #${match.id} | TC: ${match.time_control || 'Custom'}</div>
+                        <a href="play.html?gameId=${match.id}" class="review-btn">Review Game 🔎</a>
                     </div>`;
                 box.appendChild(matchCard);
             });
