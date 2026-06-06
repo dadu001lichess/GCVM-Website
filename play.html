@@ -79,7 +79,7 @@
             box-sizing: border-box;
         }
 
-        .lobby-container, .game-container { max-width: 950px; margin: 0 auto; }
+        .lobby-container, .game-container { max-width: 1000px; margin: 0 auto; }
         .btn { padding: 10px 20px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
         .btn:hover { background-color: #1557b0; }
         .btn.secondary-action { background-color: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; margin-right: 8px; }
@@ -93,7 +93,7 @@
         .setup-box { background-color: #f8f9fa; border: 1px solid #dadce0; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
         .select-style { padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #dadce0; margin-right: 10px; }
 
-        /* PLAYING AREA SIDE-BY-SIDE LAYOUT */
+        /* PLAYING AREA LAYOUT */
         .game-layout {
             display: flex;
             gap: 30px;
@@ -114,22 +114,28 @@
         .clock { flex: 1; text-align: center; background: #f1f3f4; padding: 8px 12px; border-radius: 4px; border: 1px solid #dadce0; }
         .clock.active-turn { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
 
-        /* GAME CHAT WINDOW SYSTEM */
+        /* RIGHT PANEL: CHAT & LIVE MOVES */
+        .right-panel-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 520px;
+        }
+
         .chat-wrapper {
             flex: 1;
-            height: 520px;
             border: 1px solid #dadce0;
             border-radius: 8px;
             display: flex;
             flex-direction: column;
             background-color: #f8f9fa;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
         .chat-header {
             background-color: #202124;
             color: white;
-            padding: 12px 16px;
+            padding: 10px 16px;
             font-size: 14px;
             font-weight: 600;
             border-top-left-radius: 7px;
@@ -138,67 +144,65 @@
 
         .chat-messages {
             flex: 1;
-            padding: 15px;
+            padding: 12px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             background: white;
         }
 
         .chat-bubble {
             max-width: 85%;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 6px;
-            font-size: 13.5px;
-            line-height: 1.4;
-            word-wrap: break-word;
+            font-size: 13px;
         }
 
-        .chat-bubble.me {
-            background-color: #e8f0fe;
-            color: #1a73e8;
-            align-self: flex-end;
-            border-bottom-right-radius: 1px;
-        }
-
-        .chat-bubble.opponent {
-            background-color: #f1f3f4;
-            color: #3c4043;
-            align-self: flex-start;
-            border-bottom-left-radius: 1px;
-        }
+        .chat-bubble.me { background-color: #e8f0fe; color: #1a73e8; align-self: flex-end; }
+        .chat-bubble.opponent { background-color: #f1f3f4; color: #3c4043; align-self: flex-start; }
 
         .chat-input-area {
             display: flex;
             border-top: 1px solid #dadce0;
-            background: #f8f9fa;
-            padding: 10px;
-            border-bottom-left-radius: 7px;
-            border-bottom-right-radius: 7px;
+            padding: 8px;
         }
 
-        #chat-msg-input {
-            flex: 1;
-            padding: 8px 12px;
+        #chat-msg-input { flex: 1; padding: 6px 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; }
+        .chat-send-btn { margin-left: 6px; padding: 6px 12px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+
+        /* MOVE HISTORY TABLE STYLE */
+        .moves-table-container {
+            height: 180px;
             border: 1px solid #dadce0;
-            border-radius: 4px;
-            outline: none;
-            font-size: 13px;
+            border-radius: 8px;
+            background: white;
+            overflow-y: auto;
         }
 
-        .chat-send-btn {
-            margin-left: 8px;
-            padding: 8px 16px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
+        .moves-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 13px;
+            text-align: left;
         }
-        .chat-send-btn:hover { background-color: #1557b0; }
+
+        .moves-table th {
+            background-color: #202124;
+            color: white;
+            padding: 8px;
+            position: sticky;
+            top: 0;
+        }
+
+        .moves-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .moves-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
         
         .game-controls { margin-top: 20px; display: flex; align-items: center; }
         .hidden { display: none !important; }
@@ -208,7 +212,6 @@
 
     <aside>
         <div class="logo">GC(V)M</div>
-        
         <div class="auth-container">
             <div id="login-section" class="auth-input-group">
                 <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
@@ -218,81 +221,41 @@
                     <button class="auth-btn secondary" onclick="registerUser()">Register</button>
                 </div>
             </div>
-            
             <div id="profile-section" class="hidden">
-                <div class="user-info">
-                    Logged in as:<br>
-                    <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
-                    <span class="logout-link" onclick="logoutUser()">Log out</span>
-                </div>
+                <div class="user-info">Logged in as:<br><strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br><span class="logout-link" onclick="logoutUser()">Log out</span></div>
             </div>
         </div>
-
         <nav>
             <a href="index.html">Homepage</a>
             <a href="play.html" class="active">Play Game</a>
             <a href="profileview.html">Profile</a>
             <a href="Training.html">Training</a>
             <a href="Coaches.html">Coaches</a>
-            <details>
-              <summary>Shards currency ⌵</summary>
-              <div class="sub-menu">
-                <a href="Shardsintro.html">How to get Shards?</a>
-                <a href="Daily puzzle.html">Daily puzzle</a>
-                <a href="Shards shop.html">Shards shop</a>
-              </div>
-            </details>
+            <details><summary>Shards currency ⌵</summary><div class="sub-menu"><a href="Shardsintro.html">How to get Shards?</a><a href="Daily puzzle.html">Daily puzzle</a><a href="Shards shop.html">Shards shop</a></div></details>
             <a href="Current games.html">Current games</a>
             <a href="GoTM.html">Game of the month</a>
             <a href="Jobs.html">Special mentions/Jobs</a>
-            <details>
-              <summary>Updates/News ⌵</summary>
-              <div class="sub-menu">
-                <a href="Updates.html">Updates</a>
-                <a href="News.html">Newspaper</a>
-              </div>    
-            </details>
-            <details>
-              <summary>Community ⌵</summary>
-              <div class="sub-menu">
-                <a href="Leaders.html">Mods/Leaders</a>
-                <a href="Contact.html">Contact</a>
-                <a href="MoTM.html">MoTM</a>
-              </div>    
-            </details>
         </nav>
     </aside>
 
     <main>
         <div id="lobby-view" class="lobby-container">
             <h2>GC(V)M Live Chess Lobby</h2>
-            
-            <div id="lobby-auth-must" class="setup-box" style="background-color: #fce8e6; border-color: #f28b82;">
-                ⚠️ You must log in on the left panel before creating or joining challenges!
-            </div>
-
+            <div id="lobby-auth-must" class="setup-box" style="background-color: #fce8e6; border-color: #f28b82;">⚠️ You must log in on the left panel before playing!</div>
             <div id="resume-box" class="setup-box hidden" style="background-color: #e6f4ea; border-color: #34a853;">
-                <h3 style="color: #137333; margin-top: 0;">🔄 Active Match Detected!</h3>
-                <p>You have an ongoing game running in the cloud database right now.</p>
+                <h3>🔄 Active Match Detected!</h3>
                 <button class="btn" style="background-color: #34a853;" onclick="resumeActiveMatch()">Back to Game</button>
             </div>
-
             <div id="lobby-controls" class="setup-box hidden">
                 <h3>Choose Time Control</h3>
                 <select id="time-control-select" class="select-style">
                     <option value="3+2">Blitz (3 min + 2s inc)</option>
                     <option value="5+0">Blitz (5 min)</option>
                     <option value="10+0" selected>Rapid (10 min)</option>
-                    <option value="15+10">Rapid (15 min + 10s inc)</option>
                 </select>
                 <button id="create-challenge-btn" class="btn" onclick="createNewChallenge()">🔥 Post New Challenge</button>
-                <p id="challenge-warning" style="color: #e67c73; margin-top: 10px; font-weight: 600;" class="hidden">You already have an active pending challenge in the lobby!</p>
             </div>
-
-            <div class="lobby-list">
-                <h3>Open Challenges</h3>
-                <div id="challenges-list">No active challenges available.</div>
-            </div>
+            <div class="lobby-list"><h3>Open Challenges</h3><div id="challenges-list">No active challenges.</div></div>
         </div>
 
         <div id="game-view" class="game-container hidden">
@@ -305,18 +268,25 @@
                         <div id="white-clock-box" class="clock">White: <span id="white-time-display">--:--</span></div>
                         <div id="black-clock-box" class="clock">Black: <span id="black-time-display">--:--</span></div>
                     </div>
-
                     <div id="my-board"></div>
-                    
-                    <p id="turn-indicator" style="font-weight: 600; color: #202124;">Loading match...</p>
+                    <p id="turn-indicator">Loading match...</p>
                 </div>
 
-                <div class="chat-wrapper">
-                    <div class="chat-header">Match Chat</div>
-                    <div id="chat-messages-box" class="chat-messages"></div>
-                    <div class="chat-input-area">
-                        <input type="text" id="chat-msg-input" placeholder="Write a message..." onkeydown="if(event.key === 'Enter') sendChatMessage()">
-                        <button class="chat-send-btn" onclick="sendChatMessage()">Send</button>
+                <div class="right-panel-wrapper">
+                    <div class="chat-wrapper">
+                        <div class="chat-header">Match Chat</div>
+                        <div id="chat-messages-box" class="chat-messages"></div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chat-msg-input" placeholder="Type a message..." onkeydown="if(event.key === 'Enter') sendChatMessage()">
+                            <button class="chat-send-btn" onclick="sendChatMessage()">Send</button>
+                        </div>
+                    </div>
+
+                    <div class="moves-table-container">
+                        <table class="moves-table">
+                            <thead><tr><th>Move</th><th>White</th><th>Black</th></tr></thead>
+                            <tbody id="moves-table-body"><tr><td colspan="3" style="text-align:center; color:#80868b;">No moves made yet</td></tr></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -324,8 +294,8 @@
             <div class="game-controls">
                 <button id="resign-btn" class="btn danger-action" onclick="resignMatch()">Resign</button>
                 <button id="draw-btn" class="btn secondary-action" onclick="offerDraw()">Offer Draw</button>
-                <button id="accept-draw-btn" class="btn hidden" style="background-color: #f4b400; color: white; margin-right: 8px;" onclick="acceptDraw()">Accept Draw Offer</button>
-                <button id="exit-btn" class="btn secondary-action" onclick="leaveGame()">Lobby / Exit Screen</button>
+                <button id="accept-draw-btn" class="btn hidden" style="background-color: #f4b400; color: white;" onclick="acceptDraw()">Accept Draw</button>
+                <button id="exit-btn" class="btn secondary-action" onclick="leaveGame()">Lobby / Exit</button>
             </div>
         </div>
     </main>
@@ -335,65 +305,37 @@
         const SUPABASE_KEY = 'sb_publishable_SbuaIgblKnnOIDHf6KRznw_NZUCUc1u'; 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentUser = null;
-        let currentGameId = null;
-        let myColor = null;
-        let board = null;
-        let game = new Chess();
-        let gameSubscription = null;
-        let clockInterval = null;
-
-        let whiteTimeLeft = 0;
-        let blackTimeLeft = 0;
-        let activeMatchData = null;
-        let loadedChatMessagesCount = 0;
+        let currentUser = null, currentGameId = null, myColor = null, board = null;
+        let game = new Chess(), gameSubscription = null, clockInterval = null;
+        let whiteTimeLeft = 0, blackTimeLeft = 0, activeMatchData = null, loadedChatMessagesCount = 0;
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
-            const currentRole = localStorage.getItem('gcvm_db_role');
             if (currentSession) {
-                showStyle(currentSession, currentRole);
-                updateOnlineStatus(currentSession);
-                setInterval(() => updateOnlineStatus(currentSession), 60000);
+                showStyle(currentSession, localStorage.getItem('gcvm_db_role'));
+                setInterval(() => supabaseClient.from('gcvm_users').update({ last_seen: new Date().toISOString() }).eq('username', currentSession), 60000);
                 checkForOngoingGames();
             }
             loadLobby();
-            listenToLobby();
+            supabaseClient.channel('public:gcvm_games').on('postgres_changes', { event: '*', filter: 'status=eq.waiting', table: 'gcvm_games', schema: 'public' }, () => loadLobby()).subscribe();
         };
-
-        async function updateOnlineStatus(username) {
-            try {
-                await supabaseClient.from('gcvm_users').update({ last_seen: new Date().toISOString() }).eq('username', username);
-            } catch(e) { console.error(e); }
-        }
 
         async function registerUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) { alert("Please fill in both fields!"); return; }
-            try {
-                const { data: existingUser } = await supabaseClient.from('gcvm_users').select('username').eq('username', username).maybeSingle();
-                if (existingUser) { alert("This username is already registered online!"); return; }
-                const { error } = await supabaseClient.from('gcvm_users').insert([{ username: username, password: password, role: 'user', bio: 'Hello!' }]);
-                if (error) throw error;
-                alert("Account created successfully! You can now log in.");
-                document.getElementById('password-input').value = "";
-            } catch (err) { alert("Error: " + err.message); }
+            if (!username || !password) return alert("Fill in fields!");
+            await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', bio: 'Hello!' }]);
+            alert("Account created!");
         }
 
         async function loginUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) { alert("Please fill in both fields!"); return; }
-            try {
-                const { data: user, error } = await supabaseClient.from('gcvm_users').select('*').eq('username', username).eq('password', password).maybeSingle();
-                if (error || !user) { alert("Invalid username or password!"); return; }
-                localStorage.setItem('gcvm_db_session', user.username);
-                localStorage.setItem('gcvm_db_role', user.role);
-                showStyle(user.username, user.role);
-                updateOnlineStatus(user.username);
-                window.location.reload();
-            } catch (err) { alert("Error: " + err.message); }
+            const { data: user } = await supabaseClient.from('gcvm_users').select('*').eq('username', username).eq('password', password).maybeSingle();
+            if (!user) return alert("Invalid credentials!");
+            localStorage.setItem('gcvm_db_session', user.username);
+            localStorage.setItem('gcvm_db_role', user.role);
+            window.location.reload();
         }
 
         function showStyle(username, role) {
@@ -401,216 +343,89 @@
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('profile-section').classList.remove('hidden');
             document.getElementById('displayed-username').innerText = username;
-            
             document.getElementById('lobby-auth-must').classList.add('hidden');
             document.getElementById('lobby-controls').classList.remove('hidden');
         }
 
-        function logoutUser() {
-            localStorage.removeItem('gcvm_db_session');
-            localStorage.removeItem('gcvm_db_role');
-            window.location.reload();
-        }
+        function logoutUser() { localStorage.clear(); window.location.reload(); }
 
         async function checkForOngoingGames() {
-            if (!currentUser) return;
-            const { data, error } = await supabaseClient
-                .from('gcvm_games')
-                .select('*')
-                .eq('status', 'playing')
-                .or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`)
-                .maybeSingle();
-
-            if (!error && data) {
-                activeMatchData = data;
-                document.getElementById('resume-box').classList.remove('hidden');
-            } else {
-                document.getElementById('resume-box').classList.add('hidden');
-            }
+            const { data } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'playing').or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`).maybeSingle();
+            if (data) { activeMatchData = data; document.getElementById('resume-box').classList.remove('hidden'); }
         }
 
-        function resumeActiveMatch() {
-            if (!activeMatchData) return;
-            myColor = (activeMatchData.white_player === currentUser) ? 'w' : 'b';
-            initGame(activeMatchData);
-        }
+        function resumeActiveMatch() { if (activeMatchData) { myColor = (activeMatchData.white_player === currentUser) ? 'w' : 'b'; initGame(activeMatchData); } }
 
         async function loadLobby() {
-            const { data, error } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
-            if (!error) {
-                displayChallenges(data);
-                checkMyActiveChallenges(data);
-            }
-        }
-
-        function checkMyActiveChallenges(games) {
-            if (!currentUser) return;
-            const hasActive = games.some(g => g.white_player === currentUser);
-            if (hasActive) {
-                document.getElementById('create-challenge-btn').disabled = true;
-                document.getElementById('create-challenge-btn').style.opacity = "0.5";
-                document.getElementById('challenge-warning').classList.remove('hidden');
-            } else {
-                document.getElementById('create-challenge-btn').disabled = false;
-                document.getElementById('create-challenge-btn').style.opacity = "1";
-                document.getElementById('challenge-warning').classList.add('hidden');
-            }
+            const { data } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
+            if (data) displayChallenges(data);
         }
 
         function displayChallenges(games) {
             const container = document.getElementById('challenges-list');
             container.innerHTML = "";
-            if (games.length === 0) { container.innerHTML = "No active challenges available."; return; }
-
+            if (games.length === 0) { container.innerHTML = "No challenges available."; return; }
             games.forEach(g => {
                 const div = document.createElement('div');
                 div.className = "lobby-item";
                 const isMine = g.white_player === currentUser;
-                div.innerHTML = `
-                    <span>Challenge from <strong>${g.white_player}</strong> (${g.time_control})</span>
-                    ${(!isMine && currentUser) ? `<button class="btn" onclick="joinGame('${g.id}')">Play</button>` : isMine ? `<button class="btn" style="background-color: #d93025;" onclick="cancelChallenge('${g.id}')">Cancel</button>` : `<span>(Log in)</span>`}
-                `;
+                div.innerHTML = `<span>Challenge from <strong>${g.white_player}</strong> (${g.time_control})</span>
+                    ${(!isMine && currentUser) ? `<button class="btn" onclick="joinGame('${g.id}')">Play</button>` : isMine ? `<button class="btn" style="background-color:#d93025;" onclick="cancelChallenge('${g.id}')">Cancel</button>` : ''}`;
                 container.appendChild(div);
             });
         }
 
-        function listenToLobby() {
-            supabaseClient.channel('public:gcvm_games').on('postgres_changes', { event: '*', filter: 'status=eq.waiting', table: 'gcvm_games', schema: 'public' }, () => {
-                loadLobby();
+        async function createNewChallenge() {
+            const tc = document.getElementById('time-control-select').value;
+            const startSec = parseInt(tc.split('+')[0]) * 60;
+            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ white_player: currentUser, status: 'waiting', time_control: tc, white_time: startSec, black_time: startSec, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', chat_log: [] }]).select().single();
+            if (error) return alert(error.message);
+            currentGameId = data.id; myColor = 'w'; initGame(data);
+        }
+
+        async function cancelChallenge(gameId) { await supabaseClient.from('gcvm_games').delete().eq('id', gameId); loadLobby(); }
+
+        async function joinGame(gameId) {
+            const { data: cg } = await supabaseClient.from('gcvm_games').select('*').eq('id', gameId).single();
+            const startSec = parseInt(cg.time_control.split('+')[0]) * 60;
+            const { data } = await supabaseClient.from('gcvm_games').update({ black_player: currentUser, status: 'playing', last_move_at: new Date().toISOString(), white_time: startSec, black_time: startSec }).eq('id', gameId).select().single();
+            myColor = 'b'; initGame(data);
+        }
+
+        /* HARD SYNC REALTIME RECEIVER LISTENER */
+        function listenToSpecificGame(gameId) {
+            if (gameSubscription) supabaseClient.removeChannel(gameSubscription);
+            
+            gameSubscription = supabaseClient.channel(`game_room_channel`)
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games' }, (payload) => {
+                const updatedGame = payload.new;
+                if (updatedGame.id === gameId || updatedGame.id == gameId) {
+                    clearInterval(clockInterval);
+                    
+                    game.load(updatedGame.fen);
+                    board.position(updatedGame.fen, false);
+                    
+                    whiteTimeLeft = updatedGame.white_time;
+                    blackTimeLeft = updatedGame.black_time;
+                    adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
+                    
+                    updateClockDisplays();
+                    updateTurnIndicator();
+                    renderChatLog(updatedGame.chat_log);
+                    updateMovesTable(); // Update live zet-tabel
+                    
+                    if (updatedGame.status === 'playing') startLocalClock();
+                    else displayGameEndMessage(updatedGame.status);
+                }
             }).subscribe();
         }
 
-        async function createNewChallenge() {
-            if (document.getElementById('create-challenge-btn').disabled) return;
-            const tc = document.getElementById('time-control-select').value;
-            const baseMinutes = parseInt(tc.split('+')[0]);
-            const startSeconds = baseMinutes * 60;
-
-            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ 
-                white_player: currentUser, 
-                status: 'waiting',
-                time_control: tc,
-                white_time: startSeconds,
-                black_time: startSeconds,
-                fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-                chat_log: []
-            }]).select().single();
-
-            if (error) return alert(error.message);
-            currentGameId = data.id;
-            myColor = 'w';
-            listenToSpecificGame(data.id);
-            loadLobby();
-        }
-
-        async function cancelChallenge(gameId) {
-            await supabaseClient.from('gcvm_games').delete().eq('id', gameId);
-            currentGameId = null;
-            myColor = null;
-            loadLobby();
-        }
-
-        async function joinGame(gameId) {
-            const { data: checkGame } = await supabaseClient.from('gcvm_games').select('*').eq('id', gameId).single();
-            const baseMinutes = parseInt(checkGame.time_control.split('+')[0]);
-            const startSeconds = baseMinutes * 60;
-
-            const { data, error } = await supabaseClient.from('gcvm_games').update({ 
-                black_player: currentUser, 
-                status: 'playing',
-                last_move_at: new Date().toISOString(),
-                white_time: startSeconds,
-                black_time: startSeconds
-            }).eq('id', gameId).select().single();
-
-            if (error) return alert("Sorry, this challenge is no longer available.");
-            myColor = 'b';
-            initGame(data);
-        }
-
-function listenToSpecificGame(gameId) {
-    if (gameSubscription) {
-        supabaseClient.removeChannel(gameSubscription);
-    }
-    
-    gameSubscription = supabaseClient.channel(`game_room_channel`)
-    .on('postgres_changes', { 
-        event: 'UPDATE', 
-        schema: 'public', 
-        table: 'gcvm_games'
-    }, (payload) => {
-        const updatedGame = payload.new;
-        
-        // Controleer of de update voor dit specifieke spel is
-        if (updatedGame.id === gameId || updatedGame.id == gameId) {
-            console.log("Harde database-update ontvangen!", updatedGame);
-            
-            // Schakel over naar het bordscherm als dat nog niet zo was
-            if (document.getElementById('game-view').classList.contains('hidden')) {
-                initGame(updatedGame);
-                return;
-            }
-            
-            // STAP 1: Stop direct alle lopende klokken om asynchrone loops te breken
-            clearInterval(clockInterval);
-            
-            // STAP 2: Dwing de schaakengine om de FEN-status uit de database in te laden
-            game.load(updatedGame.fen);
-            
-            // STAP 3: Update de visuele stukken op het bord direct zonder animatie-hapering
-            board.position(updatedGame.fen, false);
-            
-            // STAP 4: Overschrijf de kloktijden met de exacte databasestanden
-            whiteTimeLeft = updatedGame.white_time;
-            blackTimeLeft = updatedGame.black_time;
-            
-            // Corrigeer netwerkvertragingen
-            if (typeof adjustTimeForPassedLapse === "function") {
-                adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
-            }
-            
-            // Remise-aanbiedingen verwerken
-            if (updatedGame.draw_offer && updatedGame.draw_offer !== myColor) {
-                document.getElementById('accept-draw-btn').classList.remove('hidden');
-            } else if (!updatedGame.draw_offer) {
-                document.getElementById('accept-draw-btn').classList.add('hidden');
-            }
-            
-            // STAP 5: Bouw de visuele interface opnieuw op op basis van de gloednieuwe beurt
-            updateClockDisplays();
-            updateTurnIndicator();
-            renderChatLog(updatedGame.chat_log);
-            
-            // STAP 6: Start de klokaftelling opnieuw voor de speler die nu écht aan de beurt is volgens de database
-            if (updatedGame.status === 'playing') {
-                startLocalClock();
-            } else if (updatedGame.status.endsWith('_won') || updatedGame.status === 'draw') {
-                displayGameEndMessage(updatedGame.status);
-            }
-        }
-    })
-    .subscribe((status) => {
-        // Update de tekst in je paarse statusbalk
-        const indicators = document.querySelectorAll('#turn-indicator');
-        console.log("Realtime status:", status);
-    });
-}
-
         function adjustTimeForPassedLapse(lastMoveAtIso, currentFen) {
             if (!lastMoveAtIso) return;
-            const tempGame = new Chess(currentFen);
-            const activeTurn = tempGame.turn(); 
-            
-            const lastMoveTime = new Date(lastMoveAtIso).getTime();
-            const nowTime = new Date().getTime();
-            const elapsedSeconds = Math.floor((nowTime - lastMoveTime) / 1000);
-            
-            if (elapsedSeconds > 0) {
-                if (activeTurn === 'w') {
-                    whiteTimeLeft = Math.max(0, whiteTimeLeft - elapsedSeconds);
-                } else {
-                    blackTimeLeft = Math.max(0, blackTimeLeft - elapsedSeconds);
-                }
+            const elapsed = Math.floor((new Date().getTime() - new Date(lastMoveAtIso).getTime()) / 1000);
+            if (elapsed > 0) {
+                if (new Chess(currentFen).turn() === 'w') whiteTimeLeft = Math.max(0, whiteTimeLeft - elapsed);
+                else blackTimeLeft = Math.max(0, blackTimeLeft - elapsed);
             }
         }
 
@@ -619,7 +434,7 @@ function listenToSpecificGame(gameId) {
             document.getElementById('lobby-view').classList.add('hidden');
             document.getElementById('game-view').classList.remove('hidden');
             document.getElementById('match-time-label').innerText = gameData.time_control;
-            document.getElementById('players-info').innerText = `White: ${gameData.white_player} vs Black: ${gameData.black_player}`;
+            document.getElementById('players-info').innerText = `White: ${gameData.white_player} vs Black: ${gameData.black_player || 'Waiting...'}`;
             
             game.load(gameData.fen);
             whiteTimeLeft = gameData.white_time;
@@ -628,224 +443,133 @@ function listenToSpecificGame(gameId) {
             adjustTimeForPassedLapse(gameData.last_move_at, gameData.fen);
             updateClockDisplays();
             renderChatLog(gameData.chat_log);
+            updateMovesTable();
 
-            const config = {
+            board = Chessboard('my-board', {
                 draggable: true,
                 position: gameData.fen,
                 orientation: myColor === 'w' ? 'white' : 'black',
-                onDragStart: onDragStart,
+                onDragStart: (src, piece) => {
+                    if (game.game_over()) return false;
+                    if ((myColor === 'w' && piece.search(/^b/) !== -1) || (myColor === 'b' && piece.search(/^w/) !== -1)) return false;
+                    if (game.turn() !== myColor) return false;
+                },
                 onDrop: onDrop,
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-            };
-            board = Chessboard('my-board', config);
-            
-            if (gameData.draw_offer && gameData.draw_offer !== myColor) {
-                document.getElementById('accept-draw-btn').classList.remove('hidden');
-            } else {
-                document.getElementById('accept-draw-btn').classList.add('hidden');
-            }
+            });
 
-            if (gameData.status.endsWith('_won') || gameData.status === 'draw') {
-                displayGameEndMessage(gameData.status);
-            } else {
-                updateTurnIndicator();
-                startLocalClock();
-            }
-
+            if (gameData.status === 'playing') { updateTurnIndicator(); startLocalClock(); }
             listenToSpecificGame(currentGameId);
         }
 
-        function onDragStart (source, piece) {
-            if (game.game_over()) return false;
-            if ((myColor === 'w' && piece.search(/^b/) !== -1) || (myColor === 'b' && piece.search(/^w/) !== -1)) return false;
-            if ((game.turn() === 'w' && myColor !== 'w') || (game.turn() === 'b' && myColor !== 'b')) return false;
-        }
-
-        async function onDrop (source, target) {
-            const currentTurnBeforeMove = game.turn();
-            
+        /* VALIDATED ON-DROP METHOD */
+        async function onDrop(source, target) {
+            // Controleer via chess.js of de zet legaal is
             const move = game.move({ from: source, to: target, promotion: 'q' });
+            
+            // ILLEGALE ZET? Stuk springt direct terug naar de oude plek!
             if (move === null) return 'snapback';
 
+            // Legale zet! Pas direct tijd-increment toe
             const tc = document.getElementById('match-time-label').innerText;
-            const increment = parseInt(tc.split('+')[1]) || 0;
-
-            if (currentTurnBeforeMove === 'w' && myColor === 'w') whiteTimeLeft += increment;
-            if (currentTurnBeforeMove === 'b' && myColor === 'b') blackTimeLeft += increment;
+            const inc = parseInt(tc.split('+')[1]) || 0;
+            if (myColor === 'w') whiteTimeLeft += inc; else blackTimeLeft += inc;
 
             updateClockDisplays();
-            
-            let gameStatusUpdate = 'playing';
-            if (game.in_checkmate()) {
-                gameStatusUpdate = (myColor === 'w') ? 'white_won' : 'black_won';
-            } else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition()) {
-                gameStatusUpdate = 'draw';
-            }
+            updateMovesTable();
 
-            if (gameStatusUpdate !== 'playing') {
-                clearInterval(clockInterval);
-                displayGameEndMessage(gameStatusUpdate);
-            } else {
-                updateTurnIndicator();
-            }
+            let statusUpdate = 'playing';
+            if (game.in_checkmate()) statusUpdate = (myColor === 'w') ? 'white_won' : 'black_won';
+            else if (game.in_draw() || game.in_stalemate()) statusUpdate = 'draw';
 
+            // Sla de goedgekeurde zet op in de online database
             await supabaseClient.from('gcvm_games').update({ 
-                fen: game.fen(),
-                white_time: whiteTimeLeft,
-                black_time: blackTimeLeft,
-                status: gameStatusUpdate,
-                draw_offer: null, 
-                last_move_at: new Date().toISOString()
+                fen: game.fen(), 
+                white_time: whiteTimeLeft, 
+                black_time: blackTimeLeft, 
+                status: statusUpdate, 
+                last_move_at: new Date().toISOString() 
             }).eq('id', currentGameId);
         }
 
-        /* GAME CHAT INTERACTIVE LOGIC */
+        /* AUTO-GENERATING MOVE TABLE FROM FEN/HISTORY */
+        function updateMovesTable() {
+            const tbody = document.getElementById('moves-table-body');
+            tbody.innerHTML = "";
+            const history = game.history();
+
+            if (history.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#80868b;">No moves made yet</td></tr>`;
+                return;
+            }
+
+            for (let i = 0; i < history.length; i += 2) {
+                const moveNum = Math.floor(i / 2) + 1;
+                const whiteMove = history[i] || "";
+                const blackMove = history[i + 1] || "";
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td><strong>${moveNum}.</strong></td><td>${whiteMove}</td><td>${blackMove}</td>`;
+                tbody.appendChild(tr);
+            }
+            tbody.parentElement.parentElement.scrollTop = tbody.parentElement.parentElement.scrollHeight;
+        }
+
         function renderChatLog(chatLog) {
             const arr = Array.isArray(chatLog) ? chatLog : [];
-            if (arr.length === loadedChatMessagesCount) return; 
-            
             const box = document.getElementById('chat-messages-box');
             box.innerHTML = "";
-            
             arr.forEach(msg => {
-                const bubble = document.createElement('div');
-                const isMe = msg.sender === currentUser;
-                bubble.className = `chat-bubble ${isMe ? 'me' : 'opponent'}`;
-                bubble.innerHTML = `<strong>${msg.sender}:</strong> ${escapeHtml(msg.text)}`;
-                box.appendChild(bubble);
+                const div = document.createElement('div');
+                div.className = `chat-bubble ${msg.sender === currentUser ? 'me' : 'opponent'}`;
+                div.innerHTML = `<strong>${msg.sender}:</strong> ${msg.text}`;
+                box.appendChild(div);
             });
-            
             box.scrollTop = box.scrollHeight;
-            loadedChatMessagesCount = arr.length;
         }
 
         async function sendChatMessage() {
             const input = document.getElementById('chat-msg-input');
-            const txt = input.value.trim();
-            if (!txt || !currentGameId) return;
-            
+            if (!input.value.trim()) return;
+            const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
+            let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
+            log.push({ sender: currentUser, text: input.value.trim() });
             input.value = "";
-            
-            const { data: latestGame } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-            let currentLog = Array.isArray(latestGame?.chat_log) ? latestGame.chat_log : [];
-            
-            const newMsg = { sender: currentUser, text: txt, time: new Date().toISOString() };
-            currentLog.push(newMsg);
-            
-            await supabaseClient.from('gcvm_games').update({ chat_log: currentLog }).eq('id', currentGameId);
-        }
-
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        async function resignMatch() {
-            if (!currentGameId || game.game_over()) return;
-            if (!confirm("Are you sure you want to resign this game?")) return;
-
-            clearInterval(clockInterval);
-            const statusText = (myColor === 'w') ? 'black_won' : 'white_won';
-            displayGameEndMessage(statusText);
-
-            await supabaseClient.from('gcvm_games').update({ 
-                status: statusText,
-                last_move_at: new Date().toISOString()
-            }).eq('id', currentGameId);
-        }
-
-        async function offerDraw() {
-            if (!currentGameId || game.game_over()) return;
-            alert("Draw offer submitted to your opponent!");
-            await supabaseClient.from('gcvm_games').update({ 
-                draw_offer: myColor 
-            }).eq('id', currentGameId);
-        }
-
-        async function acceptDraw() {
-            if (!currentGameId || game.game_over()) return;
-            clearInterval(clockInterval);
-            displayGameEndMessage('draw');
-            
-            await supabaseClient.from('gcvm_games').update({ 
-                status: 'draw',
-                draw_offer: null,
-                last_move_at: new Date().toISOString()
-            }).eq('id', currentGameId);
+            await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
         }
 
         function updateTurnIndicator() {
-            const turnBoxW = document.getElementById('white-clock-box');
-            const turnBoxB = document.getElementById('black-clock-box');
-
-            if (game.turn() === 'w') {
-                turnBoxW.classList.add('active-turn');
-                turnBoxB.classList.remove('active-turn');
-                document.getElementById('turn-indicator').innerText = "Turn: White";
-            } else {
-                turnBoxB.classList.add('active-turn');
-                turnBoxW.classList.remove('active-turn');
-                document.getElementById('turn-indicator').innerText = "Turn: Black";
-            }
-        }
-
-        function displayGameEndMessage(status) {
-            let msg = "Game Over! ";
-            if (status === 'white_won') msg += "White wins!";
-            else if (status === 'black_won') msg += "Black wins!";
-            else msg += "The match ended in a draw.";
-            
-            document.getElementById('turn-indicator').innerText = msg;
-            document.getElementById('white-clock-box').classList.remove('active-turn');
-            document.getElementById('black-clock-box').classList.remove('active-turn');
-            document.getElementById('resign-btn').classList.add('hidden');
-            document.getElementById('draw-btn').classList.add('hidden');
-            document.getElementById('accept-draw-btn').classList.add('hidden');
+            document.getElementById('turn-indicator').innerText = game.turn() === 'w' ? "Turn: White" : "Turn: Black";
+            document.getElementById('white-clock-box').className = game.turn() === 'w' ? 'clock active-turn' : 'clock';
+            document.getElementById('black-clock-box').className = game.turn() === 'b' ? 'clock active-turn' : 'clock';
         }
 
         function startLocalClock() {
             if (clockInterval) clearInterval(clockInterval);
             clockInterval = setInterval(() => {
-                if (game.game_over()) return;
-
-                if (game.turn() === 'w') {
-                    if (whiteTimeLeft > 0) whiteTimeLeft--;
-                    else handleTimeOut('w');
-                } else {
-                    if (blackTimeLeft > 0) blackTimeLeft--;
-                    else handleTimeOut('b');
-                }
+                if (game.turn() === 'w') { if (whiteTimeLeft > 0) whiteTimeLeft--; else handleTimeOut('w'); }
+                else { if (blackTimeLeft > 0) blackTimeLeft--; else handleTimeOut('b'); }
                 updateClockDisplays();
             }, 1000);
         }
 
         function updateClockDisplays() {
-            document.getElementById('white-time-display').innerText = formatTime(whiteTimeLeft);
-            document.getElementById('black-time-display').innerText = formatTime(blackTimeLeft);
+            const fmt = (s) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+            document.getElementById('white-time-display').innerText = fmt(whiteTimeLeft);
+            document.getElementById('black-time-display').innerText = fmt(blackTimeLeft);
         }
 
-        function formatTime(seconds) {
-            const m = Math.floor(seconds / 60);
-            const s = seconds % 60;
-            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-        }
-
-        async function handleTimeOut(loserColor) {
+        async function handleTimeOut(color) {
             clearInterval(clockInterval);
-            const statusText = loserColor === 'w' ? 'black_won' : 'white_won';
-            displayGameEndMessage(statusText);
-            await supabaseClient.from('gcvm_games').update({ status: statusText }).eq('id', currentGameId);
+            const res = color === 'w' ? 'black_won' : 'white_won';
+            await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
         }
 
-        function leaveGame() {
-            if (gameSubscription) gameSubscription.unsubscribe();
-            if (clockInterval) clearInterval(clockInterval);
-            document.getElementById('game-view').classList.add('hidden');
-            document.getElementById('lobby-view').classList.remove('hidden');
-            activeMatchData = null;
-            loadedChatMessagesCount = 0;
-            checkForOngoingGames();
-            loadLobby();
+        function displayGameEndMessage(status) {
+            document.getElementById('turn-indicator').innerText = status === 'draw' ? "Match ended in a draw!" : `${status === 'white_won' ? 'White' : 'Black'} won the match!`;
         }
+
+        function leaveGame() { clearInterval(clockInterval); window.location.reload(); }
     </script>
 </body>
 </html>
