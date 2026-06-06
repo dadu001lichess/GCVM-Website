@@ -301,7 +301,7 @@
                         <div id="black-clock-box" class="clock">Black: <span id="black-time-display">--:--</span></div>
                     </div>
                     <div id="my-board"></div>
-                    <p id="turn-indicator">Loading match...</p>
+                    <p id="turn-indicator">Waiting for an opponent to join...</p>
                 </div>
 
                 <div class="right-panel-wrapper">
@@ -420,6 +420,7 @@
             const startSec = parseInt(tc.split('+')[0]) * 60;
             const { data, error } = await supabaseClient.from('gcvm_games').insert([{ 
                 white_player: currentUser, 
+                black_player: null, // HIER GEWIJZIGD: Staat nu netjes leeg tot er iemand meedoet!
                 status: 'waiting', 
                 time_control: tc, 
                 white_time: startSec, 
@@ -458,7 +459,7 @@
                 blackTimeLeft = updatedGame.black_time;
                 adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
                 
-                document.getElementById('players-info').innerText = `White: ${updatedGame.white_player} vs Black: ${updatedGame.black_player || 'Waiting...'}`;
+                document.getElementById('players-info').innerText = `White: ${updatedGame.white_player} vs Black: ${updatedGame.black_player || 'Waiting for opponent...'}`;
                 
                 updateClockDisplays();
                 updateTurnIndicator();
@@ -466,7 +467,7 @@
                 renderMovesTable(updatedGame.moves_list);
                 
                 if (updatedGame.status === 'playing') startLocalClock();
-                else displayGameEndMessage(updatedGame.status);
+                else if (updatedGame.status !== 'waiting') displayGameEndMessage(updatedGame.status);
             }).subscribe();
         }
 
@@ -484,7 +485,7 @@
             document.getElementById('lobby-view').classList.add('hidden');
             document.getElementById('game-view').classList.remove('hidden');
             document.getElementById('match-time-label').innerText = gameData.time_control;
-            document.getElementById('players-info').innerText = `White: ${gameData.white_player} vs Black: ${gameData.black_player || 'Waiting...'}`;
+            document.getElementById('players-info').innerText = `White: ${gameData.white_player} vs Black: ${gameData.black_player || 'Waiting for opponent...'}`;
             
             game.load(gameData.fen);
             whiteTimeLeft = gameData.white_time;
@@ -501,6 +502,7 @@
                 orientation: myColor === 'w' ? 'white' : 'black',
                 onDragStart: (src, piece) => {
                     if (game.game_over()) return false;
+                    if (gameData.status !== 'playing') return false; // Kan pas zetten doen als er een tegenstander is!
                     if ((myColor === 'w' && piece.search(/^b/) !== -1) || (myColor === 'b' && piece.search(/^w/) !== -1)) return false;
                     if (game.turn() !== myColor) return false;
                 },
@@ -508,7 +510,12 @@
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
             });
 
-            if (gameData.status === 'playing') { updateTurnIndicator(); startLocalClock(); }
+            if (gameData.status === 'playing') { 
+                updateTurnIndicator(); 
+                startLocalClock(); 
+            } else {
+                document.getElementById('turn-indicator').innerText = "Waiting for an opponent to join...";
+            }
             listenToSpecificGame(currentGameId);
         }
 
