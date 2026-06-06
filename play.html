@@ -12,12 +12,57 @@
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
     <style>
         body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; color: #3c4043; }
-        aside { width: 280px; background-color: #202124; height: 100vh; position: fixed; padding: 40px 24px; box-sizing: border-box; overflow-y: auto; left:0; top:0; z-index:10; }
+        
+        /* SIDEBAR STYLING - EXACT OVERGENOMEN UIT INDEX.HTML */
+        aside { 
+            width: 280px; 
+            background-color: #202124; 
+            height: 100vh; 
+            position: fixed; 
+            padding: 40px 24px; 
+            box-sizing: border-box; 
+            overflow-y: auto; 
+            left: 0; 
+            top: 0; 
+            z-index: 10; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
         .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
         nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
         nav a:hover, nav a.active { color: #8ab4f8; }
-        main { margin-left: 280px; width: calc(100% - 280px); padding: 40px; box-sizing: border-box; display: flex; gap: 40px; }
         
+        /* ACCOUNT SECTIE ONDERAAN SIDEBAR */
+        .auth-footer {
+            border-top: 1px solid #3c4043;
+            padding-top: 20px;
+            margin-top: auto;
+        }
+        .profile-summary {
+            color: white;
+            font-size: 14px;
+        }
+        .profile-summary p { margin: 0 0 8px 0; color: #bdc1c6; }
+        .profile-summary strong { color: white; display: block; font-size: 16px; margin-bottom: 4px; }
+        .profile-link { display: inline-block; color: #8ab4f8; text-decoration: none; margin-right: 12px; font-size: 13px; }
+        .profile-link:hover { text-decoration: underline; }
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #5f6368;
+            color: #e8eaed;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            width: 100%;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+        .logout-btn:hover { background: #303134; border-color: #8ab4f8; }
+
+        /* MAIN CONTENT INTERFACE */
+        main { margin-left: 280px; width: calc(100% - 280px); padding: 40px; box-sizing: border-box; display: flex; gap: 40px; }
         .game-area { flex: 1; max-width: 600px; display: flex; flex-direction: column; gap: 15px; }
         .sidebar-right { width: 360px; display: flex; flex-direction: column; gap: 20px; }
         .card { border: 1px solid #dadce0; border-radius: 8px; padding: 20px; background: #f8f9fa; box-sizing: border-box; }
@@ -45,12 +90,24 @@
 <body>
 
     <aside>
-        <div class="logo">GC(V)M</div>
-        <nav>
-            <a href="index.html">Homepage</a>
-            <a href="profileview.html">Profile</a>
-            <a href="play.html" class="active">Play Chess</a>
-        </nav>
+        <div>
+            <div class="logo">GC(V)M</div>
+            <nav>
+                <a href="index.html">Homepage</a>
+                <a href="profileview.html">Profile</a>
+                <a href="play.html" class="active">Play Chess</a>
+            </nav>
+        </div>
+
+        <div class="auth-footer">
+            <div id="user-profile-summary" class="profile-summary">
+                <p>Ingelogd als:</p>
+                <strong id="summary-username">Loading...</strong>
+                <span id="summary-role" style="font-size: 11px; color: #8ab4f8; display: block; margin-bottom: 8px;">User</span>
+                <a href="profileview.html" class="profile-link">Instellingen</a>
+                <button class="logout-btn" onclick="logoutUser()">Uitloggen</button>
+            </div>
+        </div>
     </aside>
 
     <main>
@@ -170,6 +227,7 @@
         let board = null;
         let gameLogic = new Chess();
         let currentUser = localStorage.getItem('gcvm_db_session');
+        let currentRole = localStorage.getItem('gcvm_db_role') || 'User';
         let currentGameId = null;
         let myColor = 'w'; 
         let currentStatus = 'waiting';
@@ -180,23 +238,35 @@
         let reviewCurrentIndex = -1;
 
         window.onload = function() {
+            // RENDERING ACCOUNT IN SIDEBAR (Zoals in index.html)
+            if (!currentUser) {
+                alert("Please log in through the profile page first!");
+                window.location.href = "profileview.html";
+                return;
+            } else {
+                document.getElementById('summary-username').innerText = currentUser;
+                document.getElementById('summary-role').innerText = currentRole.toUpperCase();
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const urlGameId = urlParams.get('gameId');
 
             if (urlGameId) {
                 initReviewMode(urlGameId);
             } else {
-                if (!currentUser) {
-                    alert("Please log in through the profile page first!");
-                    window.location.href = "profileview.html";
-                    return;
-                }
                 loadOpenChallenges();
                 setInterval(loadOpenChallenges, 4000); 
                 checkActiveLiveGame();
                 listenForLobbyChanges();
             }
         };
+
+        // LOGOUT FUNCTIE UIT INDEX.HTML
+        function logoutUser() {
+            localStorage.removeItem('gcvm_db_session');
+            localStorage.removeItem('gcvm_db_role');
+            window.location.href = "profileview.html";
+        }
 
         function initBoardConfig() {
             return {
@@ -218,7 +288,7 @@
         }
 
         // ==========================================
-        // REVIEW TIMELINE
+        // REVIEW COMPONENT
         // ==========================================
         async function initReviewMode(gameId) {
             isReviewMode = true;
@@ -305,175 +375,129 @@
         // ==========================================
         // LOBBY & SYSTEM REALTIME LISTENERS
         // ==========================================
-// Fix voor de Cancel knop
-window.cancelChallenge = async function(gameId) {
-    try {
-        const { error } = await supabaseClient
-            .from('gcvm_games')
-            .delete()
-            .eq('id', gameId);
-            
-        if (error) throw error;
-        
-        alert("Challenge successfully cancelled!");
-        location.reload(); // Harde refresh om de lobby meteen leeg te maken
-    } catch(err) { 
-        alert("Supabase Error during cancel: " + err.message); 
-    }
-};
-
-// Zorg dat de lobby de juiste database-kolommen uitleest
-async function loadOpenChallenges() {
-    if (isReviewMode || currentStatus === 'playing') return;
-    try {
-        const typeFilter = document.getElementById('filterType').value;
-        const speedFilter = document.getElementById('filterSpeed').value;
-
-        let { data: challenges, error } = await supabaseClient
-            .from('gcvm_games')
-            .select('*')
-            .eq('status', 'waiting');
-            
-        if (error) throw error;
-
-        const container = document.getElementById('challenges-container');
-        container.innerHTML = "";
-
-        let finalChallenges = challenges || [];
-        
-        // We checken hier zowel op 'rated' als 'is_rated' zodat het altijd matcht!
-        if (typeFilter === 'rated') {
-            finalChallenges = finalChallenges.filter(g => g.rated === true || g.is_rated === true);
-        }
-        if (typeFilter === 'casual') {
-            finalChallenges = finalChallenges.filter(g => g.rated === false || g.is_rated === false);
-        }
-
-        if (speedFilter !== 'all') {
-            finalChallenges = finalChallenges.filter(g => {
-                const mins = parseInt(g.time_control?.split('+')[0]) || 10;
-                if (speedFilter === 'bullet') return mins < 3;
-                if (speedFilter === 'blitz') return mins >= 3 && mins < 10;
-                if (speedFilter === 'rapid') return mins >= 10 && mins < 29;
-                if (speedFilter === 'classical') return mins >= 29;
-                return true;
-            });
-        }
-
-        if (finalChallenges.length === 0) {
-            container.innerHTML = `<p style="font-size:13px; color:#70757a; margin:0;">No active challenges listed.</p>`;
-            return;
-        }
-
-        finalChallenges.forEach(c => {
-            const isRatedGame = c.rated ?? c.is_rated ?? false;
-            const mode = isRatedGame ? "Rated" : "Casual";
-            const item = document.createElement('div');
-            item.className = "challenge-item";
-
-            const isMine = (c.white_player === currentUser || c.black_player === currentUser);
-            const creator = c.white_player || c.black_player || "Anonymous";
-
-            if (isMine) {
-                item.style.backgroundColor = "#fff9c4"; 
-                item.style.borderLeft = "4px solid #fbc02d";
-                item.innerHTML = `
-                    <div>
-                        <strong style="color:#b68500;">Your Broadcast</strong>
-                        <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
-                    </div>
-                    <button class="btn danger" style="width:auto; padding:6px 12px; font-size:12px;" onclick="cancelChallenge('${c.id}')">Cancel ❌</button>
-                `;
-            } else {
-                item.innerHTML = `
-                    <div>
-                        <strong style="color:#1a73e8;">${creator}</strong>
-                        <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
-                    </div>
-                    <button class="btn" style="width:auto; padding:6px 12px; font-size:12px;" onclick="acceptChallenge('${c.id}')">Accept Match ⚔</button>
-                `;
+        window.cancelChallenge = async function(gameId) {
+            try {
+                const { error } = await supabaseClient
+                    .from('gcvm_games')
+                    .delete()
+                    .eq('id', gameId);
+                    
+                if (error) throw error;
+                alert("Challenge successfully cancelled!");
+                loadOpenChallenges();
+            } catch(err) { 
+                alert("Supabase Error during cancel: " + err.message); 
             }
-            container.appendChild(item);
-        });
-
-    } catch (err) { 
-        console.error("Lobby load error: ", err); 
-    }
-}
-async function acceptChallenge(gameId) {
-    try {
-        // Ruim eerst eventuele eigen oude uitdagingen op
-        const { error: deleteError } = await supabaseClient
-            .from('gcvm_games')
-            .delete()
-            .eq('white_player', currentUser)
-            .eq('status', 'waiting');
-            
-        if (deleteError) console.warn("Could not clear old challenges:", deleteError.message);
-
-        // Accepteer de match - Let op: we gebruiken hier 'rated' in plaats van 'is_rated'!
-        const { error } = await supabaseClient
-            .from('gcvm_games')
-            .update({
-                black_player: currentUser,
-                status: 'playing'
-            })
-            .eq('id', gameId);
-        
-        if (error) throw error;
-        
-        currentStatus = 'playing';
-        checkActiveLiveGame();
-    } catch(err) { 
-        alert("Supabase Error during join: " + err.message); 
-    }
-}
-
-async function createNewChallenge() {
-    try {
-        // Check of er al een openstaande challenge is
-        const { data: existingChallenges } = await supabaseClient
-            .from('gcvm_games')
-            .select('id')
-            .eq('white_player', currentUser)
-            .eq('status', 'waiting');
-
-        if (existingChallenges && existingChallenges.length > 0) {
-            alert("You already have an open challenge in the lobby! Cancel that one first before making a new one.");
-            return;
-        }
-
-        const preset = document.getElementById('tc-preset').value;
-        let tc = preset;
-        
-        if (preset === 'custom') {
-            const mins = document.getElementById('custom-minutes').value;
-            const inc = document.getElementById('custom-increment').value;
-            tc = `${mins}+${inc}`;
-        }
-
-        const isRated = document.getElementById('rated-select').value === "true";
-
-        // MATCH PAYLOAD: Hier veranderen we 'is_rated' naar 'rated' zodat het klopt met jouw database screenshot!
-        const challengePayload = {
-            white_player: currentUser,
-            status: 'waiting',
-            time_control: tc,
-            rated: isRated, // Aangepast naar jouw kolomnaam!
-            fen: 'start',
-            move_history: [],
-            pgn_log: ""
         };
 
-        const { error } = await supabaseClient.from('gcvm_games').insert([challengePayload]);
-        if (error) throw error;
-        loadOpenChallenges();
-    } catch (err) { alert(err.message); }
-}
+        window.acceptChallenge = async function(gameId) {
+            try {
+                const { error: deleteError } = await supabaseClient
+                    .from('gcvm_games')
+                    .delete()
+                    .eq('white_player', currentUser)
+                    .eq('status', 'waiting');
+                    
+                if (deleteError) console.warn("Could not clear old challenges:", deleteError.message);
+
+                const { error } = await supabaseClient
+                    .from('gcvm_games')
+                    .update({
+                        black_player: currentUser,
+                        status: 'playing'
+                    })
+                    .eq('id', gameId);
+                
+                if (error) throw error;
+                
+                currentStatus = 'playing';
+                checkActiveLiveGame();
+            } catch(err) { 
+                alert("Supabase Error during join: " + err.message); 
+            }
+        };
+
+        async function loadOpenChallenges() {
+            if (isReviewMode || currentStatus === 'playing') return;
+            try {
+                const typeFilter = document.getElementById('filterType').value;
+                const speedFilter = document.getElementById('filterSpeed').value;
+
+                let { data: challenges, error } = await supabaseClient
+                    .from('gcvm_games')
+                    .select('*')
+                    .eq('status', 'waiting');
+                    
+                if (error) throw error;
+
+                const container = document.getElementById('challenges-container');
+                container.innerHTML = "";
+
+                let finalChallenges = challenges || [];
+                
+                if (typeFilter === 'rated') finalChallenges = finalChallenges.filter(g => g.rated === true || g.is_rated === true);
+                if (typeFilter === 'casual') finalChallenges = finalChallenges.filter(g => g.rated === false || g.is_rated === false);
+
+                if (speedFilter !== 'all') {
+                    finalChallenges = finalChallenges.filter(g => {
+                        const mins = parseInt(g.time_control?.split('+')[0]) || 10;
+                        if (speedFilter === 'bullet') return mins < 3;
+                        if (speedFilter === 'blitz') return mins >= 3 && mins < 10;
+                        if (speedFilter === 'rapid') return mins >= 10 && mins < 29;
+                        if (speedFilter === 'classical') return mins >= 29;
+                        return true;
+                    });
+                }
+
+                if (finalChallenges.length === 0) {
+                    container.innerHTML = `<p style="font-size:13px; color:#70757a; margin:0;">No active challenges listed.</p>`;
+                    return;
+                }
+
+                finalChallenges.forEach(c => {
+                    const isRatedGame = c.rated ?? c.is_rated ?? false;
+                    const mode = isRatedGame ? "Rated" : "Casual";
+                    const item = document.createElement('div');
+                    item.className = "challenge-item";
+
+                    const isMine = (c.white_player === currentUser || c.black_player === currentUser);
+                    const creator = c.white_player || c.black_player || "Anonymous";
+
+                    if (isMine) {
+                        item.style.backgroundColor = "#fff9c4"; 
+                        item.style.borderLeft = "4px solid #fbc02d";
+                        item.innerHTML = `
+                            <div>
+                                <strong style="color:#b68500;">Your Broadcast</strong>
+                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
+                            </div>
+                            <button class="btn danger" style="width:auto; padding:6px 12px; font-size:12px;" onclick="cancelChallenge('${c.id}')">Cancel ❌</button>
+                        `;
+                    } else {
+                        item.innerHTML = `
+                            <div>
+                                <strong style="color:#1a73e8;">${creator}</strong>
+                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
+                            </div>
+                            <button class="btn" style="width:auto; padding:6px 12px; font-size:12px;" onclick="acceptChallenge('${c.id}')">Accept Match ⚔</button>
+                        `;
+                    }
+                    container.appendChild(item);
+                });
+
+            } catch (err) { console.error("Lobby load error: ", err); }
+        }
+
+        function listenForLobbyChanges() {
+            supabaseClient.channel('lobby-global-room')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'gcvm_games' }, () => {
+                    loadOpenChallenges();
+                    checkActiveLiveGame();
+                }).subscribe();
+        }
 
         async function createNewChallenge() {
             try {
-                // VEILIGHEID CHECK: Kijk of er al een openstaande challenge van deze gebruiker bestaat
                 const { data: existingChallenges } = await supabaseClient
                     .from('gcvm_games')
                     .select('id')
@@ -482,7 +506,7 @@ async function createNewChallenge() {
 
                 if (existingChallenges && existingChallenges.length > 0) {
                     alert("You already have an open challenge in the lobby! Cancel that one first before making a new one.");
-                    return; // Stop de executie direct!
+                    return;
                 }
 
                 const preset = document.getElementById('tc-preset').value;
@@ -500,7 +524,7 @@ async function createNewChallenge() {
                     white_player: currentUser,
                     status: 'waiting',
                     time_control: tc,
-                    is_rated: isRated,
+                    rated: isRated,
                     fen: 'start',
                     move_history: [],
                     pgn_log: ""
