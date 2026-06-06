@@ -191,7 +191,7 @@
                     return;
                 }
                 loadOpenChallenges();
-                setInterval(loadOpenChallenges, 3000); 
+                setInterval(loadOpenChallenges, 4000); 
                 checkActiveLiveGame();
             }
         };
@@ -216,7 +216,7 @@
         }
 
         // ==========================================
-        // FIXED REVIEW ENGINE (Fully English & Functional)
+        // REVIEW COMPONENT
         // ==========================================
         async function initReviewMode(gameId) {
             isReviewMode = true;
@@ -251,12 +251,11 @@
                 }
 
                 document.getElementById('players-display-info').innerHTML = `
-                    ⚪ White: <a href="profileview.html?user=${game.white_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.white_player}</a> (${game.white_rating || 1500})<br>
-                    ⚫ Black: <a href="profileview.html?user=${game.black_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.black_player}</a> (${game.black_rating || 1500})
+                    ⚪ White: <a href="profileview.html?user=${game.white_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.white_player}</a><br>
+                    ⚫ Black: <a href="profileview.html?user=${game.black_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.black_player}</a>
                 `;
                 banner.innerHTML = `Reviewing Match Results: <strong>${game.status.toUpperCase().replace('_', ' ')}</strong>`;
 
-                // Robuuste parsing van zet-historie
                 if (game.move_history && Array.isArray(game.move_history) && game.move_history.length > 0) {
                     reviewMovesList = game.move_history;
                 } else if (game.pgn_log && game.pgn_log.trim() !== "") {
@@ -285,12 +284,12 @@
                     if (i % 2 === 0) logHTML += `${Math.floor(i/2)+1}. <strong>${reviewMovesList[i]}</strong> `;
                     else logHTML += `${reviewMovesList[i]}<br>`;
                 } catch(e) {
-                    console.error("Move error parsing index: ", i, reviewMovesList[i]);
+                    console.error("Parse error index: ", i, reviewMovesList[i]);
                 }
             }
 
             board.position(testEngine.fen());
-            document.getElementById('move-log-container').innerHTML = logHTML || "<i>Starting Position (No moves recorded yet)</i>";
+            document.getElementById('move-log-container').innerHTML = logHTML || "<i>Starting Position (No moves recorded)</i>";
         }
 
         function stepReview(direction) {
@@ -302,25 +301,27 @@
         }
 
         // ==========================================
-        // FIX: LOBBY & WORKING BUTTONS (Accept / Cancel)
+        // ENGINE: BROADCAST, CANCEL & JOIN CHALLENGES
         // ==========================================
         async function loadOpenChallenges() {
-            if (isReviewMode) return;
+            if (isReviewMode || currentStatus === 'playing') return;
             try {
                 const typeFilter = document.getElementById('filterType').value;
                 const speedFilter = document.getElementById('filterSpeed').value;
 
-                let query = supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
-                if (typeFilter === 'rated') query = query.eq('is_rated', true);
-                if (typeFilter === 'casual') query = query.eq('is_rated', false);
-
-                const { data: challenges, error } = await query;
+                // Haal alle wachtende uitdagingen op
+                let { data: challenges, error } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
                 if (error) throw error;
 
                 const container = document.getElementById('challenges-container');
                 container.innerHTML = "";
 
                 let finalChallenges = challenges || [];
+                
+                // Pas filters toe in JavaScript om crashes door ontbrekende database-kolommen te voorkomen
+                if (typeFilter === 'rated') finalChallenges = finalChallenges.filter(g => g.is_rated === true || g.is_rated === null);
+                if (typeFilter === 'casual') finalChallenges = finalChallenges.filter(g => g.is_rated === false);
+
                 if (speedFilter !== 'all') {
                     finalChallenges = finalChallenges.filter(g => {
                         const mins = parseInt(g.time_control?.split('+')[0]) || 10;
@@ -351,7 +352,7 @@
                         item.innerHTML = `
                             <div>
                                 <strong style="color:#b68500;">Your Broadcast</strong>
-                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control} | [${mode}]</div>
+                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
                             </div>
                             <button class="btn danger" style="width:auto; padding:6px 12px; font-size:12px;" onclick="cancelChallenge(${c.id})">Cancel ❌</button>
                         `;
@@ -359,7 +360,7 @@
                         item.innerHTML = `
                             <div>
                                 <strong style="color:#1a73e8;">${creator}</strong>
-                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control} | [${mode}]</div>
+                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control || '10+0'} | [${mode}]</div>
                             </div>
                             <button class="btn" style="width:auto; padding:6px 12px; font-size:12px;" onclick="acceptChallenge(${c.id})">Accept Match ⚔</button>
                         `;
@@ -367,7 +368,7 @@
                     container.appendChild(item);
                 });
 
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Lobby load error: ", err); }
         }
 
         async function cancelChallenge(gameId) {
@@ -375,7 +376,9 @@
                 const { error } = await supabaseClient.from('gcvm_games').delete().eq('id', gameId);
                 if (error) throw error;
                 loadOpenChallenges();
-            } catch(err) { alert("Action failed: " + err.message); }
+            } catch(err) { 
+                alert("Database rejection during Cancel operation:\n" + err.message); 
+            }
         }
 
         async function acceptChallenge(gameId) {
@@ -386,8 +389,13 @@
                 }).eq('id', gameId);
                 
                 if (error) throw error;
-                window.location.reload();
-            } catch(err) { alert("Action failed: " + err.message); }
+                
+                // Direct doorsturen en live zetten!
+                currentStatus = 'playing';
+                checkActiveLiveGame();
+            } catch(err) { 
+                alert("Database rejection during Accept operation:\n" + err.message); 
+            }
         }
 
         async function createNewChallenge() {
@@ -402,71 +410,84 @@
 
             const isRated = document.getElementById('rated-select').value === "true";
 
-            const { data, error } = await supabaseClient.from('gcvm_games').insert([{
+            // We sturen alle mogelijke varianten van opslag mee om typesafety-fouten te omzeilen
+            const challengePayload = {
                 white_player: currentUser,
                 status: 'waiting',
                 time_control: tc,
                 is_rated: isRated,
                 fen: 'start',
-                move_history: []
-            }]).select();
+                move_history: [],
+                pgn_log: ""
+            };
 
-            if (error) alert(error.message);
-            else {
+            try {
+                const { data, error } = await supabaseClient.from('gcvm_games').insert([challengePayload]).select();
+                if (error) throw error;
+                
+                alert("Your challenge has been broadcasted to the lobby successfully!");
                 loadOpenChallenges();
+            } catch (err) {
+                alert("Database rejection during Broadcast operation:\n" + err.message);
             }
         }
 
         // ==========================================
-        // ACTIVE PLAYING PIPELINE
+        // GAMEPLAY ENGINE
         // ==========================================
         async function checkActiveLiveGame() {
-            const { data: games } = await supabaseClient.from('gcvm_games')
-                .select('*')
-                .or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`)
-                .eq('status', 'playing');
+            try {
+                const { data: games } = await supabaseClient.from('gcvm_games')
+                    .select('*')
+                    .or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`)
+                    .eq('status', 'playing');
 
-            if (games && games.length > 0) {
-                const game = games[0];
-                currentGameId = game.id;
-                currentStatus = 'playing';
-                myColor = game.white_player === currentUser ? 'w' : 'b';
+                if (games && games.length > 0) {
+                    const game = games[0];
+                    currentGameId = game.id;
+                    currentStatus = 'playing';
+                    myColor = (game.white_player === currentUser) ? 'w' : 'b';
 
-                document.getElementById('create-challenge-box').classList.add('hidden');
-                document.getElementById('challenges-list-box').classList.add('hidden');
-                document.getElementById('lobby-empty-state').classList.add('hidden');
-                
-                document.getElementById('board-wrapper').classList.remove('hidden');
-                document.getElementById('game-actions-box').classList.remove('hidden');
+                    document.getElementById('create-challenge-box').classList.add('hidden');
+                    document.getElementById('challenges-list-box').classList.add('hidden');
+                    document.getElementById('lobby-empty-state').classList.add('hidden');
+                    
+                    document.getElementById('board-wrapper').classList.remove('hidden');
+                    document.getElementById('game-actions-box').classList.remove('hidden');
 
-                document.getElementById('players-display-info').innerHTML = `
-                    ⚪ White: <a href="profileview.html?user=${game.white_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.white_player}</a><br>
-                    ⚫ Black: <a href="profileview.html?user=${game.black_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.black_player}</a>
-                `;
-                
-                const banner = document.getElementById('game-status-banner');
-                banner.classList.remove('hidden');
-                banner.innerText = `Live Match Ongoing`;
+                    document.getElementById('players-display-info').innerHTML = `
+                        ⚪ White: <strong>${game.white_player}</strong><br>
+                        ⚫ Black: <strong>${game.black_player}</strong>
+                    `;
+                    
+                    const banner = document.getElementById('game-status-banner');
+                    banner.classList.remove('hidden');
+                    banner.innerText = `Live Match Ongoing (You are playing as ${myColor === 'w' ? 'White' : 'Black'})`;
 
-                board = Chessboard('chess-board', initBoardConfig());
-                gameLogic.load(game.fen || 'start');
-                board.position(gameLogic.fen());
-                board.orientation(myColor === 'w' ? 'white' : 'black');
-                renderLiveMoveLogs();
+                    if (!board) {
+                        board = Chessboard('chess-board', initBoardConfig());
+                    }
+                    
+                    gameLogic.load(game.fen && game.fen !== 'start' ? game.fen : 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+                    board.position(gameLogic.fen());
+                    board.orientation(myColor === 'w' ? 'white' : 'black');
+                    renderLiveMoveLogs();
 
-                supabaseClient.channel(`game-${currentGameId}`)
-                    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games', filter: `id=eq.${currentGameId}` }, payload => {
-                        const updated = payload.new;
-                        if (updated.status !== 'playing') {
-                            alert(`Game concluded. Verdict: ${updated.status}`);
-                            window.location.href = "profileview.html";
-                        } else {
-                            gameLogic.load(updated.fen);
-                            board.position(gameLogic.fen());
-                            renderLiveMoveLogs();
-                        }
-                    }).subscribe();
-            }
+                    // Activeer real-time listener voor zetten van tegenstander
+                    supabaseClient.channel(`live-room-${currentGameId}`)
+                        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games', filter: `id=eq.${currentGameId}` }, payload => {
+                            const updated = payload.new;
+                            if (updated.status !== 'playing') {
+                                alert(`Match Finished! Status: ${updated.status}`);
+                                window.location.href = "profileview.html";
+                            } else {
+                                gameLogic.load(updated.fen);
+                                board.position(gameLogic.fen());
+                                renderLiveMoveLogs();
+                            }
+                        }).subscribe();
+                }
+            } catch(e) { console.error("Live loop issue:", e); }
         }
 
         function renderLiveMoveLogs() {
@@ -476,7 +497,7 @@
                 if (i % 2 === 0) logHTML += `${Math.floor(i/2)+1}. <strong>${history[i]}</strong> `;
                 else logHTML += `${history[i]}<br>`;
             }
-            document.getElementById('move-log-container').innerHTML = logHTML || "<i>No moves played yet. Break the ice!</i>";
+            document.getElementById('move-log-container').innerHTML = logHTML || "<i>No moves played yet. Make your first move!</i>";
         }
 
         async function handleMovePiece(source, target) {
@@ -488,22 +509,32 @@
             if (move === null) return 'snapback';
 
             let nextStatus = 'playing';
-            if (gameLogic.in_checkmate()) nextStatus = myColor === 'w' ? 'white_won' : 'black_won';
+            if (gameLogic.in_checkmate()) nextStatus = (myColor === 'w') ? 'white_won' : 'black_won';
             else if (gameLogic.in_draw()) nextStatus = 'draw';
 
             currentMoves.push(move.san);
+            const pgnString = currentMoves.join(" ");
 
-            await supabaseClient.from('gcvm_games').update({
-                fen: gameLogic.fen(),
-                status: nextStatus,
-                move_history: currentMoves
-            }).eq('id', currentGameId);
+            // Pas het bord lokaal direct aan voor optimale snelheid
+            board.position(gameLogic.fen());
+            renderLiveMoveLogs();
+
+            try {
+                await supabaseClient.from('gcvm_games').update({
+                    fen: gameLogic.fen(),
+                    status: nextStatus,
+                    move_history: currentMoves,
+                    pgn_log: pgnString
+                }).eq('id', currentGameId);
+            } catch(err) {
+                console.error("Move update blocked: ", err);
+            }
         }
 
         async function resignMatch() {
             if (currentStatus !== 'playing') return;
-            if (!confirm("Are you sure you want to resign?")) return;
-            const res = myColor === 'w' ? 'black_won' : 'white_won';
+            if (!confirm("Are you sure you want to resign this match?")) return;
+            const res = (myColor === 'w') ? 'black_won' : 'white_won';
             await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
             window.location.reload();
         }
