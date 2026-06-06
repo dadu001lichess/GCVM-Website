@@ -379,25 +379,9 @@
                 }).subscribe();
         }
 
-async function cancelChallenge(gameId) {
-    try {
-        const { error } = await supabaseClient
-            .from('gcvm_games')
-            .delete()
-            .eq('id', gameId);
-            
-        if (error) throw error;
-        alert("Challenge successfully cancelled!");
-        loadOpenChallenges();
-    } catch(err) { 
-        alert("Supabase Error during cancel: " + err.message); 
-    }
-}
-
 async function acceptChallenge(gameId) {
     try {
-        // We proberen eerst je eigen oude wachtende uitdagingen op te ruimen
-        // Mocht dit mislukken door RLS, loggen we het alleen in de console zodat de app niet crasht
+        // Ruim eerst eventuele eigen oude uitdagingen op
         const { error: deleteError } = await supabaseClient
             .from('gcvm_games')
             .delete()
@@ -406,7 +390,7 @@ async function acceptChallenge(gameId) {
             
         if (deleteError) console.warn("Could not clear old challenges:", deleteError.message);
 
-        // Nu updaten we de game die je wilt joinen
+        // Accepteer de match - Let op: we gebruiken hier 'rated' in plaats van 'is_rated'!
         const { error } = await supabaseClient
             .from('gcvm_games')
             .update({
@@ -422,6 +406,48 @@ async function acceptChallenge(gameId) {
     } catch(err) { 
         alert("Supabase Error during join: " + err.message); 
     }
+}
+
+async function createNewChallenge() {
+    try {
+        // Check of er al een openstaande challenge is
+        const { data: existingChallenges } = await supabaseClient
+            .from('gcvm_games')
+            .select('id')
+            .eq('white_player', currentUser)
+            .eq('status', 'waiting');
+
+        if (existingChallenges && existingChallenges.length > 0) {
+            alert("You already have an open challenge in the lobby! Cancel that one first before making a new one.");
+            return;
+        }
+
+        const preset = document.getElementById('tc-preset').value;
+        let tc = preset;
+        
+        if (preset === 'custom') {
+            const mins = document.getElementById('custom-minutes').value;
+            const inc = document.getElementById('custom-increment').value;
+            tc = `${mins}+${inc}`;
+        }
+
+        const isRated = document.getElementById('rated-select').value === "true";
+
+        // MATCH PAYLOAD: Hier veranderen we 'is_rated' naar 'rated' zodat het klopt met jouw database screenshot!
+        const challengePayload = {
+            white_player: currentUser,
+            status: 'waiting',
+            time_control: tc,
+            rated: isRated, // Aangepast naar jouw kolomnaam!
+            fen: 'start',
+            move_history: [],
+            pgn_log: ""
+        };
+
+        const { error } = await supabaseClient.from('gcvm_games').insert([challengePayload]);
+        if (error) throw error;
+        loadOpenChallenges();
+    } catch (err) { alert(err.message); }
 }
 
         async function createNewChallenge() {
