@@ -207,7 +207,6 @@
         .clock { flex: 1; text-align: center; background: #f1f3f4; padding: 8px 12px; border-radius: 4px; border: 1px solid #dadce0; }
         .clock.active-turn { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
 
-        /* PLAYBACK CONTROLS STYLING */
         .playback-controls {
             display: flex;
             justify-content: center;
@@ -253,7 +252,7 @@
         .moves-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
         .moves-table th { background-color: #202124; color: white; padding: 8px; position: sticky; top: 0; }
         .moves-table td { padding: 6px 8px; border-bottom: 1px solid #f1f3f4; }
-        .moves-table td.active-move { background-color: #fff3cd; font-weight: 600; }
+        .moves-table td.active-move { background-color: #fff3cd; font-weight: 600; border-radius: 2px; }
         .moves-table tr:nth-child(even) { background-color: #f8f9fa; }
         
         .game-controls { margin-top: 20px; display: flex; align-items: center; }
@@ -380,9 +379,8 @@
         let game = new Chess(), gameSubscription = null, clockInterval = null;
         let whiteTimeLeft = 0, blackTimeLeft = 0, activeMatchData = null;
         
-        // Playback state parameters
         let globalMovesList = [];
-        let playbackIndex = -1; // -1 means viewing live game
+        let playbackIndex = -1; // -1 = live view
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
@@ -479,11 +477,13 @@
                 const updatedGame = payload.new;
                 clearInterval(clockInterval);
                 
+                // Update de globale zettenlijst rechtstreeks vanuit de database data
                 globalMovesList = Array.isArray(updatedGame.moves_list) ? updatedGame.moves_list : Object.values(updatedGame.moves_list || {});
                 
+                // Update de live FEN-status van het schaakbord
                 game.load(updatedGame.fen);
                 
-                // Only pull piece positions automatically if player isn't actively exploring past history
+                // Pas de visuele weergave aan op basis van of je live kijkt of in playback zit
                 if (playbackIndex === -1) {
                     board.position(updatedGame.fen, true);
                 }
@@ -497,7 +497,7 @@
                 updateClockDisplays();
                 updateTurnIndicator();
                 renderChatLog(updatedGame.chat_log);
-                renderMovesTable();
+                renderMovesTable(); // Tekent de tabel ALTIJD stabiel op basis van globalMovesList
                 updatePlaybackButtons();
                 
                 if (updatedGame.status === 'playing') startLocalClock();
@@ -539,7 +539,7 @@
                 position: gameData.fen,
                 orientation: myColor === 'w' ? 'white' : 'black',
                 onDragStart: (src, piece) => {
-                    if (playbackIndex !== -1) return false; // Block moving if examining history
+                    if (playbackIndex !== -1) return false; // Blokkeer zetten tijdens playback bladeren
                     if (game.game_over()) return false;
                     if ((myColor === 'w' && piece.search(/^b/) !== -1) || (myColor === 'b' && piece.search(/^w/) !== -1)) return false;
                     if (game.turn() !== myColor) return false;
@@ -553,11 +553,10 @@
         }
 
         async function onDrop(source, target) {
-            // Check move legitimacy locally
             const move = game.move({ from: source, to: target, promotion: 'q' });
             if (move === null) return 'snapback';
 
-            // Fixed SAN representation format (e.g., e4, e5, Nf3)
+            // Zorgt voor de perfecte PGN string notatie (e4, e5, Nf3, Bf5)
             const cleanSanMove = move.san; 
 
             const tc = document.getElementById('match-time-label').innerText;
@@ -568,7 +567,6 @@
             if (game.in_checkmate()) statusUpdate = (myColor === 'w') ? 'white_won' : 'black_won';
             else if (game.in_draw() || game.in_stalemate()) statusUpdate = 'draw';
 
-            // FIX: Handmatig toevoegen aan de lijst in plaats van game.history() te gebruiken!
             globalMovesList.push(cleanSanMove);
 
             await supabaseClient.from('gcvm_games').update({ 
@@ -584,7 +582,7 @@
             updatePlaybackButtons();
         }
 
-        // RE-ENGINEERED TABLE SYSTEM: Volledig gekoppeld aan de database én highlight de geselecteerde playback zet
+        // PERFECTED TABLE RENDERING ENGINE: Onafhankelijk van chess.js interne geschiedenis
         function renderMovesTable() {
             const tbody = document.getElementById('moves-table-body');
             tbody.innerHTML = "";
@@ -600,8 +598,6 @@
                 const blackMove = globalMovesList[i + 1] || "";
 
                 const tr = document.createElement('tr');
-                
-                // Genereer unieke ID's om cellen geel te highlighten tijdens playback
                 const whiteId = `move-cell-${i}`;
                 const blackId = `move-cell-${i + 1}`;
 
@@ -613,30 +609,38 @@
                 tbody.appendChild(tr);
             }
             
+            // Volg de live-scrolldown alleen als je de live partij bekijkt
             if (playbackIndex === -1) {
-                tbody.parentElement.parentElement.scrollTop = tbody.parentElement.parentElement.scrollHeight;
+                const container = tbody.parentElement.parentElement;
+                container.scrollTop = container.scrollHeight;
             }
         }
 
-        // PLAYBACK FEATURE ENGINE
+        // RE-ENGINEERED SINGLE-MOVE PLAYBACK SYSTEM
         function playbackMove(action) {
             if (globalMovesList.length === 0) return;
 
             if (action === 'start') {
                 playbackIndex = 0;
             } else if (action === 'prev') {
-                if (playbackIndex === -1) playbackIndex = globalMovesList.length - 1;
-                else if (playbackIndex > 0) playbackIndex--;
+                if (playbackIndex === -1) {
+                    playbackIndex = globalMovesList.length - 1;
+                } else if (playbackIndex > 0) {
+                    playbackIndex--;
+                }
             } else if (action === 'next') {
                 if (playbackIndex !== -1) {
-                    if (playbackIndex < globalMovesList.length - 1) playbackIndex++;
-                    else playbackIndex = -1; // Jump back to live view
+                    if (playbackIndex < globalMovesList.length - 1) {
+                        playbackIndex++;
+                    } else {
+                        playbackIndex = -1; // Keer direct terug naar live view na de laatste zet
+                    }
                 }
             } else if (action === 'live') {
                 playbackIndex = -1;
             }
 
-            // Bouw de FEN op tot het gekozen playback-punt vanaf de beginstelling
+            // Bouw de FEN-stelling stap-voor-stap op vanaf nul tot de geselecteerde index
             const tempGame = new Chess();
             const targetLimit = (playbackIndex === -1) ? globalMovesList.length : playbackIndex + 1;
             
@@ -644,13 +648,12 @@
                 tempGame.move(globalMovesList[x]);
             }
 
-            // Update het visuele bord naar de historische positie
+            // Zet het bord visueel naar de exacte historische FEN stelling van dat moment
             board.position(tempGame.fen(), true);
             
             renderMovesTable();
             updatePlaybackButtons();
             
-            // Pas de turn-indicator tekst aan tijdens het browsen
             if (playbackIndex !== -1) {
                 document.getElementById('turn-indicator').innerText = `Viewing move ${playbackIndex + 1}/${globalMovesList.length}`;
             } else {
