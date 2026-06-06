@@ -189,11 +189,12 @@
 
         .lobby-container, .game-container { max-width: 1000px; margin: 0 auto; }
         .btn { padding: 10px 20px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .btn:hover { background-color: #1557b0; }
+        .btn:hover:not(:disabled) { background-color: #1557b0; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn.secondary-action { background-color: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; margin-right: 8px; }
-        .btn.secondary-action:hover { background-color: #e8eaed; }
+        .btn.secondary-action:hover:not(:disabled) { background-color: #e8eaed; }
         .btn.danger-action { background-color: #d93025; color: white; margin-right: 8px; }
-        .btn.danger-action:hover { background-color: #b31412; }
+        .btn.danger-action:hover:not(:disabled) { background-color: #b31412; }
         
         .lobby-list { margin-top: 20px; border: 1px solid #dadce0; border-radius: 8px; padding: 15px; background-color: #f8f9fa; }
         .lobby-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
@@ -364,6 +365,7 @@
             
             <div class="game-controls">
                 <button id="draw-btn" class="btn secondary-action" onclick="offerDraw()">Offer Draw</button>
+                <button id="takeback-btn" class="btn secondary-action" onclick="requestTakeback()">🔄 Request Takeback</button>
                 <button id="resign-btn" class="btn danger-action" onclick="resignMatch()">Resign</button>
                 <button id="exit-btn" class="btn secondary-action" onclick="leaveGame()">Lobby / Exit</button>
             </div>
@@ -380,7 +382,13 @@
         let whiteTimeLeft = 0, blackTimeLeft = 0, activeMatchData = null;
         
         let globalMovesList = [];
-        let playbackIndex = -1; // -1 = live view
+        let playbackIndex = -1; 
+        let currentStatus = 'playing';
+
+        // Lokale vlaggen om te voorkomen dat popups oneindig blijven herhalen bij database-updates
+        let activeDrawPrompt = false;
+        let activeTakebackPrompt = false;
+        let alertTriggeredForEnd = false;
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
@@ -456,7 +464,7 @@
         async function createNewChallenge() {
             const tc = document.getElementById('time-control-select').value;
             const startSec = parseInt(tc.split('+')[0]) * 60;
-            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ white_player: currentUser, status: 'waiting', time_control: tc, white_time: startSec, black_time: startSec, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', chat_log: [], moves_list: [] }]).select().single();
+            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ white_player: currentUser, status: 'playing', status: 'waiting', time_control: tc, white_time: startSec, black_time: startSec, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', chat_log: [], moves_list: [] }]).select().single();
             if (error) return alert(error.message);
             currentGameId = data.id; myColor = 'w'; initGame(data);
         }
@@ -475,15 +483,12 @@
             gameSubscription = supabaseClient.channel(`game_updates_${gameId}`)
             .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games', filter: `id=eq.${gameId}` }, (payload) => {
                 const updatedGame = payload.new;
+                currentStatus = updatedGame.status;
                 clearInterval(clockInterval);
                 
-                // Update de globale zettenlijst rechtstreeks vanuit de database data
                 globalMovesList = Array.isArray(updatedGame.moves_list) ? updatedGame.moves_list : Object.values(updatedGame.moves_list || {});
-                
-                // Update de live FEN-status van het schaakbord
                 game.load(updatedGame.fen);
                 
-                // Pas de visuele weergave aan op basis van of je live kijkt of in playback zit
                 if (playbackIndex === -1) {
                     board.position(updatedGame.fen, true);
                 }
@@ -497,12 +502,78 @@
                 updateClockDisplays();
                 updateTurnIndicator();
                 renderChatLog(updatedGame.chat_log);
-                renderMovesTable(); // Tekent de tabel ALTIJD stabiel op basis van globalMovesList
+                renderMovesTable(); 
                 updatePlaybackButtons();
                 
-                if (updatedGame.status === 'playing') startLocalClock();
-                else displayGameEndMessage(updatedGame.status);
+                // --- INKOMENDE ACTIE NOTIFICATIES ---
+
+                // 1. Check Remise Aanbod (enkel voor de ontvanger)
+                if (updatedGame.draw_offered_by && updatedGame.draw_offered_by !== currentUser && !activeDrawPrompt && currentStatus === 'playing') {
+                    activeDrawPrompt = true;
+                    setTimeout(async () => {
+                        const accept = confirm(`🤝 Opponent (${updatedGame.draw_offered_by}) has offered a draw. Do you accept?`);
+                        if (accept) {
+                            await supabaseClient.from('gcvm_games').update({ status: 'draw', draw_offered_by: null }).eq('id', gameId);
+                        } else {
+                            await supabaseClient.from('gcvm_games').update({ draw_offered_by: null }).eq('id', gameId);
+                        }
+                        activeDrawPrompt = false;
+                    }, 100);
+                }
+
+                // 2. Check Takeback Verzoek (enkel voor de ontvanger)
+                if (updatedGame.takeback_requested_by && updatedGame.takeback_requested_by !== currentUser && !activeTakebackPrompt && currentStatus === 'playing') {
+                    activeTakebackPrompt = true;
+                    setTimeout(async () => {
+                        const accept = confirm(`🔄 Opponent (${updatedGame.takeback_requested_by}) is requesting a takeback (undo last move). Do you allow this?`);
+                        if (accept && globalMovesList.length > 0) {
+                            // Verwijder de allerlaatste zet uit de lijst
+                            let newMovesList = [...globalMovesList];
+                            newMovesList.pop();
+
+                            // Reconstitueer de vorige FEN stelling
+                            const reconstruction = new Chess();
+                            newMovesList.forEach(m => reconstruction.move(m));
+
+                            await supabaseClient.from('gcvm_games').update({ 
+                                moves_list: newMovesList,
+                                fen: reconstruction.fen(),
+                                takeback_requested_by: null
+                            }).eq('id', gameId);
+                        } else {
+                            await supabaseClient.from('gcvm_games').update({ takeback_requested_by: null }).eq('id', gameId);
+                        }
+                        activeTakebackPrompt = false;
+                    }, 100);
+                }
+
+                // 3. Einde Partij Check (Harde Alarms / Blokkeren acties)
+                if (currentStatus !== 'playing') {
+                    disableGameControls();
+                    if (!alertTriggeredForEnd) {
+                        alertTriggeredForEnd = true;
+                        if (currentStatus === 'white_won') alert("🏆 Match Ended: White has won the game!");
+                        else if (currentStatus === 'black_won') alert("🏆 Match Ended: Black has won the game!");
+                        else if (currentStatus === 'draw') alert("🤝 Match Ended: The game resulted in a draw.");
+                    }
+                    displayGameEndMessage(currentStatus);
+                } else {
+                    enableGameControls();
+                    startLocalClock();
+                }
             }).subscribe();
+        }
+
+        function disableGameControls() {
+            document.getElementById('draw-btn').disabled = true;
+            document.getElementById('resign-btn').disabled = true;
+            document.getElementById('takeback-btn').disabled = true;
+        }
+
+        function enableGameControls() {
+            document.getElementById('draw-btn').disabled = false;
+            document.getElementById('resign-btn').disabled = false;
+            document.getElementById('takeback-btn').disabled = false;
         }
 
         function adjustTimeForPassedLapse(lastMoveAtIso, currentFen) {
@@ -516,6 +587,9 @@
 
         function initGame(gameData) {
             currentGameId = gameData.id;
+            currentStatus = gameData.status;
+            alertTriggeredForEnd = false;
+
             document.getElementById('lobby-view').classList.add('hidden');
             document.getElementById('game-view').classList.remove('hidden');
             document.getElementById('match-time-label').innerText = gameData.time_control;
@@ -539,7 +613,8 @@
                 position: gameData.fen,
                 orientation: myColor === 'w' ? 'white' : 'black',
                 onDragStart: (src, piece) => {
-                    if (playbackIndex !== -1) return false; // Blokkeer zetten tijdens playback bladeren
+                    if (currentStatus !== 'playing') return false; // Blokkeer slepen als game al over is
+                    if (playbackIndex !== -1) return false; 
                     if (game.game_over()) return false;
                     if ((myColor === 'w' && piece.search(/^b/) !== -1) || (myColor === 'b' && piece.search(/^w/) !== -1)) return false;
                     if (game.turn() !== myColor) return false;
@@ -548,15 +623,22 @@
                 pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
             });
 
-            if (gameData.status === 'playing') { updateTurnIndicator(); startLocalClock(); }
+            if (currentStatus === 'playing') { 
+                updateTurnIndicator(); 
+                startLocalClock(); 
+                enableGameControls();
+            } else {
+                disableGameControls();
+                displayGameEndMessage(currentStatus);
+            }
             listenToSpecificGame(currentGameId);
         }
 
         async function onDrop(source, target) {
+            if (currentStatus !== 'playing') return 'snapback';
             const move = game.move({ from: source, to: target, promotion: 'q' });
             if (move === null) return 'snapback';
 
-            // Zorgt voor de perfecte PGN string notatie (e4, e5, Nf3, Bf5)
             const cleanSanMove = move.san; 
 
             const tc = document.getElementById('match-time-label').innerText;
@@ -582,7 +664,6 @@
             updatePlaybackButtons();
         }
 
-        // PERFECTED TABLE RENDERING ENGINE: Onafhankelijk van chess.js interne geschiedenis
         function renderMovesTable() {
             const tbody = document.getElementById('moves-table-body');
             tbody.innerHTML = "";
@@ -609,14 +690,12 @@
                 tbody.appendChild(tr);
             }
             
-            // Volg de live-scrolldown alleen als je de live partij bekijkt
             if (playbackIndex === -1) {
                 const container = tbody.parentElement.parentElement;
                 container.scrollTop = container.scrollHeight;
             }
         }
 
-        // RE-ENGINEERED SINGLE-MOVE PLAYBACK SYSTEM
         function playbackMove(action) {
             if (globalMovesList.length === 0) return;
 
@@ -633,14 +712,13 @@
                     if (playbackIndex < globalMovesList.length - 1) {
                         playbackIndex++;
                     } else {
-                        playbackIndex = -1; // Keer direct terug naar live view na de laatste zet
+                        playbackIndex = -1; 
                     }
                 }
             } else if (action === 'live') {
                 playbackIndex = -1;
             }
 
-            // Bouw de FEN-stelling stap-voor-stap op vanaf nul tot de geselecteerde index
             const tempGame = new Chess();
             const targetLimit = (playbackIndex === -1) ? globalMovesList.length : playbackIndex + 1;
             
@@ -648,7 +726,6 @@
                 tempGame.move(globalMovesList[x]);
             }
 
-            // Zet het bord visueel naar de exacte historische FEN stelling van dat moment
             board.position(tempGame.fen(), true);
             
             renderMovesTable();
@@ -694,6 +771,7 @@
 
         function updateTurnIndicator() {
             if (playbackIndex !== -1) return;
+            if (currentStatus !== 'playing') return;
             document.getElementById('turn-indicator').innerText = game.turn() === 'w' ? "Turn: White" : "Turn: Black";
             document.getElementById('white-clock-box').className = game.turn() === 'w' ? 'clock active-turn' : 'clock';
             document.getElementById('black-clock-box').className = game.turn() === 'b' ? 'clock active-turn' : 'clock';
@@ -702,6 +780,7 @@
         function startLocalClock() {
             if (clockInterval) clearInterval(clockInterval);
             clockInterval = setInterval(() => {
+                if (currentStatus !== 'playing') return;
                 if (game.turn() === 'w') { if (whiteTimeLeft > 0) whiteTimeLeft--; else handleTimeOut('w'); }
                 else { if (blackTimeLeft > 0) blackTimeLeft--; else handleTimeOut('b'); }
                 updateClockDisplays();
@@ -722,17 +801,37 @@
 
         function displayGameEndMessage(status) {
             document.getElementById('turn-indicator').innerText = status === 'draw' ? "Match ended in a draw!" : `${status === 'white_won' ? 'White' : 'Black'} won the match!`;
+            document.getElementById('white-clock-box').className = 'clock';
+            document.getElementById('black-clock-box').className = 'clock';
         }
 
+        // VERBETERD REMISE-AANBOD SYSTEEM (Nu via Database Notificatie)
         async function offerDraw() {
-            if(confirm("Do you want to declare this match a draw?")) {
-                await supabaseClient.from('gcvm_games').update({ status: 'draw' }).eq('id', currentGameId);
+            if (currentStatus !== 'playing') return;
+            if (confirm("Are you sure you want to offer a draw?")) {
+                await supabaseClient.from('gcvm_games').update({ draw_offered_by: currentUser }).eq('id', currentGameId);
+                alert("Draw offer sent to opponent. Waiting for response...");
             }
         }
 
+        // VERBETERDE TAKEBACK ACTIE
+        async function requestTakeback() {
+            if (currentStatus !== 'playing') return;
+            if (globalMovesList.length === 0) return alert("No moves have been made yet!");
+            if (confirm("Would you like to request a takeback for the last move?")) {
+                await supabaseClient.from('gcvm_games').update({ takeback_requested_by: currentUser }).eq('id', currentGameId);
+                alert("Takeback request sent to opponent. Waiting for response...");
+            }
+        }
+
+        // VERBETERDE CONFIRMATION BIJ RESIGN
         async function resignMatch() {
-            const res = myColor === 'w' ? 'black_won' : 'white_won';
-            await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
+            if (currentStatus !== 'playing') return;
+            // Vereist expliciete klik/bevestiging
+            if (confirm("Are you sure you want to RESIGN?")) {
+                const res = myColor === 'w' ? 'black_won' : 'white_won';
+                await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
+            }
         }
 
         function leaveGame() { clearInterval(clockInterval); window.location.reload(); }
