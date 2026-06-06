@@ -529,12 +529,10 @@
         }
 
 function listenToSpecificGame(gameId) {
-    // Sluit een eventuele oude actieve luisteraar
     if (gameSubscription) {
         supabaseClient.removeChannel(gameSubscription);
     }
     
-    // We luisteren nu breed naar de 'gcvm_games' tabel (net als de lobby)
     gameSubscription = supabaseClient.channel(`game_room_channel`)
     .on('postgres_changes', { 
         event: 'UPDATE', 
@@ -543,51 +541,57 @@ function listenToSpecificGame(gameId) {
     }, (payload) => {
         const updatedGame = payload.new;
         
-        // JAVASCRIPT FILTER: Controleer hier pas of de update bedoeld is voor DIT spel
+        // Controleer of de update voor dit specifieke spel is
         if (updatedGame.id === gameId || updatedGame.id == gameId) {
-            console.log("Live update ontvangen voor huidige match!", updatedGame);
+            console.log("Harde database-update ontvangen!", updatedGame);
             
-            if (updatedGame.status === 'playing') {
-                if (document.getElementById('game-view').classList.contains('hidden')) {
-                    initGame(updatedGame);
-                    return;
-                }
-                
-                // Synchroniseer de schaakengine en het visuele bord direct
-                game.load(updatedGame.fen);
-                board.position(updatedGame.fen, false); // false voorkomt haperingen
-                
-                // Update de kloktijden
-                whiteTimeLeft = updatedGame.white_time;
-                blackTimeLeft = updatedGame.black_time;
+            // Schakel over naar het bordscherm als dat nog niet zo was
+            if (document.getElementById('game-view').classList.contains('hidden')) {
+                initGame(updatedGame);
+                return;
+            }
+            
+            // STAP 1: Stop direct alle lopende klokken om asynchrone loops te breken
+            clearInterval(clockInterval);
+            
+            // STAP 2: Dwing de schaakengine om de FEN-status uit de database in te laden
+            game.load(updatedGame.fen);
+            
+            // STAP 3: Update de visuele stukken op het bord direct zonder animatie-hapering
+            board.position(updatedGame.fen, false);
+            
+            // STAP 4: Overschrijf de kloktijden met de exacte databasestanden
+            whiteTimeLeft = updatedGame.white_time;
+            blackTimeLeft = updatedGame.black_time;
+            
+            // Corrigeer netwerkvertragingen
+            if (typeof adjustTimeForPassedLapse === "function") {
                 adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
-                
-                // Remise aanbiedingen controleren
-                if (updatedGame.draw_offer && updatedGame.draw_offer !== myColor) {
-                    document.getElementById('accept-draw-btn').classList.remove('hidden');
-                } else if (!updatedGame.draw_offer) {
-                    document.getElementById('accept-draw-btn').classList.add('hidden');
-                }
-                
-                // Ververs de klokken, beurt-indicator en chatlog
-                updateClockDisplays();
-                updateTurnIndicator();
-                renderChatLog(updatedGame.chat_log);
-                
-                // Start de klok voor de juiste speler
+            }
+            
+            // Remise-aanbiedingen verwerken
+            if (updatedGame.draw_offer && updatedGame.draw_offer !== myColor) {
+                document.getElementById('accept-draw-btn').classList.remove('hidden');
+            } else if (!updatedGame.draw_offer) {
+                document.getElementById('accept-draw-btn').classList.add('hidden');
+            }
+            
+            // STAP 5: Bouw de visuele interface opnieuw op op basis van de gloednieuwe beurt
+            updateClockDisplays();
+            updateTurnIndicator();
+            renderChatLog(updatedGame.chat_log);
+            
+            // STAP 6: Start de klokaftelling opnieuw voor de speler die nu écht aan de beurt is volgens de database
+            if (updatedGame.status === 'playing') {
                 startLocalClock();
-                
             } else if (updatedGame.status.endsWith('_won') || updatedGame.status === 'draw') {
-                clearInterval(clockInterval);
-                game.load(updatedGame.fen);
-                board.position(updatedGame.fen);
                 displayGameEndMessage(updatedGame.status);
-                renderChatLog(updatedGame.chat_log);
             }
         }
     })
     .subscribe((status) => {
-        // Dit laat ons in de console of paarse balk zien of de verbinding live is
+        // Update de tekst in je paarse statusbalk
+        const indicators = document.querySelectorAll('#turn-indicator');
         console.log("Realtime status:", status);
     });
 }
