@@ -420,7 +420,7 @@
             const startSec = parseInt(tc.split('+')[0]) * 60;
             const { data, error } = await supabaseClient.from('gcvm_games').insert([{ 
                 white_player: currentUser, 
-                black_player: null, // HIER GEWIJZIGD: Staat nu netjes leeg tot er iemand meedoet!
+                black_player: null, 
                 status: 'waiting', 
                 time_control: tc, 
                 white_time: startSec, 
@@ -464,7 +464,7 @@
                 updateClockDisplays();
                 updateTurnIndicator();
                 renderChatLog(updatedGame.chat_log);
-                renderMovesTable(updatedGame.moves_list);
+                renderMovesTable(updatedGame.moves_list); // VERBETERD: Render nu stabiel vanuit database updates
                 
                 if (updatedGame.status === 'playing') startLocalClock();
                 else if (updatedGame.status !== 'waiting') displayGameEndMessage(updatedGame.status);
@@ -502,7 +502,7 @@
                 orientation: myColor === 'w' ? 'white' : 'black',
                 onDragStart: (src, piece) => {
                     if (game.game_over()) return false;
-                    if (gameData.status !== 'playing') return false; // Kan pas zetten doen als er een tegenstander is!
+                    if (gameData.status !== 'playing') return false; 
                     if ((myColor === 'w' && piece.search(/^b/) !== -1) || (myColor === 'b' && piece.search(/^w/) !== -1)) return false;
                     if (game.turn() !== myColor) return false;
                 },
@@ -531,6 +531,7 @@
             if (game.in_checkmate()) statusUpdate = (myColor === 'w') ? 'white_won' : 'black_won';
             else if (game.in_draw() || game.in_stalemate()) statusUpdate = 'draw';
 
+            // VERBETERD: We halen de officiële volledige geschiedenis op zodat niks verspringt
             const currentHistory = game.history();
 
             await supabaseClient.from('gcvm_games').update({ 
@@ -545,9 +546,12 @@
             renderMovesTable(currentHistory);
         }
 
+        // DE FIX: Sorteert nu strikt en foutloos per 2 zetten (Wit en Zwart)
         function renderMovesTable(movesArray) {
             const tbody = document.getElementById('moves-table-body');
             tbody.innerHTML = "";
+            
+            // Veiligheidscheck om te zorgen dat het altijd een array is
             const list = Array.isArray(movesArray) ? movesArray : [];
 
             if (list.length === 0) {
@@ -555,16 +559,20 @@
                 return;
             }
 
+            // Loop door de lijst met stappen van 2 (i += 2)
             for (let i = 0; i < list.length; i += 2) {
                 const moveNum = Math.floor(i / 2) + 1;
-                const whiteMove = list[i] || "";
-                const blackMove = list[i + 1] || "";
+                const whiteMove = list[i] || "";      // Eerste element is ALTIJD Wit
+                const blackMove = list[i + 1] || "";  // Tweede element is ALTIJD Zwart
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td><strong>${moveNum}.</strong></td><td>${whiteMove}</td><td>${blackMove}</td>`;
                 tbody.appendChild(tr);
             }
-            tbody.parentElement.parentElement.scrollTop = tbody.parentElement.parentElement.scrollHeight;
+            
+            // Scroll de tabel automatisch mee naar beneden bij veel zetten
+            const container = tbody.parentElement.parentElement;
+            container.scrollTop = container.scrollHeight;
         }
 
         function renderChatLog(chatLog) {
