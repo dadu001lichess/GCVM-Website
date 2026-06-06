@@ -82,25 +82,17 @@
         }
         .rating-name { font-weight: 600; font-size: 14px; }
         .rating-val { color: #1a73e8; font-weight: 600; font-size: 16px; }
-        .rating-sub { font-size: 11px; color: #70757a; }
+        .rating-sub { font-size: 11px; color: #70757a; margin-top: 2px; }
 
         .main-panel { display: flex; flex-direction: column; gap: 25px; }
         .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 15px; }
         .profile-title { font-size: 28px; margin: 0 0 8px 0; font-weight: 400; }
 
-        /* Verbeterde, minimalistische flair-badge */
         .flair-display-box { font-size: 14px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 6px 14px; border-radius: 20px; width: fit-content; margin-top: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .bio-display-text { font-size: 15px; line-height: 1.6; white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #dadce0; min-height: 100px; }
         
         .edit-link-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 15px; text-decoration: none; display: inline-block; }
         .edit-link-btn:hover { background: #1557b0; }
-
-        .graph-placeholder {
-            border: 1px solid #dadce0; border-radius: 6px; height: 150px; display: flex; align-items: center;
-            justify-content: center; color: #70757a; font-size: 14px;
-            background-image: linear-gradient(#f1f3f4 1px, transparent 1px), linear-gradient(90deg, #f1f3f4 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
 
         .alert-warn { background: #fce8e6; border: 1px solid #f28b82; color: #a51d24; padding: 15px; border-radius: 6px; text-align: center; font-weight: 600; }
         .hidden { display: none !important; }
@@ -140,6 +132,7 @@
                 <a href="Shards shop.html">Shards shop</a>
               </div>
             </details>
+            <a href="play.html">Play Chess</a>
             <a href="Current games.html">Current games</a>
             <a href="GoTM.html">Game of the month</a>
             <a href="Jobs.html">Special mentions/Jobs</a>
@@ -180,11 +173,22 @@
                 <div class="profile-grid">
                     
                     <div class="side-panel">
-                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Elo Ratings</h3>
-                        <div class="rating-card"><div><div class="rating-name">Classical</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
-                        <div class="rating-card"><div><div class="rating-name">Rapid</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
-                        <div class="rating-card"><div><div class="rating-name">Blitz</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
-                        <div class="rating-card"><div><div class="rating-name">Bullet</div><div class="rating-sub">0 games</div></div><div class="rating-val">1500?</div></div>
+                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Live Statistics</h3>
+                        <div class="rating-card">
+                            <div>
+                                <div class="rating-name">Live Rating</div>
+                                <div class="rating-sub">Deviation: <span id="user-rd">±350</span></div>
+                            </div>
+                            <div class="rating-val" id="user-rating">1500</div>
+                        </div>
+
+                        <div class="rating-card" style="display: block;">
+                            <div class="rating-name" style="margin-bottom: 8px;">Performance</div>
+                            <div class="rating-sub">Win Rate: <strong id="stat-winrate" style="color: #34a853;">0%</strong></div>
+                            <div class="rating-sub">Total Games: <span id="stat-total">0</span></div>
+                            <div class="rating-sub">As White: <span id="stat-white-pct">0%</span></div>
+                            <div class="rating-sub">As Black: <span id="stat-black-pct">0%</span></div>
+                        </div>
                     </div>
 
                     <div class="main-panel">
@@ -201,9 +205,9 @@
                         </div>
 
                         <div>
-                            <h3 style="margin:0 0 10px 0; font-size:16px;">Rating Progress Graph</h3>
-                            <div class="graph-placeholder">
-                                Progress Chart History — <span style="color:#1a73e8; font-weight:600; margin-left:5px;">Coming Soon!</span>
+                            <h3 style="margin:0 0 10px 0; font-size:16px;">Recent Match History</h3>
+                            <div id="history-list-box" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
+                                <p style="color: #70757a; font-size: 14px;">No matches recorded yet.</p>
                             </div>
                         </div>
                     </div>
@@ -244,7 +248,7 @@
             try {
                 const { data: users, error } = await supabaseClient
                     .from('gcvm_users')
-                    .select('username, bio, flair')
+                    .select('username, bio, flair, rating, rd')
                     .ilike('username', username);
 
                 if (error) throw error;
@@ -258,6 +262,10 @@
                 
                 document.getElementById('bio-text-container').innerText = user.bio && user.bio.trim() !== "" ? user.bio : "This member hasn't written a biography yet.";
                 document.getElementById('view-username').innerText = user.username;
+                
+                // Display Live rating and rating deviation
+                document.getElementById('user-rating').innerText = user.rating || 1500;
+                document.getElementById('user-rd').innerText = `±${Math.round(user.rd || 350)}`;
 
                 const flairBadge = document.getElementById('flair-badge-text');
                 if (user.flair && user.flair.trim() !== "") {
@@ -274,7 +282,124 @@
                     editBtn.classList.add('hidden');
                 }
 
+                // Compute and render match stats + history list dynamically
+                await fetchAndCalculateStats(user.username);
+
             } catch(err) { console.error(err); }
+        }
+
+        async function fetchAndCalculateStats(targetUsername) {
+            try {
+                const { data: games, error } = await supabaseClient
+                    .from('gcvm_games')
+                    .select('*')
+                    .or(`white_player.ilike.${targetUsername},black_player.ilike.${targetUsername}`);
+
+                if (error) throw error;
+
+                const finishedGames = games ? games.filter(g => g.status !== 'playing' && g.status !== 'waiting') : [];
+                const totalGames = finishedGames.length;
+
+                if (totalGames === 0) {
+                    document.getElementById('stat-winrate').innerText = "0%";
+                    document.getElementById('stat-total').innerText = "0";
+                    document.getElementById('stat-white-pct').innerText = "0%";
+                    document.getElementById('stat-black-pct').innerText = "0%";
+                    renderMatchHistoryList([], targetUsername);
+                    return;
+                }
+
+                let wins = 0;
+                let whiteCount = 0;
+                let blackCount = 0;
+
+                finishedGames.forEach(game => {
+                    const isWhite = game.white_player && game.white_player.toLowerCase() === targetUsername.toLowerCase();
+                    if (isWhite) whiteCount++; else blackCount++;
+
+                    if ((game.status === 'white_won' && isWhite) || (game.status === 'black_won' && !isWhite)) {
+                        wins++;
+                    }
+                });
+
+                const winRate = ((wins / totalGames) * 100).toFixed(1);
+                const whitePct = ((whiteCount / totalGames) * 100).toFixed(1);
+                const blackPct = ((blackCount / totalGames) * 100).toFixed(1);
+
+                document.getElementById('stat-winrate').innerText = `${winRate}%`;
+                document.getElementById('stat-total').innerText = totalGames;
+                document.getElementById('stat-white-pct').innerText = `${whitePct}%`;
+                document.getElementById('stat-black-pct').innerText = `${blackPct}%`;
+
+                renderMatchHistoryList(finishedGames, targetUsername);
+
+            } catch (err) {
+                console.error("Failed loading stats:", err.message);
+            }
+        }
+
+        function renderMatchHistoryList(gamesList, targetUsername) {
+            const box = document.getElementById('history-list-box');
+            box.innerHTML = "";
+
+            if (gamesList.length === 0) {
+                box.innerHTML = `<p style="color: #70757a; font-size: 14px;">No matches recorded yet.</p>`;
+                return;
+            }
+
+            // Sort matches so newest games appear on top
+            gamesList.sort((a, b) => b.id - a.id); 
+
+            gamesList.forEach(match => {
+                const isWhite = match.white_player && match.white_player.toLowerCase() === targetUsername.toLowerCase();
+                const opponent = isWhite ? match.black_player : match.white_player;
+                
+                let resultLabel = "Draw";
+                let cardBorderColor = "#dadce0";
+                let badgeBackground = "#f1f3f4";
+                let badgeColor = "#3c4043";
+
+                if ((match.status === 'white_won' && isWhite) || (match.status === 'black_won' && !isWhite)) {
+                    resultLabel = "Victory";
+                    cardBorderColor = "#34a853";
+                    badgeBackground = "#e6f4ea";
+                    badgeColor = "#137333";
+                } else if ((match.status === 'white_won' && !isWhite) || (match.status === 'black_won' && isWhite)) {
+                    resultLabel = "Defeat";
+                    cardBorderColor = "#d93025";
+                    badgeBackground = "#fce8e6";
+                    badgeColor = "#c5221f";
+                }
+
+                const matchCard = document.createElement('div');
+                matchCard.style = `
+                    border: 1px solid ${cardBorderColor}; 
+                    border-left: 5px solid ${cardBorderColor};
+                    padding: 14px 18px; 
+                    border-radius: 6px; 
+                    background: white; 
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: center;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                `;
+
+                matchCard.innerHTML = `
+                    <div>
+                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; background: ${badgeBackground}; color: ${badgeColor}; padding: 3px 8px; border-radius: 4px;">
+                            ${resultLabel}
+                        </span>
+                        <div style="margin-top: 8px; font-size: 15px; color: #202124;">
+                            Playing as <strong>${isWhite ? 'White' : 'Black'}</strong> against <span style="color: #1a73e8; font-weight:600;">${opponent || 'Unknown'}</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right; font-size: 13px; color: #70757a;">
+                        <div>Game ID: #${match.id}</div>
+                        <div style="font-size: 11px; margin-top: 4px; color: #9aa0a6;">Type: ${match.time_control || 'Custom'}</div>
+                    </div>
+                `;
+                box.appendChild(matchCard);
+            });
         }
 
         function searchOtherMember() {
@@ -313,7 +438,7 @@
             try {
                 const { error } = await supabaseClient
                     .from('gcvm_users')
-                    .insert([{ username, password, role: 'user', bio: '', flair: '' }]);
+                    .insert([{ username, password, role: 'user', bio: '', flair: '', rating: 1500, rd: 350 }]);
                 
                 if (error) throw error;
                 alert("Account created!");
