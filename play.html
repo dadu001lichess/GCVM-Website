@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,6 @@
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
 
     <style>
-        /* EXACTE STYLING GEKOPIEERD UIT JOUW INDEX.HTML */
         body {
             font-family: 'Open Sans', sans-serif;
             margin: 0;
@@ -180,7 +179,6 @@
             padding: 8px 0;
         }
 
-        /* SCHAAKBORD & HOOFDSCHERM STYLING */
         main {
             margin-left: 280px; 
             width: calc(100% - 280px);
@@ -342,7 +340,6 @@
         let game = new Chess(), gameSubscription = null, clockInterval = null;
         let whiteTimeLeft = 0, blackTimeLeft = 0, activeMatchData = null;
 
-        // AUTHENTICATIE MET DE EXACTE SESSY-LOGICA UIT JOUW INDEX.HTML
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
             const currentRole = localStorage.getItem('gcvm_db_role');
@@ -367,9 +364,9 @@
         async function registerUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) return alert("Fill fields!");
+            if (!username || !password) return alert("Please fill in all fields!");
             await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user' }]);
-            alert("Account created!");
+            alert("Account successfully created!");
         }
 
         function showStyle(username, role) {
@@ -421,8 +418,20 @@
         async function createNewChallenge() {
             const tc = document.getElementById('time-control-select').value;
             const startSec = parseInt(tc.split('+')[0]) * 60;
-            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ white_player: currentUser, status: 'waiting', time_control: tc, white_time: startSec, black_time: startSec, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', chat_log: [], moves_list: [] }]).select().single();
-            if (error) return alert(error.message);
+            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ 
+                white_player: currentUser, 
+                status: 'waiting', 
+                time_control: tc, 
+                white_time: startSec, 
+                black_time: startSec, 
+                fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 
+                chat_log: [], 
+                moves_list: [] 
+            }]).select().single();
+            
+            if (error) {
+                return alert("Error posting challenge: " + error.message);
+            }
             currentGameId = data.id; myColor = 'w'; initGame(data);
         }
 
@@ -612,8 +621,10 @@
         }
 
         async function resignMatch() {
-            const res = myColor === 'w' ? 'black_won' : 'white_won';
-            await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
+            if(confirm("Are you sure you want to resign?")) {
+                const res = myColor === 'w' ? 'black_won' : 'white_won';
+                await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
+            }
         }
 
         function leaveGame() { clearInterval(clockInterval); window.location.reload(); }
