@@ -14,229 +14,48 @@
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
 
     <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            margin: 0;
-            display: flex;
-            background-color: white;
-        }
+        body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; }
+        aside { width: 280px; background-color: #202124; height: 100vh; position: fixed; padding: 40px 24px; box-sizing: border-box; overflow-y: auto; left: 0; top: 0; }
+        .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
+        .auth-container { margin-bottom: 25px; }
+        .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
+        .auth-input { width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px; background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none; }
+        .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
+        .auth-btn { flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; text-align: center; }
+        .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
+        .user-info { color: #bdc1c6; font-size: 14px; }
+        .user-info strong { color: #8ab4f8; font-size: 15px; }
+        .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; }
+        .logout-link { display: inline-block; color: #f28b82; text-decoration: none; font-size: 12px; margin-top: 8px; cursor: pointer; }
+        nav { border-top: 1px solid #3c4043; padding-top: 15px; }
+        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
+        nav a:hover, nav a.active { color: #8ab4f8; }
+        summary { list-style: none; color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; }
+        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; margin-bottom: 10px; }
+        .sub-menu a { font-size: 14px; padding: 8px 0; }
 
-        aside {
-            width: 280px;
-            background-color: #202124; 
-            height: 100vh;
-            position: fixed;
-            padding: 40px 24px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            left: 0;
-            top: 0;
-        }
-
-        .logo {
-            color: white;
-            font-size: 22px;
-            font-weight: 300;
-            margin-bottom: 20px;
-            letter-spacing: 0.5px;
-        }
-
-        .auth-container {
-            margin-bottom: 25px;
-        }
-
-        .auth-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #3c4043;
-            border-radius: 4px;
-            background-color: #303134;
-            color: white;
-            font-size: 13px;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        .auth-input::placeholder {
-            color: #80868b;
-        }
-
-        .auth-btn-container {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .auth-btn {
-            flex: 1;
-            padding: 10px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            transition: background-color 0.2s;
-        }
-
-        .auth-btn:hover {
-            background-color: #1557b0;
-        }
-
-        .auth-btn.secondary {
-            background-color: #3c4043;
-            color: #bdc1c6;
-        }
-
-        .auth-btn.secondary:hover {
-            background-color: #4f5357;
-            color: white;
-        }
-
-        .user-info {
-            color: #bdc1c6;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .user-info strong {
-            color: #8ab4f8;
-            font-size: 15px;
-        }
-
-        .badge {
-            display: inline-block;
-            font-size: 10px;
-            padding: 2px 6px;
-            background-color: #34a853;
-            color: white;
-            border-radius: 10px;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
-
-        .logout-link {
-            display: inline-block;
-            color: #f28b82;
-            text-decoration: none;
-            font-size: 12px;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-
-        .logout-link:hover {
-            text-decoration: underline;
-        }
-
-        nav {
-            border-top: 1px solid #3c4043;
-            padding-top: 15px;
-        }
-
-        nav a {
-            display: block;
-            color: #bdc1c6;
-            text-decoration: none;
-            padding: 12px 0;
-            font-size: 15px;
-            font-weight: 400;
-            transition: color 0.2s;
-        }
-
-        nav a:hover, nav a.active {
-            color: #8ab4f8;
-        }
-
-        summary {
-            list-style: none;
-            color: #bdc1c6;
-            padding: 12px 0;
-            font-size: 15px;
-            cursor: pointer;
-            outline: none;
-        }
-
-        summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .sub-menu {
-            padding-left: 20px;
-            border-left: 1px solid #3c4043;
-            margin-bottom: 10px;
-        }
-
-        .sub-menu a {
-            font-size: 14px;
-            padding: 8px 0;
-        }
-
-        main {
-            margin-left: 280px; 
-            width: calc(100% - 280px);
-            min-height: 100vh;
-            padding: 40px;
-            box-sizing: border-box;
-        }
-
+        main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; padding: 40px; box-sizing: border-box; }
         .lobby-container, .game-container { max-width: 1000px; margin: 0 auto; }
         .btn { padding: 10px 20px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
         .btn:hover:not(:disabled) { background-color: #1557b0; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn.secondary-action { background-color: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; margin-right: 8px; }
-        .btn.secondary-action:hover:not(:disabled) { background-color: #e8eaed; }
         .btn.danger-action { background-color: #d93025; color: white; margin-right: 8px; }
-        .btn.danger-action:hover:not(:disabled) { background-color: #b31412; }
         
         .lobby-list { margin-top: 20px; border: 1px solid #dadce0; border-radius: 8px; padding: 15px; background-color: #f8f9fa; }
         .lobby-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
         .setup-box { background-color: #f8f9fa; border: 1px solid #dadce0; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
         .select-style { padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #dadce0; margin-right: 10px; }
 
-        /* NOTIFICATIEBALKEN STYLE */
-        .notification-banner {
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #856404;
-            padding: 12px 16px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .notification-banner.alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-        .notification-banner.alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-        .notification-buttons {
-            display: flex;
-            gap: 8px;
-        }
-        .action-btn {
-            padding: 4px 12px;
-            border-radius: 4px;
-            border: none;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+        .form-row { margin-bottom: 15px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .form-label { font-size: 14px; font-weight: 600; color: #202124; min-width: 120px; }
+        .slider-container { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #3c4043; }
+
+        .notification-banner { background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px 16px; border-radius: 6px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; }
+        .notification-banner.alert-danger { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .notification-banner.alert-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .notification-buttons { display: flex; gap: 8px; }
+        .action-btn { padding: 4px 12px; border-radius: 4px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
         .action-btn.accept { background-color: #28a745; color: white; }
         .action-btn.decline { background-color: #dc3545; color: white; }
 
@@ -247,35 +66,9 @@
         .clock { flex: 1; text-align: center; background: #f1f3f4; padding: 8px 12px; border-radius: 4px; border: 1px solid #dadce0; }
         .clock.active-turn { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
 
-        .playback-controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-            background: #f1f3f4;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #dadce0;
-        }
-        .playback-btn {
-            padding: 6px 16px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            border: 1px solid #dadce0;
-            background: white;
-            color: #3c4043;
-            transition: all 0.2s;
-        }
-        .playback-btn:hover:not(:disabled) {
-            background: #e8eaed;
-            color: black;
-        }
-        .playback-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .playback-controls { display: flex; justify-content: center; gap: 10px; margin-top: 15px; background: #f1f3f4; padding: 8px; border-radius: 6px; border: 1px solid #dadce0; }
+        .playback-btn { padding: 6px 16px; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 4px; border: 1px solid #dadce0; background: white; color: #3c4043; }
+        .playback-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .right-panel-wrapper { flex: 1; display: flex; flex-direction: column; gap: 20px; height: 500px; }
         .chat-wrapper { flex: 1; border: 1px solid #dadce0; border-radius: 8px; display: flex; flex-direction: column; background-color: #f8f9fa; min-height: 250px; }
@@ -292,7 +85,7 @@
         .moves-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
         .moves-table th { background-color: #202124; color: white; padding: 8px; position: sticky; top: 0; }
         .moves-table td { padding: 6px 8px; border-bottom: 1px solid #f1f3f4; }
-        .moves-table td.active-move { background-color: #fff3cd; font-weight: 600; border-radius: 2px; }
+        .moves-table td.active-move { background-color: #fff3cd; font-weight: 600; }
         .moves-table tr:nth-child(even) { background-color: #f8f9fa; }
         
         .game-controls { margin-top: 20px; display: flex; align-items: center; }
@@ -315,14 +108,13 @@
             <div id="profile-section" class="hidden">
                 <div class="user-info">
                     Logged in as:<br>
-                    <strong id="displayed-username">...</strong>
-                    <span id="admin-badge" class="badge hidden">Admin</span><br>
+                    <strong id="displayed-username">...</strong> <span id="admin-badge" class="badge hidden">Admin</span><br>
                     <span class="logout-link" onclick="logoutUser()">Log out</span>
                 </div>
             </div>
         </div>
         <nav>
-            <a href="index.html" class="active">Homepage</a>
+            <a href="index.html">Homepage</a>
             <a href="profileview.html">Profile</a>
             <a href="Training.html">Training</a>
             <a href="Coaches.html">Coaches</a>
@@ -334,49 +126,74 @@
                 <a href="Shards shop.html">Shards shop</a>
               </div>
             </details>
+            <a href="play.html" class="active">Play Chess</a>
             <a href="Current games.html">Current games</a>
             <a href="GoTM.html">Game of the month</a>
             <a href="Jobs.html">Special mentions/Jobs</a>
-            <details>
-              <summary>Updates/News ⌵</summary>
-              <div class="sub-menu">
-                <a href="Updates.html">Updates</a>
-                <a href="News.html">Newspaper</a>
-              </div>    
-            </details>
-            <details>
-              <summary>Community ⌵</summary>
-              <div class="sub-menu">
-                <a href="Leaders.html">Mods/Leaders</a>
-                <a href="Contact.html">Contact</a>
-                <a href="MoTM.html">MoTM</a>
-              </div>    
-            </details>
         </nav>
     </aside>
 
     <main>
         <div id="lobby-view" class="lobby-container">
             <h2>GC(V)M Live Chess Lobby</h2>
-            <div id="lobby-auth-must" class="setup-box" style="background-color: #fce8e6; border-color: #f28b82;">⚠️ You must log in on the left panel before playing!</div>
+            <div id="lobby-auth-must" class="setup-box" style="background-color: #fce8e6; border-color: #f28b82;">You must log in on the left panel before playing!</div>
+            
             <div id="resume-box" class="setup-box hidden" style="background-color: #e6f4ea; border-color: #34a853;">
-                <h3>🔄 Active Match Detected!</h3>
+                <h3>Active Match Detected!</h3>
                 <button class="btn" style="background-color: #34a853;" onclick="resumeActiveMatch()">Back to Game</button>
             </div>
+
             <div id="lobby-controls" class="setup-box hidden">
-                <h3>Choose Time Control</h3>
-                <select id="time-control-select" class="select-style">
-                    <option value="10+0" selected>Rapid (10 min)</option>
-                    <option value="5+0">Blitz (5 min)</option>
-                    <option value="3+2">Blitz (3 min + 2s inc)</option>
-                </select>
-                <button id="create-challenge-btn" class="btn" onclick="createNewChallenge()">🔥 Post New Challenge</button>
+                <h3>Create a Challenge</h3>
+                
+                <div class="form-row">
+                    <span class="form-label">Time Presets:</span>
+                    <select id="time-control-select" class="select-style" onchange="toggleCustomTimeFields()">
+                        <option value="10+0" selected>Rapid (10 min)</option>
+                        <option value="5+0">Blitz (5 min)</option>
+                        <option value="3+2">Blitz (3 min + 2s inc)</option>
+                        <option value="1+0">Bullet (1 min)</option>
+                        <option value="30+0">Classical (30 min)</option>
+                        <option value="custom">-- Custom Time Control --</option>
+                    </select>
+                </div>
+
+                <div id="custom-time-zone" class="hidden" style="border-left: 3px solid #1a73e8; padding-left: 15px; margin-bottom:15px;">
+                    <div class="form-row">
+                        <span class="form-label">Minutes per side:</span>
+                        <div class="slider-container">
+                            <input type="range" id="custom-mins" min="1" max="180" value="10" oninput="document.getElementById('mins-val').innerText = this.value">
+                            <span id="mins-val" style="font-weight:600;">10</span> min
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <span class="form-label">Increment (sec):</span>
+                        <div class="slider-container">
+                            <input type="range" id="custom-incs" min="0" max="60" value="0" oninput="document.getElementById('incs-val').innerText = this.value">
+                            <span id="incs-val" style="font-weight:600;">0</span> sec
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <span class="form-label">Game Mode:</span>
+                    <select id="rated-select" class="select-style">
+                        <option value="true" selected>Rated (Affects Profile Elo)</option>
+                        <option value="false">Casual (Unrated / Friendly)</option>
+                    </select>
+                </div>
+
+                <button id="create-challenge-btn" class="btn" onclick="createNewChallenge()">Post New Challenge</button>
             </div>
-            <div class="lobby-list"><h3>Open Challenges</h3><div id="challenges-list">No active challenges.</div></div>
+
+            <div class="lobby-list">
+                <h3>Open Challenges</h3>
+                <div id="challenges-list">No active challenges.</div>
+            </div>
         </div>
 
         <div id="game-view" class="game-container hidden">
-            <h2>Live Match (<span id="match-time-label">10+0</span>)</h2>
+            <h2>Live Match (<span id="match-time-label">10+0</span>) <span id="match-mode-label" style="font-size:14px; background:#e8f0fe; padding:4px 10px; border-radius:12px; margin-left:10px;">Rated</span></h2>
             <p id="players-info">White: ... vs Black: ...</p>
             
             <div id="game-notification-zone"></div>
@@ -439,7 +256,6 @@
         let globalMovesList = [];
         let playbackIndex = -1; 
         let currentStatus = 'playing';
-        let ratingProcessed = false;
 
         window.onload = function() {
             const currentSession = localStorage.getItem('gcvm_db_session');
@@ -451,6 +267,16 @@
             loadLobby();
             supabaseClient.channel('lobby_channel').on('postgres_changes', { event: '*', table: 'gcvm_games', schema: 'public' }, () => loadLobby()).subscribe();
         };
+
+        function toggleCustomTimeFields() {
+            const select = document.getElementById('time-control-select').value;
+            const zone = document.getElementById('custom-time-zone');
+            if (select === 'custom') {
+                zone.classList.remove('hidden');
+            } else {
+                zone.classList.add('hidden');
+            }
+        }
 
         async function loginUser() {
             const username = document.getElementById('username-input').value.trim();
@@ -466,7 +292,7 @@
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
             if (!username || !password) return alert("Fill fields!");
-            await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', rating: 1500, rd: 350 }]);
+            await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', bio:'', flair:'', rating:1500, rd:350 }]);
             alert("Account created!");
         }
 
@@ -506,16 +332,41 @@
                 const div = document.createElement('div');
                 div.className = "lobby-item";
                 const isMine = g.white_player === currentUser;
-                div.innerHTML = `<span>Challenge from <strong>${g.white_player}</strong> (${g.time_control})</span>
+                const modeLabel = g.is_rated ? "Rated" : "Casual";
+                div.innerHTML = `<span>Challenge from <strong>${g.white_player}</strong> (${g.time_control}) [${modeLabel}]</span>
                     ${(!isMine && currentUser) ? `<button class="btn" onclick="joinGame('${g.id}')">Play</button>` : isMine ? `<button class="btn" style="background-color:#d93025;" onclick="cancelChallenge('${g.id}')">Cancel</button>` : ''}`;
                 container.appendChild(div);
             });
         }
 
         async function createNewChallenge() {
-            const tc = document.getElementById('time-control-select').value;
-            const startSec = parseInt(tc.split('+')[0]) * 60;
-            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ white_player: currentUser, status: 'waiting', time_control: tc, white_time: startSec, black_time: startSec, fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', chat_log: [], moves_list: [] }]).select().single();
+            const selectVal = document.getElementById('time-control-select').value;
+            const isRated = document.getElementById('rated-select').value === "true";
+            
+            let finalTC = selectVal;
+            let finalSec = 600;
+
+            if (selectVal === 'custom') {
+                const mins = document.getElementById('custom-mins').value;
+                const incs = document.getElementById('custom-incs').value;
+                finalTC = `${mins}+${incs}`;
+                finalSec = parseInt(mins) * 60;
+            } else {
+                finalSec = parseInt(selectVal.split('+')[0]) * 60;
+            }
+
+            const { data, error } = await supabaseClient.from('gcvm_games').insert([{ 
+                white_player: currentUser, 
+                status: 'waiting', 
+                time_control: finalTC, 
+                white_time: finalSec, 
+                black_time: finalSec, 
+                is_rated: isRated,
+                fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 
+                chat_log: [], 
+                moves_list: [] 
+            }]).select().single();
+            
             if (error) return alert(error.message);
             currentGameId = data.id; myColor = 'w'; initGame(data);
         }
@@ -549,6 +400,7 @@
                 adjustTimeForPassedLapse(updatedGame.last_move_at, updatedGame.fen);
                 
                 document.getElementById('players-info').innerText = `White: ${updatedGame.white_player} vs Black: ${updatedGame.black_player || 'Waiting...'}`;
+                document.getElementById('match-mode-label').innerText = updatedGame.is_rated ? "Rated" : "Casual";
                 
                 updateClockDisplays();
                 updateTurnIndicator();
@@ -558,7 +410,6 @@
                 renderMovesTable(); 
                 updatePlaybackButtons();
                 
-                // --- IN-LAYOUT NOTIFICATIE DETECTIE VIA DE CHATSTREAM ---
                 const zone = document.getElementById('game-notification-zone');
                 zone.innerHTML = ""; 
 
@@ -569,7 +420,6 @@
                     if (currentChatLog.length > 0) {
                         const lastMsg = currentChatLog[currentChatLog.length - 1];
 
-                        // 1. Draw offer actie via chat-vlag
                         if (lastMsg.text === "[SYSTEM_DRAW_OFFER]") {
                             const banner = document.createElement('div');
                             banner.className = "notification-banner";
@@ -587,7 +437,6 @@
                             zone.appendChild(banner);
                         }
 
-                        // 2. Takeback actie via chat-vlag
                         if (lastMsg.text === "[SYSTEM_TAKEBACK_REQUEST]") {
                             const banner = document.createElement('div');
                             banner.className = "notification-banner";
@@ -595,7 +444,7 @@
                                 banner.innerHTML = `<span>⏳ Takeback requested. Waiting for opponent...</span>`;
                             } else {
                                 banner.innerHTML = `
-                                    <span>${lastMsg.sender} requests a takeback.</span>
+                                    <span>🔄 ${lastMsg.sender} requests a takeback.</span>
                                     <div class="notification-buttons">
                                         <button class="action-btn accept" onclick="respondTakeback(true)">Allow</button>
                                         <button class="action-btn decline" onclick="respondTakeback(false)">Deny</button>
@@ -618,52 +467,8 @@
                     }
                     zone.appendChild(banner);
                     displayGameEndMessage(currentStatus);
-
-                    // Execute Rating Formulas dynamically on completion
-                    if (!ratingProcessed) {
-                        ratingProcessed = true;
-                        processEloExchange(updatedGame);
-                    }
                 }
             }).subscribe();
-        }
-
-        // DYNAMIC ELO & RATING DEVIATION (RD) ENGINE
-        async function processEloExchange(gameRow) {
-            const wPlayer = gameRow.white_player;
-            const bPlayer = gameRow.black_player;
-            if (!wPlayer || !bPlayer) return;
-
-            // Fetch profiles
-            const { data: whiteData } = await supabaseClient.from('gcvm_users').select('rating, rd').eq('username', wPlayer).single();
-            const { data: blackData } = await supabaseClient.from('gcvm_users').select('rating, rd').eq('username', bPlayer).single();
-
-            if (!whiteData || !blackData) return;
-
-            let Rw = whiteData.rating || 1500;
-            let Rb = blackData.rating || 1500;
-            let RDw = whiteData.rd || 350;
-            let RDb = blackData.rd || 350;
-
-            // Simple standard Chess Elo math implementation
-            const K = 32; 
-            const Ew = 1 / (1 + Math.pow(10, (Rb - Rw) / 400));
-            const Eb = 1 / (1 + Math.pow(10, (Rw - Rb) / 400));
-
-            let Sw = 0.5, Sb = 0.5; // Default Draw outcome setup
-            if (gameRow.status === 'white_won') { Sw = 1; Sb = 0; }
-            if (gameRow.status === 'black_won') { Sw = 0; Sb = 1; }
-
-            let newRw = Math.round(Rw + K * (Sw - Ew));
-            let newRb = Math.round(Rb + K * (Sb - Eb));
-
-            // Reduce uncertainty (Rating Deviation drops as games are completed)
-            let newRDw = Math.max(50, Math.round(RDw - 15));
-            let newRDb = Math.max(50, Math.round(RDb - 15));
-
-            // Sync payloads back into database rows
-            await supabaseClient.from('gcvm_users').update({ rating: newRw, rd: newRDw }).eq('username', wPlayer);
-            await supabaseClient.from('gcvm_users').update({ rating: newRb, rd: newRDb }).eq('username', bPlayer);
         }
 
         function disableGameControls() {
@@ -690,11 +495,11 @@
         function initGame(gameData) {
             currentGameId = gameData.id;
             currentStatus = gameData.status;
-            ratingProcessed = false;
 
             document.getElementById('lobby-view').classList.add('hidden');
             document.getElementById('game-view').classList.remove('hidden');
             document.getElementById('match-time-label').innerText = gameData.time_control;
+            document.getElementById('match-mode-label').innerText = gameData.is_rated ? "Rated" : "Casual";
             document.getElementById('players-info').innerText = `White: ${gameData.white_player} vs Black: ${gameData.black_player || 'Waiting...'}`;
             
             globalMovesList = Array.isArray(gameData.moves_list) ? gameData.moves_list : Object.values(gameData.moves_list || {});
@@ -781,17 +586,13 @@
                 const blackMove = globalMovesList[i + 1] || "";
 
                 const tr = document.createElement('tr');
-                const whiteId = `move-cell-${i}`;
-                const blackId = `move-cell-${i + 1}`;
-
                 tr.innerHTML = `
                     <td><strong>${moveNum}.</strong></td>
-                    <td id="${whiteId}" class="${playbackIndex === i ? 'active-move' : ''}">${whiteMove}</td>
-                    <td id="${blackId}" class="${playbackIndex === (i + 1) ? 'active-move' : ''}">${blackMove}</td>
+                    <td id="move-cell-${i}" class="${playbackIndex === i ? 'active-move' : ''}">${whiteMove}</td>
+                    <td id="move-cell-${i + 1}" class="${playbackIndex === (i + 1) ? 'active-move' : ''}">${blackMove}</td>
                 `;
                 tbody.appendChild(tr);
             }
-            
             if (playbackIndex === -1) {
                 const container = tbody.parentElement.parentElement;
                 container.scrollTop = container.scrollHeight;
@@ -800,36 +601,22 @@
 
         function playbackMove(action) {
             if (globalMovesList.length === 0) return;
-
-            if (action === 'start') {
-                playbackIndex = 0;
-            } else if (action === 'prev') {
-                if (playbackIndex === -1) {
-                    playbackIndex = globalMovesList.length - 1;
-                } else if (playbackIndex > 0) {
-                    playbackIndex--;
-                }
+            if (action === 'start') playbackIndex = 0;
+            else if (action === 'prev') {
+                if (playbackIndex === -1) playbackIndex = globalMovesList.length - 1;
+                else if (playbackIndex > 0) playbackIndex--;
             } else if (action === 'next') {
                 if (playbackIndex !== -1) {
-                    if (playbackIndex < globalMovesList.length - 1) {
-                        playbackIndex++;
-                    } else {
-                        playbackIndex = -1; 
-                    }
+                    if (playbackIndex < globalMovesList.length - 1) playbackIndex++;
+                    else playbackIndex = -1;
                 }
-            } else if (action === 'live') {
-                playbackIndex = -1;
-            }
+            } else if (action === 'live') playbackIndex = -1;
 
             const tempGame = new Chess();
             const targetLimit = (playbackIndex === -1) ? globalMovesList.length : playbackIndex + 1;
-            
-            for (let x = 0; x < targetLimit; x++) {
-                tempGame.move(globalMovesList[x]);
-            }
+            for (let x = 0; x < targetLimit; x++) tempGame.move(globalMovesList[x]);
 
             board.position(tempGame.fen(), true);
-            
             renderMovesTable();
             updatePlaybackButtons();
             
@@ -854,7 +641,6 @@
             box.innerHTML = "";
             arr.forEach(msg => {
                 if (msg.text === "[SYSTEM_DRAW_OFFER]" || msg.text === "[SYSTEM_TAKEBACK_REQUEST]" || msg.text === "[SYSTEM_DECLINED]") return;
-
                 const div = document.createElement('div');
                 div.className = `chat-bubble ${msg.sender === currentUser ? 'me' : 'opponent'}`;
                 div.innerHTML = `<strong>${msg.sender}:</strong> ${msg.text}`;
@@ -918,22 +704,19 @@
         }
 
         async function respondDraw(accepted) {
+            const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
+            let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
             if (accepted) {
-                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
                 log.push({ sender: currentUser, text: "Match drawn by mutual agreement." });
                 await supabaseClient.from('gcvm_games').update({ status: 'draw', chat_log: log }).eq('id', currentGameId);
             } else {
-                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
                 log.push({ sender: currentUser, text: "[SYSTEM_DECLINED]" });
                 await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
             }
         }
 
         async function requestTakeback() {
-            if (currentStatus !== 'playing') return;
-            if (globalMovesList.length === 0) return;
+            if (currentStatus !== 'playing' || globalMovesList.length === 0) return;
             const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
             let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
             log.push({ sender: currentUser, text: "[SYSTEM_TAKEBACK_REQUEST]" });
@@ -941,25 +724,16 @@
         }
 
         async function respondTakeback(allowed) {
+            const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
+            let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
             if (allowed && globalMovesList.length > 0) {
                 let newMovesList = [...globalMovesList];
-                newMovesList.pop(); 
-
+                newMovesList.pop();
                 const reconstruction = new Chess();
                 newMovesList.forEach(m => reconstruction.move(m));
-
-                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
                 log.push({ sender: currentUser, text: "Takeback allowed. Last move undone." });
-
-                await supabaseClient.from('gcvm_games').update({ 
-                    moves_list: newMovesList,
-                    fen: reconstruction.fen(),
-                    chat_log: log
-                }).eq('id', currentGameId);
+                await supabaseClient.from('gcvm_games').update({ moves_list: newMovesList, fen: reconstruction.fen(), chat_log: log }).eq('id', currentGameId);
             } else {
-                const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-                let log = Array.isArray(data?.chat_log) ? data.chat_log : [];
                 log.push({ sender: currentUser, text: "[SYSTEM_DECLINED]" });
                 await supabaseClient.from('gcvm_games').update({ chat_log: log }).eq('id', currentGameId);
             }
@@ -968,16 +742,10 @@
         async function resignMatch() {
             if (currentStatus !== 'playing') return;
             const btn = document.getElementById('resign-btn');
-            
             if (btn.innerText === "Resign") {
                 btn.innerText = "Confirm Resign?";
                 btn.style.backgroundColor = "#b31412";
-                setTimeout(() => {
-                    if (btn.innerText === "Confirm Resign?") {
-                        btn.innerText = "Resign";
-                        btn.style.backgroundColor = "#d93025";
-                    }
-                }, 4000); 
+                setTimeout(() => { if (btn.innerText === "Confirm Resign?") { btn.innerText = "Resign"; btn.style.backgroundColor = "#d93025"; } }, 4000); 
             } else {
                 const res = myColor === 'w' ? 'black_won' : 'white_won';
                 await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
