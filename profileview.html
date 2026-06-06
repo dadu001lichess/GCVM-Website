@@ -222,7 +222,6 @@
                     editBtn.classList.add('hidden');
                 }
 
-                // Stel de globale rating & RD in als fallback/provisional check
                 const userRD = user.rd !== undefined && user.rd !== null ? user.rd : 350;
                 const showQuestionMark = userRD > 110 ? "?" : "";
                 
@@ -236,15 +235,17 @@
 
         async function fetchAndCalculateStats(targetUsername, qMark, currentRD) {
             try {
+                // FORCEER SORTERING OP ID DESCENDING (Nieuw naar oud)
                 const { data: games, error } = await supabaseClient
                     .from('gcvm_games')
                     .select('*')
-                    .or(`white_player.ilike.${targetUsername},black_player.ilike.${targetUsername}`);
+                    .or(`white_player.ilike.${targetUsername},black_player.ilike.${targetUsername}`)
+                    .order('id', { ascending: false });
 
                 if (error) throw error;
 
                 const finishedGames = games ? games.filter(g => g.status !== 'playing' && g.status !== 'waiting') : [];
-                globalGamesCache = finishedGames; // Sla op voor filtering
+                globalGamesCache = finishedGames; 
                 const totalGames = finishedGames.length;
 
                 let timeControls = {
@@ -268,7 +269,8 @@
                 let whiteCount = 0;
                 let blackCount = 0;
 
-                finishedGames.forEach(game => {
+                // Loop achterstevoren om historische ratings correct chronologisch op te bouwen
+                [...finishedGames].reverse().forEach(game => {
                     const isWhite = game.white_player && game.white_player.toLowerCase() === targetUsername.toLowerCase();
                     if (isWhite) whiteCount++; else blackCount++;
 
@@ -311,7 +313,6 @@
             const types = ['classical', 'rapid', 'blitz', 'bullet'];
             types.forEach(t => {
                 document.getElementById(`count-${t}`).innerText = timeControls[t].count;
-                // Als er nog geen games in die categorie zijn gespeeld, behoudt het z'an onzekerheidsteken (?)
                 const displayMark = timeControls[t].count === 0 ? "?" : qMark;
                 const targetEl = document.getElementById(`rating-${t}`);
                 targetEl.innerText = timeControls[t].rating + displayMark;
@@ -347,7 +348,6 @@
                 box.innerHTML = `<p style="color: #70757a; font-size: 14px;">No matches found matching criteria.</p>`;
                 return;
             }
-            gamesList.sort((a, b) => b.id - a.id); 
 
             gamesList.forEach(match => {
                 const isWhite = match.white_player && match.white_player.toLowerCase() === targetUsername.toLowerCase();
@@ -362,7 +362,6 @@
                     resultLabel = "Defeat 💥"; cardBorderColor = "#d93025";
                 }
 
-                // Haal elo change op uit de database
                 let changeText = "";
                 if (match.is_rated !== false) {
                     const diff = isWhite ? match.white_rating_change : match.black_rating_change;
