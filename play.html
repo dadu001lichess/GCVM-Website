@@ -15,25 +15,36 @@
 
     <style>
         body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; }
+        
+        /* MATCH MET JOUW ORIGINELE SIDEBAR LAY-OUT */
         aside { width: 280px; background-color: #202124; height: 100vh; position: fixed; padding: 40px 24px; box-sizing: border-box; overflow-y: auto; left: 0; top: 0; z-index: 10; }
         .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
-        .auth-container { margin-bottom: 25px; }
+        .auth-container { margin-bottom: 25px; color: #bdc1c6; font-size: 14px; }
         .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
         .auth-input { width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px; background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none; }
         .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
         .auth-btn { flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; text-align: center; }
         .auth-btn:hover { background-color: #1557b0; }
         .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
+        
         .user-info { color: #bdc1c6; font-size: 14px; line-height: 1.4; }
-        .user-info strong { color: #8ab4f8; font-size: 15px; }
-        .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; }
+        .user-info strong { color: #8ab4f8; font-size: 15px; display: block; margin-top: 4px; }
         .logout-link { display: inline-block; color: #f28b82; text-decoration: none; font-size: 12px; margin-top: 8px; cursor: pointer; }
         
         nav { border-top: 1px solid #3c4043; padding-top: 15px; }
         nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; transition: color 0.2s; }
         nav a:hover, nav a.active { color: #8ab4f8; }
-        summary { color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; }
+        
+        /* Dropdowns & Details styling uit jouw navigatie */
+        details { margin: 4px 0; }
+        summary { color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; list-style: none; outline: none; display: flex; justify-content: space-between; align-items: center; }
+        summary::-webkit-details-marker { display: none; }
+        summary::after { content: ' ⌃'; transform: rotate(180deg); display: inline-block; font-size: 10px; transition: transform 0.2s; }
+        details[open] summary::after { transform: rotate(0deg); }
+        .dropdown-content { padding-left: 15px; display: flex; flex-direction: column; }
+        .dropdown-content a { padding: 8px 0; font-size: 14px; }
 
+        /* HOOFDSCHERM */
         main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; padding: 40px; box-sizing: border-box; }
         .lobby-container, .game-container { max-width: 1000px; margin: 0 auto; }
         .btn { padding: 10px 20px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
@@ -88,7 +99,7 @@
                 </div>
             </div>
             <div id="profile-section" class="hidden">
-                <div class="user-info">Logged in as:<br><strong id="displayed-username">...</strong><span class="logout-link" onclick="logoutUser()">Log out</span></div>
+                <div class="user-info">Logged in as: <strong id="displayed-username">...</strong><span class="logout-link" onclick="logoutUser()">Log out</span></div>
             </div>
         </div>
         <nav>
@@ -96,6 +107,35 @@
             <a href="play.html" class="active">Play Game</a>
             <a href="profileview.html">Profile</a>
             <a href="Training.html">Training</a>
+            <a href="Coaches.html">Coaches</a>
+            
+            <details>
+                <summary>Shards currency</summary>
+                <div class="dropdown-content">
+                    <a href="shards.html">What are shards?</a>
+                    <a href="leaderboard.html">Leaderboard</a>
+                </div>
+            </details>
+
+            <a href="currentgames.html">Current games</a>
+            <a href="gameofthemonth.html">Game of the month</a>
+            <a href="specialmentions.html">Special mentions/Jobs</a>
+
+            <details>
+                <summary>Updates/News</summary>
+                <div class="dropdown-content">
+                    <a href="changelog.html">Changelog</a>
+                    <a href="news.html">News</a>
+                </div>
+            </details>
+
+            <details>
+                <summary>Community</summary>
+                <div class="dropdown-content">
+                    <a href="contact.html">Contact</a>
+                    <a href="about.html">About us</a>
+                </div>
+            </details>
         </nav>
     </aside>
 
@@ -110,8 +150,9 @@
             <div id="lobby-controls" class="setup-box hidden">
                 <h3>Choose Time Control</h3>
                 <select id="time-control-select" class="select-style">
-                    <option value="10+0" selected>Rapid (10 min)</option>
+                    <option value="10+0">Rapid (10 min)</option>
                     <option value="5+0">Blitz (5 min)</option>
+                    <option value="3+2" selected>Blitz (3+2)</option>
                 </select>
                 <button id="create-challenge-btn" class="btn" onclick="createNewChallenge()">🔥 Post New Challenge</button>
             </div>
@@ -119,7 +160,7 @@
         </div>
 
         <div id="game-view" class="game-container hidden">
-            <h2>Live Match (<span id="match-time-label">10+0</span>)</h2>
+            <h2>Live Match (<span id="match-time-label">3+2</span>)</h2>
             <p id="players-info">White: ... vs Black: ...</p>
             
             <div class="game-layout">
@@ -152,6 +193,7 @@
             </div>
             
             <div class="game-controls">
+                <button id="draw-btn" class="btn secondary-action" onclick="offerDraw()">Offer Draw</button>
                 <button id="resign-btn" class="btn danger-action" onclick="resignMatch()">Resign</button>
                 <button id="exit-btn" class="btn secondary-action" onclick="leaveGame()">Lobby / Exit</button>
             </div>
@@ -243,7 +285,6 @@
         async function cancelChallenge(gameId) { await supabaseClient.from('gcvm_games').delete().eq('id', gameId); loadLobby(); }
 
         async function joinGame(gameId) {
-            // HIER IS DE FIX: Sla de actuele currentUser op als black_player!
             const { data } = await supabaseClient.from('gcvm_games').update({ black_player: currentUser, status: 'playing', last_move_at: new Date().toISOString() }).eq('id', gameId).select().single();
             myColor = 'b'; 
             initGame(data);
@@ -269,7 +310,7 @@
                 updateClockDisplays();
                 updateTurnIndicator();
                 renderChatLog(updatedGame.chat_log);
-                renderMovesTable(updatedGame.moves_list); // Live updaten vanuit de DB!
+                renderMovesTable(updatedGame.moves_list);
                 
                 if (updatedGame.status === 'playing') startLocalClock();
                 else displayGameEndMessage(updatedGame.status);
@@ -319,11 +360,9 @@
         }
 
         async function onDrop(source, target) {
-            // VALIDEER DE ZET RECHTSTREEKS VIA CHESS.JS
             const move = game.move({ from: source, to: target, promotion: 'q' });
-            if (move === null) return 'snapback'; // Ongeldig? Stuk schiet terug!
+            if (move === null) return 'snapback';
 
-            // Update lokale tijd-increment
             const tc = document.getElementById('match-time-label').innerText;
             const inc = parseInt(tc.split('+')[1]) || 0;
             if (myColor === 'w') whiteTimeLeft += inc; else blackTimeLeft += inc;
@@ -332,23 +371,20 @@
             if (game.in_checkmate()) statusUpdate = (myColor === 'w') ? 'white_won' : 'black_won';
             else if (game.in_draw() || game.in_stalemate()) statusUpdate = 'draw';
 
-            // Haal de huidige zethistorie op en push de nieuwste zet erin
             const currentHistory = game.history();
 
-            // Opslaan in Supabase database
             await supabaseClient.from('gcvm_games').update({ 
                 fen: game.fen(), 
                 white_time: whiteTimeLeft, 
                 black_time: blackTimeLeft, 
                 status: statusUpdate, 
-                moves_list: currentHistory, // Deelt de zet live met de ander!
+                moves_list: currentHistory,
                 last_move_at: new Date().toISOString() 
             }).eq('id', currentGameId);
 
             renderMovesTable(currentHistory);
         }
 
-        /* HARD RENDERING VAN DE MOVE HISTORIE TABEL */
         function renderMovesTable(movesArray) {
             const tbody = document.getElementById('moves-table-body');
             tbody.innerHTML = "";
@@ -423,6 +459,12 @@
 
         function displayGameEndMessage(status) {
             document.getElementById('turn-indicator').innerText = status === 'draw' ? "Match ended in a draw!" : `${status === 'white_won' ? 'White' : 'Black'} won the match!`;
+        }
+
+        async function offerDraw() {
+            if(confirm("Do you want to declare this match a draw?")) {
+                await supabaseClient.from('gcvm_games').update({ status: 'draw' }).eq('id', currentGameId);
+            }
         }
 
         async function resignMatch() {
