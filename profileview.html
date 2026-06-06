@@ -173,13 +173,38 @@
                 <div class="profile-grid">
                     
                     <div class="side-panel">
-                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Live Statistics</h3>
+                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Elo Ratings</h3>
+                        
                         <div class="rating-card">
                             <div>
-                                <div class="rating-name">Live Rating</div>
-                                <div class="rating-sub">Deviation: <span id="user-rd">±350</span></div>
+                                <div class="rating-name">Classical</div>
+                                <div class="rating-sub"><span id="count-classical">0</span> games</div>
                             </div>
-                            <div class="rating-val" id="user-rating">1500</div>
+                            <div class="rating-val" id="rating-classical">1500</div>
+                        </div>
+
+                        <div class="rating-card">
+                            <div>
+                                <div class="rating-name">Rapid</div>
+                                <div class="rating-sub"><span id="count-rapid">0</span> games</div>
+                            </div>
+                            <div class="rating-val" id="rating-rapid">1500</div>
+                        </div>
+
+                        <div class="rating-card">
+                            <div>
+                                <div class="rating-name">Blitz</div>
+                                <div class="rating-sub"><span id="count-blitz">0</span> games</div>
+                            </div>
+                            <div class="rating-val" id="rating-blitz">1500</div>
+                        </div>
+
+                        <div class="rating-card">
+                            <div>
+                                <div class="rating-name">Bullet</div>
+                                <div class="rating-sub"><span id="count-bullet">0</span> games</div>
+                            </div>
+                            <div class="rating-val" id="rating-bullet">1500</div>
                         </div>
 
                         <div class="rating-card" style="display: block;">
@@ -234,9 +259,9 @@
                 const userParam = urlParams.get('user');
                 
                 if (userParam) {
-                    loadProfileView(userParam);
+                    loadProfileView(userParam.trim());
                 } else {
-                    loadProfileView(currentSession);
+                    loadProfileView(currentSession.trim());
                 }
             }
         };
@@ -246,27 +271,25 @@
             document.getElementById('page-main-title').innerText = `${username}'s Profile`;
 
             try {
+                // Fetch user data accurately using full column selection
                 const { data: users, error } = await supabaseClient
                     .from('gcvm_users')
-                    .select('username, bio, flair, rating, rd')
-                    .ilike('username', username);
+                    .select('*');
 
                 if (error) throw error;
 
-                if (!users || users.length === 0) {
+                // Find user with case-insensitive check safely on client side to protect filtering match failures
+                const user = users.find(u => u.username && u.username.toLowerCase() === username.toLowerCase());
+
+                if (!user) {
                     document.getElementById('bio-text-container').innerText = "Member not found.";
+                    document.getElementById('view-username').innerText = username;
                     return;
                 }
 
-                const user = users[0];
-                
-                document.getElementById('bio-text-container').innerText = user.bio && user.bio.trim() !== "" ? user.bio : "This member hasn't written a biography yet.";
                 document.getElementById('view-username').innerText = user.username;
+                document.getElementById('bio-text-container').innerText = user.bio && user.bio.trim() !== "" ? user.bio : "This member hasn't written a biography yet.";
                 
-                // Display Live rating and rating deviation
-                document.getElementById('user-rating').innerText = user.rating || 1500;
-                document.getElementById('user-rd').innerText = `±${Math.round(user.rd || 350)}`;
-
                 const flairBadge = document.getElementById('flair-badge-text');
                 if (user.flair && user.flair.trim() !== "") {
                     flairBadge.innerText = user.flair;
@@ -282,10 +305,13 @@
                     editBtn.classList.add('hidden');
                 }
 
-                // Compute and render match stats + history list dynamically
+                // Compute and render match history breakdown across time controls
                 await fetchAndCalculateStats(user.username);
 
-            } catch(err) { console.error(err); }
+            } catch(err) { 
+                console.error("Profile load issue:", err); 
+                document.getElementById('bio-text-container').innerText = "Error loading user profile details.";
+            }
         }
 
         async function fetchAndCalculateStats(targetUsername) {
@@ -300,11 +326,20 @@
                 const finishedGames = games ? games.filter(g => g.status !== 'playing' && g.status !== 'waiting') : [];
                 const totalGames = finishedGames.length;
 
+                // Track games and ratings by category 
+                let timeControls = {
+                    classical: { count: 0, rating: 1500 },
+                    rapid: { count: 0, rating: 1500 },
+                    blitz: { count: 0, rating: 1500 },
+                    bullet: { count: 0, rating: 1500 }
+                };
+
                 if (totalGames === 0) {
                     document.getElementById('stat-winrate').innerText = "0%";
                     document.getElementById('stat-total').innerText = "0";
                     document.getElementById('stat-white-pct').innerText = "0%";
                     document.getElementById('stat-black-pct').innerText = "0%";
+                    updateRatingUI(timeControls);
                     renderMatchHistoryList([], targetUsername);
                     return;
                 }
@@ -317,11 +352,32 @@
                     const isWhite = game.white_player && game.white_player.toLowerCase() === targetUsername.toLowerCase();
                     if (isWhite) whiteCount++; else blackCount++;
 
+                    // Check for wins
                     if ((game.status === 'white_won' && isWhite) || (game.status === 'black_won' && !isWhite)) {
                         wins++;
                     }
+
+                    // Process dynamic game type categories based on time control strings
+                    let tc = 'rapid'; // fallback default
+                    if (game.time_control) {
+                        const lowTC = game.time_control.toLowerCase();
+                        if (lowTC.includes('classical')) tc = 'classical';
+                        else if (lowTC.includes('blitz')) tc = 'blitz';
+                        else if (lowTC.includes('bullet')) tc = 'bullet';
+                        else if (lowTC.includes('rapid')) tc = 'rapid';
+                    }
+
+                    timeControls[tc].count++;
+                    
+                    // Track latest dynamic rating from game rows if available
+                    if (isWhite && game.white_rating) {
+                        timeControls[tc].rating = game.white_rating;
+                    } else if (!isWhite && game.black_rating) {
+                        timeControls[tc].rating = game.black_rating;
+                    }
                 });
 
+                // Render overall calculation panels
                 const winRate = ((wins / totalGames) * 100).toFixed(1);
                 const whitePct = ((whiteCount / totalGames) * 100).toFixed(1);
                 const blackPct = ((blackCount / totalGames) * 100).toFixed(1);
@@ -331,11 +387,26 @@
                 document.getElementById('stat-white-pct').innerText = `${whitePct}%`;
                 document.getElementById('stat-black-pct').innerText = `${blackPct}%`;
 
+                updateRatingUI(timeControls);
                 renderMatchHistoryList(finishedGames, targetUsername);
 
             } catch (err) {
                 console.error("Failed loading stats:", err.message);
             }
+        }
+
+        function updateRatingUI(timeControls) {
+            document.getElementById('count-classical').innerText = timeControls.classical.count;
+            document.getElementById('rating-classical').innerText = timeControls.classical.rating;
+
+            document.getElementById('count-rapid').innerText = timeControls.rapid.count;
+            document.getElementById('rating-rapid').innerText = timeControls.rapid.rating;
+
+            document.getElementById('count-blitz').innerText = timeControls.blitz.count;
+            document.getElementById('rating-blitz').innerText = timeControls.blitz.rating;
+
+            document.getElementById('count-bullet').innerText = timeControls.bullet.count;
+            document.getElementById('rating-bullet').innerText = timeControls.bullet.rating;
         }
 
         function renderMatchHistoryList(gamesList, targetUsername) {
@@ -347,25 +418,24 @@
                 return;
             }
 
-            // Sort matches so newest games appear on top
             gamesList.sort((a, b) => b.id - a.id); 
 
             gamesList.forEach(match => {
                 const isWhite = match.white_player && match.white_player.toLowerCase() === targetUsername.toLowerCase();
                 const opponent = isWhite ? match.black_player : match.white_player;
                 
-                let resultLabel = "Draw";
+                let resultLabel = "Draw 🤝";
                 let cardBorderColor = "#dadce0";
                 let badgeBackground = "#f1f3f4";
                 let badgeColor = "#3c4043";
 
                 if ((match.status === 'white_won' && isWhite) || (match.status === 'black_won' && !isWhite)) {
-                    resultLabel = "Victory";
+                    resultLabel = "Victory 🏆";
                     cardBorderColor = "#34a853";
                     badgeBackground = "#e6f4ea";
                     badgeColor = "#137333";
                 } else if ((match.status === 'white_won' && !isWhite) || (match.status === 'black_won' && isWhite)) {
-                    resultLabel = "Defeat";
+                    resultLabel = "Defeat 💥";
                     cardBorderColor = "#d93025";
                     badgeBackground = "#fce8e6";
                     badgeColor = "#c5221f";
@@ -405,7 +475,7 @@
         function searchOtherMember() {
             const name = document.getElementById('memberSearchField').value.trim();
             if (name) {
-                window.location.search = `?user=${name}`;
+                window.location.href = `profileview.html?user=${name}`;
             }
         }
 
