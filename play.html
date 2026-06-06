@@ -464,7 +464,7 @@
                 updateClockDisplays();
                 updateTurnIndicator();
                 renderChatLog(updatedGame.chat_log);
-                renderMovesTable(updatedGame.moves_list); // VERBETERD: Render nu stabiel vanuit database updates
+                renderMovesTable(updatedGame.moves_list); 
                 
                 if (updatedGame.status === 'playing') startLocalClock();
                 else if (updatedGame.status !== 'waiting') displayGameEndMessage(updatedGame.status);
@@ -531,7 +531,6 @@
             if (game.in_checkmate()) statusUpdate = (myColor === 'w') ? 'white_won' : 'black_won';
             else if (game.in_draw() || game.in_stalemate()) statusUpdate = 'draw';
 
-            // VERBETERD: We halen de officiële volledige geschiedenis op zodat niks verspringt
             const currentHistory = game.history();
 
             await supabaseClient.from('gcvm_games').update({ 
@@ -546,31 +545,35 @@
             renderMovesTable(currentHistory);
         }
 
-        // DE FIX: Sorteert nu strikt en foutloos per 2 zetten (Wit en Zwart)
+        // DE DEFINITIEVE FIX: We zetten movesArray ALTIJD om naar een pure lijst via Object.values()
         function renderMovesTable(movesArray) {
             const tbody = document.getElementById('moves-table-body');
             tbody.innerHTML = "";
             
-            // Veiligheidscheck om te zorgen dat het altijd een array is
-            const list = Array.isArray(movesArray) ? movesArray : [];
+            if (!movesArray) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#80868b;">No moves made yet</td></tr>`;
+                return;
+            }
+
+            // HIER GEWIJZIGD: Object.values zorgt dat zowel arrays als JSON-objecten veranderen in een schone Javascript lijst ['d4', 'd5', ...]
+            const list = Object.values(movesArray);
 
             if (list.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#80868b;">No moves made yet</td></tr>`;
                 return;
             }
 
-            // Loop door de lijst met stappen van 2 (i += 2)
+            // Loop per 2 zetten door de lijst
             for (let i = 0; i < list.length; i += 2) {
                 const moveNum = Math.floor(i / 2) + 1;
-                const whiteMove = list[i] || "";      // Eerste element is ALTIJD Wit
-                const blackMove = list[i + 1] || "";  // Tweede element is ALTIJD Zwart
+                const whiteMove = list[i] || "";      
+                const blackMove = list[i + 1] || "";  
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td><strong>${moveNum}.</strong></td><td>${whiteMove}</td><td>${blackMove}</td>`;
                 tbody.appendChild(tr);
             }
             
-            // Scroll de tabel automatisch mee naar beneden bij veel zetten
             const container = tbody.parentElement.parentElement;
             container.scrollTop = container.scrollHeight;
         }
