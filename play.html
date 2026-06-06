@@ -305,6 +305,24 @@
         // ==========================================
         // LOBBY & SYSTEM REALTIME LISTENERS
         // ==========================================
+// Fix voor de Cancel knop
+window.cancelChallenge = async function(gameId) {
+    try {
+        const { error } = await supabaseClient
+            .from('gcvm_games')
+            .delete()
+            .eq('id', gameId);
+            
+        if (error) throw error;
+        
+        alert("Challenge successfully cancelled!");
+        location.reload(); // Harde refresh om de lobby meteen leeg te maken
+    } catch(err) { 
+        alert("Supabase Error during cancel: " + err.message); 
+    }
+};
+
+// Zorg dat de lobby de juiste database-kolommen uitleest
 async function loadOpenChallenges() {
     if (isReviewMode || currentStatus === 'playing') return;
     try {
@@ -323,8 +341,13 @@ async function loadOpenChallenges() {
 
         let finalChallenges = challenges || [];
         
-        if (typeFilter === 'rated') finalChallenges = finalChallenges.filter(g => g.is_rated === true);
-        if (typeFilter === 'casual') finalChallenges = finalChallenges.filter(g => g.is_rated === false);
+        // We checken hier zowel op 'rated' als 'is_rated' zodat het altijd matcht!
+        if (typeFilter === 'rated') {
+            finalChallenges = finalChallenges.filter(g => g.rated === true || g.is_rated === true);
+        }
+        if (typeFilter === 'casual') {
+            finalChallenges = finalChallenges.filter(g => g.rated === false || g.is_rated === false);
+        }
 
         if (speedFilter !== 'all') {
             finalChallenges = finalChallenges.filter(g => {
@@ -343,14 +366,14 @@ async function loadOpenChallenges() {
         }
 
         finalChallenges.forEach(c => {
-            const mode = c.is_rated ? "Rated" : "Casual";
+            const isRatedGame = c.rated ?? c.is_rated ?? false;
+            const mode = isRatedGame ? "Rated" : "Casual";
             const item = document.createElement('div');
             item.className = "challenge-item";
 
             const isMine = (c.white_player === currentUser || c.black_player === currentUser);
             const creator = c.white_player || c.black_player || "Anonymous";
 
-            // CRUCIALE FIX: We zetten hier \' om c.id heen zodat het als string wordt verzonden en niet als rekensom!
             if (isMine) {
                 item.style.backgroundColor = "#fff9c4"; 
                 item.style.borderLeft = "4px solid #fbc02d";
@@ -377,14 +400,6 @@ async function loadOpenChallenges() {
         console.error("Lobby load error: ", err); 
     }
 }
-        function listenForLobbyChanges() {
-            supabaseClient.channel('lobby-global-room')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'gcvm_games' }, () => {
-                    loadOpenChallenges();
-                    checkActiveLiveGame();
-                }).subscribe();
-        }
-
 async function acceptChallenge(gameId) {
     try {
         // Ruim eerst eventuele eigen oude uitdagingen op
