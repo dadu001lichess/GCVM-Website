@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,14 +11,14 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
     <style>
-        body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; }
+        body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; color: #3c4043; }
         aside { width: 280px; background-color: #202124; height: 100vh; position: fixed; padding: 40px 24px; box-sizing: border-box; overflow-y: auto; left:0; top:0; z-index:10; }
         .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
         nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
         nav a:hover, nav a.active { color: #8ab4f8; }
         main { margin-left: 280px; width: calc(100% - 280px); padding: 40px; box-sizing: border-box; display: flex; gap: 40px; }
         
-        .game-area { flex: 1; max-width: 600px; display: flex; flex-direction: column; gap: 10px; }
+        .game-area { flex: 1; max-width: 600px; display: flex; flex-direction: column; gap: 15px; }
         .sidebar-right { width: 360px; display: flex; flex-direction: column; gap: 20px; }
         .card { border: 1px solid #dadce0; border-radius: 8px; padding: 20px; background: #f8f9fa; box-sizing: border-box; }
         
@@ -26,20 +26,20 @@
         .btn.secondary { background: #3c4043; }
         .btn.danger { background: #d93025; }
         
-        .challenge-item { padding: 10px; border: 1px solid #dadce0; border-radius: 4px; background: white; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-        .status-banner { padding: 12px; background: #e8f0fe; color: #1a73e8; font-weight: 600; border-radius: 6px; text-align: center; }
+        .challenge-item { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; background: white; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .status-banner { padding: 12px; background: #e8f0fe; color: #1a73e8; font-weight: 600; border-radius: 6px; text-align: center; font-size: 15px; }
         
         .filter-group { display: flex; gap: 6px; margin-bottom: 12px; }
-        .filter-select-sm { padding: 4px 8px; border: 1px solid #dadce0; border-radius: 4px; font-size: 12px; outline: none; background: white; flex: 1; }
+        .filter-select-sm { padding: 6px; border: 1px solid #dadce0; border-radius: 4px; font-size: 12px; outline: none; background: white; flex: 1; }
         
-        /* Originele Match/Klok elementen */
         .clock-box { display: flex; justify-content: space-between; font-size: 22px; font-weight: bold; background: #202124; color: #ff9800; padding: 10px 15px; border-radius: 6px; font-family: monospace; }
-        .log-box { border: 1px solid #dadce0; background: white; height: 120px; overflow-y: auto; padding: 10px; font-size: 13px; border-radius: 4px; margin-top: 5px; }
-        .chat-container { border: 1px solid #dadce0; background: white; height: 150px; overflow-y: auto; padding: 10px; font-size: 13px; border-radius: 4px; display: flex; flex-direction: column; gap: 4px; }
+        .log-box { border: 1px solid #dadce0; background: white; height: 140px; overflow-y: auto; padding: 10px; font-size: 13px; border-radius: 4px; margin-top: 5px; line-height: 1.5; }
+        .chat-container { border: 1px solid #dadce0; background: white; height: 120px; overflow-y: auto; padding: 10px; font-size: 13px; border-radius: 4px; display: flex; flex-direction: column; gap: 4px; }
         
         .review-ctrls { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
         .hidden { display: none !important; }
         .input-inline { width: 65px; padding: 6px; border: 1px solid #dadce0; border-radius: 4px; text-align: center; }
+        .lobby-placeholder { text-align: center; padding: 40px 20px; border: 2px dashed #dadce0; border-radius: 8px; color: #70757a; font-size: 15px; background: #f8f9fa; }
     </style>
 </head>
 <body>
@@ -55,12 +55,20 @@
 
     <main>
         <div class="game-area">
-            <div id="game-status-banner" class="status-banner hidden">Geen actieve game geladen</div>
-            <div id="chess-board" style="width: 100%;"></div>
+            <div id="game-status-banner" class="status-banner hidden">No active match loaded</div>
+            
+            <div id="board-wrapper" class="hidden">
+                <div id="chess-board" style="width: 100%;"></div>
+            </div>
+
+            <div id="lobby-empty-state" class="lobby-placeholder">
+                <h3>Welcome to the Match Room</h3>
+                <p>Create a challenge on the right side or accept an open challenge from the lobby list to display the chessboard and start playing!</p>
+            </div>
             
             <div id="review-controls-box" class="review-ctrls hidden">
-                <button class="btn secondary" style="width:auto; padding: 8px 20px;" onclick="stepReview(-1)">◀ Vorige</button>
-                <button class="btn secondary" style="width:auto; padding: 8px 20px;" onclick="stepReview(1)">Volgende ▶</button>
+                <button class="btn secondary" style="width:auto; padding: 10px 24px;" onclick="stepReview(-1)">◀ Previous Move</button>
+                <button class="btn secondary" style="width:auto; padding: 10px 24px;" onclick="stepReview(1)">Next Move ▶</button>
             </div>
         </div>
 
@@ -125,7 +133,7 @@
                 <h3 style="margin-top:0; margin-bottom:10px;" id="match-ui-title">Match Console</h3>
                 
                 <div style="display:flex; flex-direction:column; gap:12px;">
-                    <div id="players-display-info" style="font-size:14px; font-weight:600; background:white; padding:8px; border:1px solid #dadce0; border-radius:4px;"></div>
+                    <div id="players-display-info" style="font-size:14px; font-weight:600; background:white; padding:10px; border:1px solid #dadce0; border-radius:4px; line-height: 1.4;"></div>
                     
                     <div class="clock-box" id="clocks-display-wrapper">
                         <div>W: <span id="clock-white">--:--</span></div>
@@ -133,7 +141,7 @@
                     </div>
 
                     <div>
-                        <span style="font-size:12px; font-weight:600;">Move History Log:</span>
+                        <span style="font-size:12px; font-weight:600;" id="log-title-label">Move History Log:</span>
                         <div id="move-log-container" class="log-box"></div>
                     </div>
 
@@ -141,7 +149,7 @@
                         <span style="font-size:12px; font-weight:600;">Match Room Chat:</span>
                         <div id="chat-box" class="chat-container"></div>
                         <div style="display:flex; gap:5px; margin-top:5px;">
-                            <input type="text" id="chat-input" style="flex:1; padding:6px; border:1px solid #dadce0; border-radius:4px;" placeholder="Send chat message...">
+                            <input type="text" id="chat-input" style="flex:1; padding:6px; border:1px solid #dadce0; border-radius:4px;" placeholder="Send message...">
                             <button class="btn" style="width:auto; padding:0 12px;" onclick="sendChatMessage()">Send</button>
                         </div>
                     </div>
@@ -166,18 +174,11 @@
         let myColor = 'w'; 
         let currentStatus = 'waiting';
         
-        // Review Systeem Variabelen
         let isReviewMode = false;
         let reviewMovesList = []; 
         let reviewCurrentIndex = -1;
 
         window.onload = function() {
-            board = Chessboard('chess-board', {
-                draggable: true,
-                position: 'start',
-                onDrop: handleMovePiece
-            });
-
             const urlParams = new URLSearchParams(window.location.search);
             const urlGameId = urlParams.get('gameId');
 
@@ -185,15 +186,24 @@
                 initReviewMode(urlGameId);
             } else {
                 if (!currentUser) {
-                    alert("Log in op de profielpagina!");
+                    alert("Please log in through the profile page first!");
                     window.location.href = "profileview.html";
                     return;
                 }
                 loadOpenChallenges();
-                setInterval(loadOpenChallenges, 4000); 
+                setInterval(loadOpenChallenges, 3000); 
                 checkActiveLiveGame();
             }
         };
+
+        function initBoardConfig() {
+            return {
+                draggable: !isReviewMode,
+                position: 'start',
+                pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+                onDrop: handleMovePiece
+            };
+        }
 
         function toggleCustomTimeFields() {
             const preset = document.getElementById('tc-preset').value;
@@ -206,7 +216,7 @@
         }
 
         // ==========================================
-        // WORKALONG: VOLLEDIG GEFIXTE REVIEW MODUS (Probleem 2)
+        // FIXED REVIEW ENGINE (Fully English & Functional)
         // ==========================================
         async function initReviewMode(gameId) {
             isReviewMode = true;
@@ -214,50 +224,54 @@
             
             document.getElementById('create-challenge-box').classList.add('hidden');
             document.getElementById('challenges-list-box').classList.add('hidden');
-            document.getElementById('review-controls-box').classList.remove('hidden');
+            document.getElementById('lobby-empty-state').classList.add('hidden');
             
-            // Toon de complete zijbalk lay-out maar pas deze aan voor reviews
+            document.getElementById('board-wrapper').classList.remove('hidden');
+            document.getElementById('review-controls-box').classList.remove('hidden');
             document.getElementById('game-actions-box').classList.remove('hidden');
+            
             document.getElementById('resign-btn').classList.add('hidden');
             document.getElementById('live-chat-wrapper').classList.add('hidden');
             document.getElementById('clocks-display-wrapper').classList.add('hidden');
+            
             document.getElementById('match-ui-title').innerText = "Review Dashboard";
+            document.getElementById('log-title-label').innerText = "Review Timeline:";
 
             const banner = document.getElementById('game-status-banner');
             banner.classList.remove('hidden');
-            banner.innerText = `Reviewing Game #${gameId} 🔎`;
+            banner.innerText = `Fetching game telemetry for #${gameId}...`;
+
+            board = Chessboard('chess-board', initBoardConfig());
 
             try {
                 const { data: game, error } = await supabaseClient.from('gcvm_games').select('*').eq('id', gameId).single();
                 if (error || !game) {
-                    banner.innerText = "Game data not found.";
+                    banner.innerText = "Error: Match log file could not be extracted.";
                     return;
                 }
 
                 document.getElementById('players-display-info').innerHTML = `
-                    ⚪ White: <strong>${game.white_player}</strong> (${game.white_rating || 1500})<br>
-                    ⚫ Black: <strong>${game.black_player}</strong> (${game.black_rating || 1500})
+                    ⚪ White: <a href="profileview.html?user=${game.white_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.white_player}</a> (${game.white_rating || 1500})<br>
+                    ⚫ Black: <a href="profileview.html?user=${game.black_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.black_player}</a> (${game.black_rating || 1500})
                 `;
-                banner.innerHTML = `Review Mode: <strong>${game.status.toUpperCase().replace('_', ' ')}</strong>`;
+                banner.innerHTML = `Reviewing Match Results: <strong>${game.status.toUpperCase().replace('_', ' ')}</strong>`;
 
-                // Bouw zet historie op uit de database logs
-                let engine = new Chess();
-                if (game.move_history && Array.isArray(game.move_history)) {
-                    reviewMovesList = game.move_history; 
-                } else if (game.pgn_log) {
-                    reviewMovesList = typeof game.pgn_log === 'string' ? game.pgn_log.split(' ') : game.pgn_log;
+                // Robuuste parsing van zet-historie
+                if (game.move_history && Array.isArray(game.move_history) && game.move_history.length > 0) {
+                    reviewMovesList = game.move_history;
+                } else if (game.pgn_log && game.pgn_log.trim() !== "") {
+                    reviewMovesList = game.pgn_log.trim().split(/\s+/);
                 } else {
-                    // Fallback: toon tenminste de eind-FEN als er geen individueel logboek is
-                    board.position(game.fen || 'start');
-                    document.getElementById('move-log-container').innerText = "No individual move logs found for this session.";
-                    return;
+                    reviewMovesList = [];
                 }
 
-                // Initialiseer herhalings-lijst
                 reviewCurrentIndex = reviewMovesList.length - 1;
                 updateReviewBoardState();
 
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error(err); 
+                banner.innerText = "Error loading review timeline.";
+            }
         }
 
         function updateReviewBoardState() {
@@ -266,13 +280,17 @@
             
             for (let i = 0; i <= reviewCurrentIndex; i++) {
                 if (!reviewMovesList[i]) continue;
-                testEngine.move(reviewMovesList[i]);
-                if (i % 2 === 0) logHTML += `${Math.floor(i/2)+1}. <strong>${reviewMovesList[i]}</strong> `;
-                else logHTML += `${reviewMovesList[i]}<br>`;
+                try {
+                    testEngine.move(reviewMovesList[i]);
+                    if (i % 2 === 0) logHTML += `${Math.floor(i/2)+1}. <strong>${reviewMovesList[i]}</strong> `;
+                    else logHTML += `${reviewMovesList[i]}<br>`;
+                } catch(e) {
+                    console.error("Move error parsing index: ", i, reviewMovesList[i]);
+                }
             }
 
             board.position(testEngine.fen());
-            document.getElementById('move-log-container').innerHTML = logHTML || "Starting Position";
+            document.getElementById('move-log-container').innerHTML = logHTML || "<i>Starting Position (No moves recorded yet)</i>";
         }
 
         function stepReview(direction) {
@@ -284,7 +302,7 @@
         }
 
         // ==========================================
-        // FEATURE: SHOW ALL CHALLENGES INCL OWN (Probleem 3)
+        // FIX: LOBBY & WORKING BUTTONS (Accept / Cancel)
         // ==========================================
         async function loadOpenChallenges() {
             if (isReviewMode) return;
@@ -315,7 +333,7 @@
                 }
 
                 if (finalChallenges.length === 0) {
-                    container.innerHTML = `<p style="font-size:13px; color:#70757a; margin:0;">No matching challenges found.</p>`;
+                    container.innerHTML = `<p style="font-size:13px; color:#70757a; margin:0;">No active challenges listed.</p>`;
                     return;
                 }
 
@@ -325,26 +343,25 @@
                     item.className = "challenge-item";
 
                     const isMine = (c.white_player === currentUser || c.black_player === currentUser);
-                    const creator = c.white_player || c.black_player;
+                    const creator = c.white_player || c.black_player || "Anonymous";
 
                     if (isMine) {
-                        // Eigen uitdagingen tonen met annuleerknop
                         item.style.backgroundColor = "#fff9c4"; 
+                        item.style.borderLeft = "4px solid #fbc02d";
                         item.innerHTML = `
                             <div>
-                                <strong style="color:#b68500;">Your Challenge</strong>
+                                <strong style="color:#b68500;">Your Broadcast</strong>
                                 <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control} | [${mode}]</div>
                             </div>
-                            <button class="btn danger" style="width:auto; padding:5px 10px; font-size:11px;" onclick="cancelChallenge(${c.id})">Cancel ❌</button>
+                            <button class="btn danger" style="width:auto; padding:6px 12px; font-size:12px;" onclick="cancelChallenge(${c.id})">Cancel ❌</button>
                         `;
                     } else {
-                        // Uitdagingen van anderen
                         item.innerHTML = `
                             <div>
                                 <strong style="color:#1a73e8;">${creator}</strong>
                                 <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control} | [${mode}]</div>
                             </div>
-                            <button class="btn" style="width:auto; padding:5px 10px; font-size:11px;" onclick="acceptChallenge(${c.id})">Play ⚔</button>
+                            <button class="btn" style="width:auto; padding:6px 12px; font-size:12px;" onclick="acceptChallenge(${c.id})">Accept Match ⚔</button>
                         `;
                     }
                     container.appendChild(item);
@@ -353,15 +370,26 @@
             } catch (err) { console.error(err); }
         }
 
-        async function cancelChallenge(id) {
-            if (!confirm("Do you want to withdraw this challenge?")) return;
-            await supabaseClient.from('gcvm_games').delete().eq('id', id);
-            loadOpenChallenges();
+        async function cancelChallenge(gameId) {
+            try {
+                const { error } = await supabaseClient.from('gcvm_games').delete().eq('id', gameId);
+                if (error) throw error;
+                loadOpenChallenges();
+            } catch(err) { alert("Action failed: " + err.message); }
         }
 
-        // ==========================================
-        // SYSTEM CONTROLS & GAMEPLAY LOGIC
-        // ==========================================
+        async function acceptChallenge(gameId) {
+            try {
+                const { error } = await supabaseClient.from('gcvm_games').update({
+                    black_player: currentUser,
+                    status: 'playing'
+                }).eq('id', gameId);
+                
+                if (error) throw error;
+                window.location.reload();
+            } catch(err) { alert("Action failed: " + err.message); }
+        }
+
         async function createNewChallenge() {
             const preset = document.getElementById('tc-preset').value;
             let tc = preset;
@@ -385,21 +413,13 @@
 
             if (error) alert(error.message);
             else {
-                alert("Challenge created and broadcasted successfully!");
                 loadOpenChallenges();
             }
         }
 
-        async function acceptChallenge(id) {
-            const { error } = await supabaseClient.from('gcvm_games').update({
-                black_player: currentUser,
-                status: 'playing'
-            }).eq('id', id);
-
-            if (error) alert(error.message);
-            else window.location.reload();
-        }
-
+        // ==========================================
+        // ACTIVE PLAYING PIPELINE
+        // ==========================================
         async function checkActiveLiveGame() {
             const { data: games } = await supabaseClient.from('gcvm_games')
                 .select('*')
@@ -414,15 +434,21 @@
 
                 document.getElementById('create-challenge-box').classList.add('hidden');
                 document.getElementById('challenges-list-box').classList.add('hidden');
+                document.getElementById('lobby-empty-state').classList.add('hidden');
+                
+                document.getElementById('board-wrapper').classList.remove('hidden');
                 document.getElementById('game-actions-box').classList.remove('hidden');
 
                 document.getElementById('players-display-info').innerHTML = `
-                    ⚪ White: <strong>${game.white_player}</strong><br>
-                    ⚫ Black: <strong>${game.black_player}</strong>
+                    ⚪ White: <a href="profileview.html?user=${game.white_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.white_player}</a><br>
+                    ⚫ Black: <a href="profileview.html?user=${game.black_player}" style="color:#1a73e8; font-weight:bold; text-decoration:none;">${game.black_player}</a>
                 `;
-                document.getElementById('game-status-banner').classList.remove('hidden');
-                document.getElementById('game-status-banner').innerText = `Live match ongoing!`;
+                
+                const banner = document.getElementById('game-status-banner');
+                banner.classList.remove('hidden');
+                banner.innerText = `Live Match Ongoing`;
 
+                board = Chessboard('chess-board', initBoardConfig());
                 gameLogic.load(game.fen || 'start');
                 board.position(gameLogic.fen());
                 board.orientation(myColor === 'w' ? 'white' : 'black');
@@ -432,7 +458,7 @@
                     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games', filter: `id=eq.${currentGameId}` }, payload => {
                         const updated = payload.new;
                         if (updated.status !== 'playing') {
-                            alert(`Game concluded. Status: ${updated.status}`);
+                            alert(`Game concluded. Verdict: ${updated.status}`);
                             window.location.href = "profileview.html";
                         } else {
                             gameLogic.load(updated.fen);
@@ -450,7 +476,7 @@
                 if (i % 2 === 0) logHTML += `${Math.floor(i/2)+1}. <strong>${history[i]}</strong> `;
                 else logHTML += `${history[i]}<br>`;
             }
-            document.getElementById('move-log-container').innerHTML = logHTML || "No moves made yet.";
+            document.getElementById('move-log-container').innerHTML = logHTML || "<i>No moves played yet. Break the ice!</i>";
         }
 
         async function handleMovePiece(source, target) {
@@ -487,7 +513,6 @@
         }
 
         function sendChatMessage() {
-            // Chat logica placeholder 
             const inp = document.getElementById('chat-input');
             if (!inp.value.trim()) return;
             const box = document.getElementById('chat-box');
