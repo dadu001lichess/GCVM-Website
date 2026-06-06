@@ -41,7 +41,7 @@
         .flair-display-box { font-size: 14px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 6px 14px; border-radius: 20px; width: fit-content; margin-top: 5px; }
         .bio-display-text { font-size: 15px; line-height: 1.6; white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #dadce0; min-height: 100px; }
         .edit-link-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 15px; text-decoration: none; display: inline-block; }
-        .filter-select { padding: 6px 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; background: white; outline: none; margin-bottom: 10px; }
+        .filter-select { padding: 6px 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; background: white; outline: none; }
         .review-btn { background: #1a73e8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block; }
         .review-btn:hover { background: #1557b0; }
         .alert-warn { background: #fce8e6; border: 1px solid #f28b82; color: #a51d24; padding: 15px; border-radius: 6px; text-align: center; font-weight: 600; }
@@ -145,15 +145,21 @@
                         </div>
 
                         <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px;">
                                 <h3 style="margin:0; font-size:16px;">Match History</h3>
-                                <select id="historyFilter" class="filter-select" onchange="filterHistory()">
-                                    <option value="all">All Games</option>
-                                    <option value="rated">Rated Only</option>
-                                    <option value="casual">Casual Only</option>
-                                    <option value="wins">Victories</option>
-                                    <option value="losses">Defeats</option>
-                                </select>
+                                <div style="display:flex; gap:8px;">
+                                    <select id="chronologyFilter" class="filter-select" onchange="filterHistory()">
+                                        <option value="newest">Newest to Oldest</option>
+                                        <option value="oldest">Oldest to Newest</option>
+                                    </select>
+                                    <select id="historyFilter" class="filter-select" onchange="filterHistory()">
+                                        <option value="all">All Statuses</option>
+                                        <option value="rated">Rated Only</option>
+                                        <option value="casual">Casual Only</option>
+                                        <option value="wins">Victories</option>
+                                        <option value="losses">Defeats</option>
+                                    </select>
+                                </div>
                             </div>
                             <div id="history-list-box" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
                                 <p style="color: #70757a; font-size: 14px;">No matches recorded yet.</p>
@@ -235,12 +241,10 @@
 
         async function fetchAndCalculateStats(targetUsername, qMark, currentRD) {
             try {
-                // FORCEER SORTERING OP ID DESCENDING (Nieuw naar oud)
                 const { data: games, error } = await supabaseClient
                     .from('gcvm_games')
                     .select('*')
-                    .or(`white_player.ilike.${targetUsername},black_player.ilike.${targetUsername}`)
-                    .order('id', { ascending: false });
+                    .or(`white_player.ilike.${targetUsername},black_player.ilike.${targetUsername}`);
 
                 if (error) throw error;
 
@@ -269,8 +273,8 @@
                 let whiteCount = 0;
                 let blackCount = 0;
 
-                // Loop achterstevoren om historische ratings correct chronologisch op te bouwen
-                [...finishedGames].reverse().forEach(game => {
+                // Bereken de ratings chronologisch (van oud naar nieuw)
+                [...finishedGames].sort((a,b) => a.id - b.id).forEach(game => {
                     const isWhite = game.white_player && game.white_player.toLowerCase() === targetUsername.toLowerCase();
                     if (isWhite) whiteCount++; else blackCount++;
 
@@ -304,7 +308,7 @@
                 document.getElementById('stat-black-pct').innerText = `${((blackCount / totalGames) * 100).toFixed(1)}%`;
 
                 updateRatingUI(timeControls, qMark, currentRD);
-                renderMatchHistoryList(finishedGames, targetUsername);
+                filterHistory(); // Rendert de lijst gesorteerd op basis van de geselecteerde criteria
 
             } catch (err) { console.error(err); }
         }
@@ -321,21 +325,30 @@
         }
 
         function filterHistory() {
-            const val = document.getElementById('historyFilter').value;
+            const statusVal = document.getElementById('historyFilter').value;
+            const chronoVal = document.getElementById('chronologyFilter').value;
+            
             let filtered = [...globalGamesCache];
 
-            if (val === 'rated') filtered = filtered.filter(g => g.is_rated !== false);
-            else if (val === 'casual') filtered = filtered.filter(g => g.is_rated === false);
-            else if (val === 'wins') {
+            if (statusVal === 'rated') filtered = filtered.filter(g => g.is_rated !== false);
+            else if (statusVal === 'casual') filtered = filtered.filter(g => g.is_rated === false);
+            else if (statusVal === 'wins') {
                 filtered = filtered.filter(g => {
                     const isWhite = g.white_player && g.white_player.toLowerCase() === globalTargetUser.toLowerCase();
                     return (g.status === 'white_won' && isWhite) || (g.status === 'black_won' && !isWhite);
                 });
-            } else if (val === 'losses') {
+            } else if (statusVal === 'losses') {
                 filtered = filtered.filter(g => {
                     const isWhite = g.white_player && g.white_player.toLowerCase() === globalTargetUser.toLowerCase();
                     return (g.status === 'white_won' && !isWhite) || (g.status === 'black_won' && isWhite);
                 });
+            }
+
+            // TIJD EN ID SORTERING (Probleem 4)
+            if (chronoVal === 'newest') {
+                filtered.sort((a, b) => b.id - a.id);
+            } else {
+                filtered.sort((a, b) => a.id - b.id);
             }
 
             renderMatchHistoryList(filtered, globalTargetUser);
@@ -374,11 +387,16 @@
 
                 const matchCard = document.createElement('div');
                 matchCard.style = `border:1px solid ${cardBorderColor}; border-left:5px solid ${cardBorderColor}; padding:14px 18px; border-radius:6px; background:white; display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;`;
+                
+                // USER PROFILE LINKS TOEGEVOEGD (Probleem 5)
                 matchCard.innerHTML = `
                     <div>
                         <span style="font-size:11px; font-weight:600; text-transform:uppercase; padding:3px 8px; border-radius:4px; background:#f1f3f4; color:#3c4043;">${resultLabel}${changeText}</span>
                         <span style="font-size:11px; font-weight:600; margin-left:5px; padding:3px 8px; border-radius:4px; background:${match.is_rated !== false ? '#e8f0fe':'#f5f5f5'}; color:${match.is_rated !== false ? '#1a73e8':'#616161'};">[${modeText}]</span>
-                        <div style="margin-top:8px; font-size:15px; color:#202124;">Playing as <strong>${isWhite ? 'White':'Black'}</strong> against <span style="color:#1a73e8; font-weight:600;">${opponent || 'Unknown'}</span></div>
+                        <div style="margin-top:8px; font-size:15px; color:#202124;">
+                            Playing as <strong>${isWhite ? 'White':'Black'}</strong> against 
+                            <a href="profileview.html?user=${opponent}" style="color:#1a73e8; font-weight:600; text-decoration:none;">${opponent || 'Unknown'}</a>
+                        </div>
                     </div>
                     <div style="text-align:right; font-size:13px; color:#70757a; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
                         <div>Game ID: #${match.id} | TC: ${match.time_control || 'Custom'}</div>
