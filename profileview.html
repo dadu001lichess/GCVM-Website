@@ -9,41 +9,14 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            margin: 0;
-            display: flex;
-            background-color: white;
-            color: #3c4043;
-        }
-
-        aside {
-            width: 280px;
-            background-color: #202124; 
-            height: 100vh;
-            position: fixed;
-            padding: 40px 24px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            left: 0;
-            top: 0;
-            z-index: 10;
-        }
-
+        body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; color: #3c4043; }
+        aside { width: 280px; background-color: #202124; height: 100vh; position: fixed; padding: 40px 24px; box-sizing: border-box; overflow-y: auto; left: 0; top: 0; z-index: 10; }
         .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
         .auth-container { margin-bottom: 25px; }
         .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
-        
-        .auth-input {
-            width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px;
-            background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none;
-        }
-
+        .auth-input { width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px; background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none; }
         .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
-        .auth-btn {
-            flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none;
-            border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;
-        }
+        .auth-btn { flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; }
         .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
         .user-info { color: #bdc1c6; font-size: 14px; }
         .user-info strong { color: #8ab4f8; font-size: 15px; }
@@ -61,25 +34,14 @@
         .banner h1 { font-size: 32px; font-weight: 400; margin: 0; color: #202124; }
         .content { max-width: 1000px; margin: 0 auto; padding: 40px; }
 
-        .top-right-search {
-            position: absolute;
-            top: 40px;
-            right: 40px;
-            display: flex;
-            gap: 8px;
-            z-index: 5;
-        }
+        .top-right-search { position: absolute; top: 40px; right: 40px; display: flex; gap: 8px; z-index: 5; }
         .search-input { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 200px; }
         .search-btn { background: #3c4043; color: white; border: none; padding: 0 14px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .search-btn:hover { background: #202124; }
 
         .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; }
         .side-panel { border-right: 1px solid #dadce0; padding-right: 20px; }
         
-        .rating-card {
-            background: #f8f9fa; border: 1px solid #dadce0; padding: 12px 16px; border-radius: 6px;
-            margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-        }
+        .rating-card { background: #f8f9fa; border: 1px solid #dadce0; padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .rating-name { font-weight: 600; font-size: 14px; }
         .rating-val { color: #1a73e8; font-weight: 600; font-size: 16px; }
         .rating-sub { font-size: 11px; color: #70757a; margin-top: 2px; }
@@ -88,11 +50,9 @@
         .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 15px; }
         .profile-title { font-size: 28px; margin: 0 0 8px 0; font-weight: 400; }
 
-        .flair-display-box { font-size: 14px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 6px 14px; border-radius: 20px; width: fit-content; margin-top: 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .flair-display-box { font-size: 14px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 6px 14px; border-radius: 20px; width: fit-content; margin-top: 5px; }
         .bio-display-text { font-size: 15px; line-height: 1.6; white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #dadce0; min-height: 100px; }
-        
         .edit-link-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 15px; text-decoration: none; display: inline-block; }
-        .edit-link-btn:hover { background: #1557b0; }
 
         .alert-warn { background: #fce8e6; border: 1px solid #f28b82; color: #a51d24; padding: 15px; border-radius: 6px; text-align: center; font-weight: 600; }
         .hidden { display: none !important; }
@@ -122,35 +82,7 @@
         <nav>
             <a href="index.html">Homepage</a>
             <a href="profileview.html" class="active">Profile</a>
-            <a href="Training.html">Training</a>
-            <a href="Coaches.html">Coaches</a>
-            <details>
-              <summary>Shards currency ⌵</summary>
-              <div class="sub-menu">
-                <a href="Shardsintro.html">How to get Shards?</a>
-                <a href="Daily puzzle.html">Daily puzzle</a>
-                <a href="Shards shop.html">Shards shop</a>
-              </div>
-            </details>
             <a href="play.html">Play Chess</a>
-            <a href="Current games.html">Current games</a>
-            <a href="GoTM.html">Game of the month</a>
-            <a href="Jobs.html">Special mentions/Jobs</a>
-            <details>
-              <summary>Updates/News ⌵</summary>
-              <div class="sub-menu">
-                <a href="Updates.html">Updates</a>
-                <a href="News.html">Newspaper</a>
-              </div>    
-            </details>
-            <details>
-              <summary>Community ⌵</summary>
-              <div class="sub-menu">
-                <a href="Leaders.html">Mods/Leaders</a>
-                <a href="Contact.html">Contact</a>
-                <a href="MoTM.html">MoTM</a>
-              </div>    
-            </details>
         </nav>
     </aside>
 
@@ -173,11 +105,11 @@
                 <div class="profile-grid">
                     
                     <div class="side-panel">
-                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Elo Ratings</h3>
+                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Elo Ratings (Rated Only)</h3>
                         
                         <div class="rating-card">
                             <div>
-                                <div class="rating-name">Classical</div>
+                                <div class="rating-name">Classical (≥29m)</div>
                                 <div class="rating-sub"><span id="count-classical">0</span> games</div>
                             </div>
                             <div class="rating-val" id="rating-classical">1500</div>
@@ -185,7 +117,7 @@
 
                         <div class="rating-card">
                             <div>
-                                <div class="rating-name">Rapid</div>
+                                <div class="rating-name">Rapid (&lt;29m)</div>
                                 <div class="rating-sub"><span id="count-rapid">0</span> games</div>
                             </div>
                             <div class="rating-val" id="rating-rapid">1500</div>
@@ -193,7 +125,7 @@
 
                         <div class="rating-card">
                             <div>
-                                <div class="rating-name">Blitz</div>
+                                <div class="rating-name">Blitz (&lt;10m)</div>
                                 <div class="rating-sub"><span id="count-blitz">0</span> games</div>
                             </div>
                             <div class="rating-val" id="rating-blitz">1500</div>
@@ -201,14 +133,14 @@
 
                         <div class="rating-card">
                             <div>
-                                <div class="rating-name">Bullet</div>
+                                <div class="rating-name">Bullet (&lt;3m)</div>
                                 <div class="rating-sub"><span id="count-bullet">0</span> games</div>
                             </div>
                             <div class="rating-val" id="rating-bullet">1500</div>
                         </div>
 
                         <div class="rating-card" style="display: block;">
-                            <div class="rating-name" style="margin-bottom: 8px;">Performance</div>
+                            <div class="rating-name" style="margin-bottom: 8px;">All-Time Record</div>
                             <div class="rating-sub">Win Rate: <strong id="stat-winrate" style="color: #34a853;">0%</strong></div>
                             <div class="rating-sub">Total Games: <span id="stat-total">0</span></div>
                             <div class="rating-sub">As White: <span id="stat-white-pct">0%</span></div>
@@ -225,12 +157,11 @@
                         <div>
                             <h3 style="margin:0 0 10px 0; font-size:16px;">Biography:</h3>
                             <div id="bio-text-container" class="bio-display-text">Loading biography...</div>
-                            
                             <a href="Profile.html" id="edit-profile-btn" class="edit-link-btn hidden">Edit Profile</a>
                         </div>
 
                         <div>
-                            <h3 style="margin:0 0 10px 0; font-size:16px;">Recent Match History</h3>
+                            <h3 style="margin:0 0 10px 0; font-size:16px;">Match History</h3>
                             <div id="history-list-box" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
                                 <p style="color: #70757a; font-size: 14px;">No matches recorded yet.</p>
                             </div>
@@ -257,12 +188,7 @@
                 
                 const urlParams = new URLSearchParams(window.location.search);
                 const userParam = urlParams.get('user');
-                
-                if (userParam) {
-                    loadProfileView(userParam.trim());
-                } else {
-                    loadProfileView(currentSession.trim());
-                }
+                loadProfileView(userParam ? userParam.trim() : currentSession.trim());
             }
         };
 
@@ -271,16 +197,10 @@
             document.getElementById('page-main-title').innerText = `${username}'s Profile`;
 
             try {
-                // Fetch user data accurately using full column selection
-                const { data: users, error } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('*');
-
+                const { data: users, error } = await supabaseClient.from('gcvm_users').select('*');
                 if (error) throw error;
 
-                // Find user with case-insensitive check safely on client side to protect filtering match failures
                 const user = users.find(u => u.username && u.username.toLowerCase() === username.toLowerCase());
-
                 if (!user) {
                     document.getElementById('bio-text-container').innerText = "Member not found.";
                     document.getElementById('view-username').innerText = username;
@@ -305,11 +225,10 @@
                     editBtn.classList.add('hidden');
                 }
 
-                // Compute and render match history breakdown across time controls
                 await fetchAndCalculateStats(user.username);
 
             } catch(err) { 
-                console.error("Profile load issue:", err); 
+                console.error(err); 
                 document.getElementById('bio-text-container').innerText = "Error loading user profile details.";
             }
         }
@@ -326,7 +245,6 @@
                 const finishedGames = games ? games.filter(g => g.status !== 'playing' && g.status !== 'waiting') : [];
                 const totalGames = finishedGames.length;
 
-                // Track games and ratings by category 
                 let timeControls = {
                     classical: { count: 0, rating: 1500 },
                     rapid: { count: 0, rating: 1500 },
@@ -352,59 +270,50 @@
                     const isWhite = game.white_player && game.white_player.toLowerCase() === targetUsername.toLowerCase();
                     if (isWhite) whiteCount++; else blackCount++;
 
-                    // Check for wins
                     if ((game.status === 'white_won' && isWhite) || (game.status === 'black_won' && !isWhite)) {
                         wins++;
                     }
 
-                    // Process dynamic game type categories based on time control strings
-                    let tc = 'rapid'; // fallback default
+                    // Strict Time Control calculation to categorize matches accurately:
+                    let tc = 'rapid'; 
                     if (game.time_control) {
-                        const lowTC = game.time_control.toLowerCase();
-                        if (lowTC.includes('classical')) tc = 'classical';
-                        else if (lowTC.includes('blitz')) tc = 'blitz';
-                        else if (lowTC.includes('bullet')) tc = 'bullet';
-                        else if (lowTC.includes('rapid')) tc = 'rapid';
+                        const parts = game.time_control.split('+');
+                        const mins = parseInt(parts[0]) || 10;
+                        const inc = parseInt(parts[1]) || 0;
+                        const totalEstimatedTime = mins + (inc * 40 / 60); // standard chess speed formula
+
+                        if (totalEstimatedTime < 3) tc = 'bullet';
+                        else if (totalEstimatedTime < 10) tc = 'blitz';
+                        else if (totalEstimatedTime < 29) tc = 'rapid';
+                        else tc = 'classical';
                     }
 
-                    timeControls[tc].count++;
-                    
-                    // Track latest dynamic rating from game rows if available
-                    if (isWhite && game.white_rating) {
-                        timeControls[tc].rating = game.white_rating;
-                    } else if (!isWhite && game.black_rating) {
-                        timeControls[tc].rating = game.black_rating;
+                    // IMPORTANT: Only let rated games update your actual category ELO score card
+                    if (game.is_rated !== false) {
+                        timeControls[tc].count++;
+                        if (isWhite && game.white_rating) timeControls[tc].rating = game.white_rating;
+                        else if (!isWhite && game.black_rating) timeControls[tc].rating = game.black_rating;
                     }
                 });
 
-                // Render overall calculation panels
-                const winRate = ((wins / totalGames) * 100).toFixed(1);
-                const whitePct = ((whiteCount / totalGames) * 100).toFixed(1);
-                const blackPct = ((blackCount / totalGames) * 100).toFixed(1);
-
-                document.getElementById('stat-winrate').innerText = `${winRate}%`;
+                document.getElementById('stat-winrate').innerText = `${((wins / totalGames) * 100).toFixed(1)}%`;
                 document.getElementById('stat-total').innerText = totalGames;
-                document.getElementById('stat-white-pct').innerText = `${whitePct}%`;
-                document.getElementById('stat-black-pct').innerText = `${blackPct}%`;
+                document.getElementById('stat-white-pct').innerText = `${((whiteCount / totalGames) * 100).toFixed(1)}%`;
+                document.getElementById('stat-black-pct').innerText = `${((blackCount / totalGames) * 100).toFixed(1)}%`;
 
                 updateRatingUI(timeControls);
                 renderMatchHistoryList(finishedGames, targetUsername);
 
-            } catch (err) {
-                console.error("Failed loading stats:", err.message);
-            }
+            } catch (err) { console.error(err); }
         }
 
         function updateRatingUI(timeControls) {
             document.getElementById('count-classical').innerText = timeControls.classical.count;
             document.getElementById('rating-classical').innerText = timeControls.classical.rating;
-
             document.getElementById('count-rapid').innerText = timeControls.rapid.count;
             document.getElementById('rating-rapid').innerText = timeControls.rapid.rating;
-
             document.getElementById('count-blitz').innerText = timeControls.blitz.count;
             document.getElementById('rating-blitz').innerText = timeControls.blitz.rating;
-
             document.getElementById('count-bullet').innerText = timeControls.bullet.count;
             document.getElementById('rating-bullet').innerText = timeControls.bullet.rating;
         }
@@ -412,107 +321,62 @@
         function renderMatchHistoryList(gamesList, targetUsername) {
             const box = document.getElementById('history-list-box');
             box.innerHTML = "";
-
             if (gamesList.length === 0) {
                 box.innerHTML = `<p style="color: #70757a; font-size: 14px;">No matches recorded yet.</p>`;
                 return;
             }
-
             gamesList.sort((a, b) => b.id - a.id); 
 
             gamesList.forEach(match => {
                 const isWhite = match.white_player && match.white_player.toLowerCase() === targetUsername.toLowerCase();
                 const opponent = isWhite ? match.black_player : match.white_player;
+                const modeText = match.is_rated !== false ? "Rated" : "Casual";
                 
-                let resultLabel = "Draw 🤝";
+                let resultLabel = "Draw";
                 let cardBorderColor = "#dadce0";
-                let badgeBackground = "#f1f3f4";
-                let badgeColor = "#3c4043";
-
                 if ((match.status === 'white_won' && isWhite) || (match.status === 'black_won' && !isWhite)) {
-                    resultLabel = "Victory 🏆";
-                    cardBorderColor = "#34a853";
-                    badgeBackground = "#e6f4ea";
-                    badgeColor = "#137333";
+                    resultLabel = "Victory"; cardBorderColor = "#34a853";
                 } else if ((match.status === 'white_won' && !isWhite) || (match.status === 'black_won' && isWhite)) {
-                    resultLabel = "Defeat 💥";
-                    cardBorderColor = "#d93025";
-                    badgeBackground = "#fce8e6";
-                    badgeColor = "#c5221f";
+                    resultLabel = "Defeat"; cardBorderColor = "#d93025";
                 }
 
                 const matchCard = document.createElement('div');
-                matchCard.style = `
-                    border: 1px solid ${cardBorderColor}; 
-                    border-left: 5px solid ${cardBorderColor};
-                    padding: 14px 18px; 
-                    border-radius: 6px; 
-                    background: white; 
-                    display: flex; 
-                    justify-content: space-between; 
-                    align-items: center;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-                `;
-
+                matchCard.style = `border:1px solid ${cardBorderColor}; border-left:5px solid ${cardBorderColor}; padding:14px 18px; border-radius:6px; background:white; display:flex; justify-content:space-between; align-items:center;`;
                 matchCard.innerHTML = `
                     <div>
-                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; background: ${badgeBackground}; color: ${badgeColor}; padding: 3px 8px; border-radius: 4px;">
-                            ${resultLabel}
-                        </span>
-                        <div style="margin-top: 8px; font-size: 15px; color: #202124;">
-                            Playing as <strong>${isWhite ? 'White' : 'Black'}</strong> against <span style="color: #1a73e8; font-weight:600;">${opponent || 'Unknown'}</span>
-                        </div>
+                        <span style="font-size:11px; font-weight:600; text-transform:uppercase; padding:3px 8px; border-radius:4px; background:#f1f3f4; color:#3c4043;">${resultLabel}</span>
+                        <span style="font-size:11px; font-weight:600; margin-left:5px; padding:3px 8px; border-radius:4px; background:${match.is_rated !== false ? '#e8f0fe':'#f5f5f5'}; color:${match.is_rated !== false ? '#1a73e8':'#616161'};">[${modeText}]</span>
+                        <div style="margin-top:8px; font-size:15px; color:#202124;">Playing as <strong>${isWhite ? 'White':'Black'}</strong> against <span style="color:#1a73e8; font-weight:600;">${opponent || 'Unknown'}</span></div>
                     </div>
-                    <div style="text-align: right; font-size: 13px; color: #70757a;">
+                    <div style="text-align:right; font-size:13px; color:#70757a;">
                         <div>Game ID: #${match.id}</div>
-                        <div style="font-size: 11px; margin-top: 4px; color: #9aa0a6;">Type: ${match.time_control || 'Custom'}</div>
-                    </div>
-                `;
+                        <div style="font-size:11px; margin-top:4px;">TC: ${match.time_control || 'Custom'}</div>
+                    </div>`;
                 box.appendChild(matchCard);
             });
         }
 
         function searchOtherMember() {
             const name = document.getElementById('memberSearchField').value.trim();
-            if (name) {
-                window.location.href = `profileview.html?user=${name}`;
-            }
+            if (name) window.location.href = `profileview.html?user=${name}`;
         }
 
         async function loginUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) return alert("Fill in all fields!");
-
-            try {
-                const { data: users, error } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('*')
-                    .ilike('username', username)
-                    .eq('password', password);
-                
-                if (error || !users || users.length === 0) { alert("Invalid credentials!"); return; }
-
-                const user = users[0];
-                localStorage.setItem('gcvm_db_session', user.username);
-                localStorage.setItem('gcvm_db_role', user.role);
-                window.location.reload();
-            } catch (err) { alert(err.message); }
+            const { data: users } = await supabaseClient.from('gcvm_users').select('*').ilike('username', username).eq('password', password);
+            if (!users || users.length === 0) return alert("Invalid credentials!");
+            localStorage.setItem('gcvm_db_session', users[0].username);
+            localStorage.setItem('gcvm_db_role', users[0].role);
+            window.location.reload();
         }
 
         async function registerUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) return alert("Fill in all fields!");
-
-            try {
-                const { error } = await supabaseClient
-                    .from('gcvm_users')
-                    .insert([{ username, password, role: 'user', bio: '', flair: '', rating: 1500, rd: 350 }]);
-                
-                if (error) throw error;
-                alert("Account created!");
-            } catch (err) { alert("Error: " + err.message); }
+            if (!username || !password) return alert("Fill in fields!");
+            await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', bio: '', flair: '', rating: 1500, rd: 350 }]);
+            alert("Account created!");
         }
 
         function showSidebarLoggedIn(username, role) {
