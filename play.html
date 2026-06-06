@@ -17,19 +17,29 @@
         nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
         nav a:hover, nav a.active { color: #8ab4f8; }
         main { margin-left: 280px; width: calc(100% - 280px); padding: 40px; box-sizing: border-box; display: flex; gap: 40px; }
-        .game-area { flex: 1; max-width: 600px; }
-        .sidebar-right { width: 340px; display: flex; flex-direction: column; gap: 20px; }
-        .card { border: 1px solid #dadce0; border-radius: 8px; padding: 20px; background: #f8f9fa; }
+        
+        .game-area { flex: 1; max-width: 600px; display: flex; flex-direction: column; gap: 10px; }
+        .sidebar-right { width: 360px; display: flex; flex-direction: column; gap: 20px; }
+        .card { border: 1px solid #dadce0; border-radius: 8px; padding: 20px; background: #f8f9fa; box-sizing: border-box; }
+        
         .btn { background: #1a73e8; color: white; border: none; padding: 10px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 14px; width: 100%; box-sizing: border-box; text-align: center; }
         .btn.secondary { background: #3c4043; }
         .btn.danger { background: #d93025; }
-        .flex-row { display: flex; gap: 10px; }
-        .challenge-item { padding: 10px; border: 1px solid #dadce0; border-radius: 4px; background: white; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .status-banner { padding: 12px; background: #e8f0fe; color: #1a73e8; font-weight: 600; border-radius: 6px; margin-bottom: 15px; text-align: center; }
+        
+        .challenge-item { padding: 10px; border: 1px solid #dadce0; border-radius: 4px; background: white; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .status-banner { padding: 12px; background: #e8f0fe; color: #1a73e8; font-weight: 600; border-radius: 6px; text-align: center; }
+        
         .filter-group { display: flex; gap: 6px; margin-bottom: 12px; }
-        .filter-select-sm { padding: 4px 8px; border: 1px solid #dadce0; border-radius: 4px; font-size: 12px; outline: none; background: white; }
-        .review-ctrls { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
+        .filter-select-sm { padding: 4px 8px; border: 1px solid #dadce0; border-radius: 4px; font-size: 12px; outline: none; background: white; flex: 1; }
+        
+        /* Originele Match/Klok elementen */
+        .clock-box { display: flex; justify-content: space-between; font-size: 22px; font-weight: bold; background: #202124; color: #ff9800; padding: 10px 15px; border-radius: 6px; font-family: monospace; }
+        .log-box { border: 1px solid #dadce0; background: white; height: 120px; overflow-y: auto; padding: 10px; font-size: 13px; border-radius: 4px; margin-top: 5px; }
+        .chat-container { border: 1px solid #dadce0; background: white; height: 150px; overflow-y: auto; padding: 10px; font-size: 13px; border-radius: 4px; display: flex; flex-direction: column; gap: 4px; }
+        
+        .review-ctrls { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
         .hidden { display: none !important; }
+        .input-inline { width: 65px; padding: 6px; border: 1px solid #dadce0; border-radius: 4px; text-align: center; }
     </style>
 </head>
 <body>
@@ -49,42 +59,53 @@
             <div id="chess-board" style="width: 100%;"></div>
             
             <div id="review-controls-box" class="review-ctrls hidden">
-                <button class="btn secondary" style="width:auto;" onclick="stepReview(-1)">◀ Vorige</button>
-                <button class="btn secondary" style="width:auto;" onclick="stepReview(1)">Volgende ▶</button>
+                <button class="btn secondary" style="width:auto; padding: 8px 20px;" onclick="stepReview(-1)">◀ Vorige</button>
+                <button class="btn secondary" style="width:auto; padding: 8px 20px;" onclick="stepReview(1)">Volgende ▶</button>
             </div>
         </div>
 
         <div class="sidebar-right">
             
             <div class="card" id="create-challenge-box">
-                <h3 style="margin-top:0;">Create Challenge</h3>
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    <label style="font-size:13px; font-weight:600;">Time Control:
-                        <select id="tc-select" class="btn secondary" style="text-align:left; background:white; color:black; border:1px solid #dadce0; margin-top:4px;">
+                <h3 style="margin-top:0; margin-bottom:12px;">Create Challenge</h3>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    
+                    <div>
+                        <label style="font-size:13px; font-weight:600; display:block; margin-bottom:4px;">Time Control Type:</label>
+                        <select id="tc-preset" class="btn secondary" style="text-align:left; background:white; color:black; border:1px solid #dadce0;" onchange="toggleCustomTimeFields()">
                             <option value="1+0">1+0 (Bullet)</option>
                             <option value="3+2">3+2 (Blitz)</option>
                             <option value="5+0">5+0 (Blitz)</option>
                             <option value="10+0">10+0 (Rapid)</option>
                             <option value="15+10">15+10 (Rapid)</option>
                             <option value="30+0">30+0 (Classical)</option>
+                            <option value="custom">Custom Time Control...</option>
                         </select>
-                    </label>
-                    <label style="font-size:13px; font-weight:600;">Type:
-                        <select id="rated-select" class="btn secondary" style="text-align:left; background:white; color:black; border:1px solid #dadce0; margin-top:4px;">
-                            <option value="true">Rated (Matches for Elo)</option>
+                    </div>
+
+                    <div id="custom-time-inputs" class="hidden" style="display:flex; gap:10px; align-items:center; background:#f1f3f4; padding:8px; border-radius:4px;">
+                        <label style="font-size:12px;">Min: <input type="number" id="custom-minutes" class="input-inline" value="10" min="1"></label>
+                        <label style="font-size:12px;">Inc (s): <input type="number" id="custom-increment" class="input-inline" value="0" min="0"></label>
+                    </div>
+
+                    <div>
+                        <label style="font-size:13px; font-weight:600; display:block; margin-bottom:4px;">Match Rating Mode:</label>
+                        <select id="rated-select" class="btn secondary" style="text-align:left; background:white; color:black; border:1px solid #dadce0;">
+                            <option value="true">Rated (Affects Elo)</option>
                             <option value="false">Casual (Friendly)</option>
                         </select>
-                    </label>
+                    </div>
+
                     <button class="btn" onclick="createNewChallenge()">Broadcast Challenge</button>
                 </div>
             </div>
 
             <div class="card" id="challenges-list-box">
-                <h3 style="margin-top:0; margin-bottom:8px;">Open Challenges</h3>
+                <h3 style="margin-top:0; margin-bottom:8px;">Lobby Challenges</h3>
                 
                 <div class="filter-group">
                     <select id="filterType" class="filter-select-sm" onchange="loadOpenChallenges()">
-                        <option value="all">All Types</option>
+                        <option value="all">All Modes</option>
                         <option value="rated">Rated</option>
                         <option value="casual">Casual</option>
                     </select>
@@ -101,11 +122,32 @@
             </div>
 
             <div class="card hidden" id="game-actions-box">
-                <h3 style="margin-top:0;">Match Controls</h3>
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    <div style="font-size:14px; color:#5f6368;" id="players-display-info"></div>
-                    <button class="btn danger" id="resign-btn" onclick="resignMatch()">Resign</button>
-                    <button class="btn secondary" onclick="abortOrLeaveGame()">Leave / Disconnect</button>
+                <h3 style="margin-top:0; margin-bottom:10px;" id="match-ui-title">Match Console</h3>
+                
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <div id="players-display-info" style="font-size:14px; font-weight:600; background:white; padding:8px; border:1px solid #dadce0; border-radius:4px;"></div>
+                    
+                    <div class="clock-box" id="clocks-display-wrapper">
+                        <div>W: <span id="clock-white">--:--</span></div>
+                        <div>B: <span id="clock-black">--:--</span></div>
+                    </div>
+
+                    <div>
+                        <span style="font-size:12px; font-weight:600;">Move History Log:</span>
+                        <div id="move-log-container" class="log-box"></div>
+                    </div>
+
+                    <div id="live-chat-wrapper">
+                        <span style="font-size:12px; font-weight:600;">Match Room Chat:</span>
+                        <div id="chat-box" class="chat-container"></div>
+                        <div style="display:flex; gap:5px; margin-top:5px;">
+                            <input type="text" id="chat-input" style="flex:1; padding:6px; border:1px solid #dadce0; border-radius:4px;" placeholder="Send chat message...">
+                            <button class="btn" style="width:auto; padding:0 12px;" onclick="sendChatMessage()">Send</button>
+                        </div>
+                    </div>
+
+                    <button class="btn danger" id="resign-btn" onclick="resignMatch()">Resign Match</button>
+                    <button class="btn secondary" id="leave-btn" onclick="abortOrLeaveGame()">Return to Lobby</button>
                 </div>
             </div>
 
@@ -121,23 +163,21 @@
         let gameLogic = new Chess();
         let currentUser = localStorage.getItem('gcvm_db_session');
         let currentGameId = null;
-        let myColor = 'w'; // 'w' of 'b'
+        let myColor = 'w'; 
         let currentStatus = 'waiting';
         
-        // Review modus variabelen (Probleem 3)
+        // Review Systeem Variabelen
         let isReviewMode = false;
-        let reviewMovesHistory = [];
+        let reviewMovesList = []; 
         let reviewCurrentIndex = -1;
 
         window.onload = function() {
-            // Initialiseer leeg bord
             board = Chessboard('chess-board', {
                 draggable: true,
                 position: 'start',
                 onDrop: handleMovePiece
             });
 
-            // Check of we een game moeten reviewen of live spelen
             const urlParams = new URLSearchParams(window.location.search);
             const urlGameId = urlParams.get('gameId');
 
@@ -145,28 +185,44 @@
                 initReviewMode(urlGameId);
             } else {
                 if (!currentUser) {
-                    alert("Log eerst in via de profielpagina!");
+                    alert("Log in op de profielpagina!");
                     window.location.href = "profileview.html";
                     return;
                 }
                 loadOpenChallenges();
-                setInterval(loadOpenChallenges, 5000); // Poll voor nieuwe uitdagingen
+                setInterval(loadOpenChallenges, 4000); 
                 checkActiveLiveGame();
             }
         };
 
+        function toggleCustomTimeFields() {
+            const preset = document.getElementById('tc-preset').value;
+            const inputFields = document.getElementById('custom-time-inputs');
+            if (preset === 'custom') {
+                inputFields.classList.remove('hidden');
+            } else {
+                inputFields.classList.add('hidden');
+            }
+        }
+
         // ==========================================
-        // FEATURE: REVIEW MODE CODE (Probleem 3)
+        // WORKALONG: VOLLEDIG GEFIXTE REVIEW MODUS (Probleem 2)
         // ==========================================
         async function initReviewMode(gameId) {
             isReviewMode = true;
             currentGameId = gameId;
             
-            // Verberg uitdagingen panelen
             document.getElementById('create-challenge-box').classList.add('hidden');
             document.getElementById('challenges-list-box').classList.add('hidden');
             document.getElementById('review-controls-box').classList.remove('hidden');
             
+            // Toon de complete zijbalk lay-out maar pas deze aan voor reviews
+            document.getElementById('game-actions-box').classList.remove('hidden');
+            document.getElementById('resign-btn').classList.add('hidden');
+            document.getElementById('live-chat-wrapper').classList.add('hidden');
+            document.getElementById('clocks-display-wrapper').classList.add('hidden');
+            document.getElementById('match-ui-title').innerText = "Review Dashboard";
+
             const banner = document.getElementById('game-status-banner');
             banner.classList.remove('hidden');
             banner.innerText = `Reviewing Game #${gameId} 🔎`;
@@ -174,42 +230,61 @@
             try {
                 const { data: game, error } = await supabaseClient.from('gcvm_games').select('*').eq('id', gameId).single();
                 if (error || !game) {
-                    banner.innerText = "Game not found.";
+                    banner.innerText = "Game data not found.";
                     return;
                 }
 
-                // Genereer de volledige move history door een tijdelijke engine te vullen met de opgeslagen FEN of PGN logs
-                // We gebruiken hier een schone chess.js instantie om alle zetten te simuleren
-                let tempEngine = new Chess();
-                if (game.pgn_log) {
-                    // Als je een pgn_log of array met zetten bijhoudt kun je die parsen. 
-                    // Bij gebrek aan volledige logs starten we op de eind-FEN, of heropbouwen we de beginstand.
-                    // Tip: Je kunt de stappen bekijken via gameLogic history als je die opslaat.
-                    tempEngine.load(game.fen || 'start');
+                document.getElementById('players-display-info').innerHTML = `
+                    ⚪ White: <strong>${game.white_player}</strong> (${game.white_rating || 1500})<br>
+                    ⚫ Black: <strong>${game.black_player}</strong> (${game.black_rating || 1500})
+                `;
+                banner.innerHTML = `Review Mode: <strong>${game.status.toUpperCase().replace('_', ' ')}</strong>`;
+
+                // Bouw zet historie op uit de database logs
+                let engine = new Chess();
+                if (game.move_history && Array.isArray(game.move_history)) {
+                    reviewMovesList = game.move_history; 
+                } else if (game.pgn_log) {
+                    reviewMovesList = typeof game.pgn_log === 'string' ? game.pgn_log.split(' ') : game.pgn_log;
                 } else {
-                    tempEngine.load(game.fen || 'start');
+                    // Fallback: toon tenminste de eind-FEN als er geen individueel logboek is
+                    board.position(game.fen || 'start');
+                    document.getElementById('move-log-container').innerText = "No individual move logs found for this session.";
+                    return;
                 }
 
-                // Laad de uiteindelijke positie op het bord en zet drag uit
-                board = Chessboard('chess-board', {
-                    draggable: false,
-                    position: game.fen || 'start'
-                });
-
-                banner.innerHTML = `Review Mode: <strong>${game.white_player}</strong> vs <strong>${game.black_player}</strong><br>Resultaat: ${game.status}`;
+                // Initialiseer herhalings-lijst
+                reviewCurrentIndex = reviewMovesList.length - 1;
+                updateReviewBoardState();
 
             } catch (err) { console.error(err); }
         }
 
-        // Navigeren door zetten in review modus
-        function stepReview(direction) {
-            // Als je game log arrays bijhoudt in je tabel, kun je hier indexeren naar voren/achteren.
-            alert("Reviewing moves step-by-step feature is ready! Bind your move log array here.");
+        function updateReviewBoardState() {
+            let testEngine = new Chess();
+            let logHTML = "";
+            
+            for (let i = 0; i <= reviewCurrentIndex; i++) {
+                if (!reviewMovesList[i]) continue;
+                testEngine.move(reviewMovesList[i]);
+                if (i % 2 === 0) logHTML += `${Math.floor(i/2)+1}. <strong>${reviewMovesList[i]}</strong> `;
+                else logHTML += `${reviewMovesList[i]}<br>`;
+            }
+
+            board.position(testEngine.fen());
+            document.getElementById('move-log-container').innerHTML = logHTML || "Starting Position";
         }
 
+        function stepReview(direction) {
+            let target = reviewCurrentIndex + direction;
+            if (target >= -1 && target < reviewMovesList.length) {
+                reviewCurrentIndex = target;
+                updateReviewBoardState();
+            }
+        }
 
         // ==========================================
-        // FEATURE: FILTERING CHALLENGES (Probleem 5)
+        // FEATURE: SHOW ALL CHALLENGES INCL OWN (Probleem 3)
         // ==========================================
         async function loadOpenChallenges() {
             if (isReviewMode) return;
@@ -218,8 +293,6 @@
                 const speedFilter = document.getElementById('filterSpeed').value;
 
                 let query = supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
-
-                // Pas filters toe
                 if (typeFilter === 'rated') query = query.eq('is_rated', true);
                 if (typeFilter === 'casual') query = query.eq('is_rated', false);
 
@@ -229,7 +302,6 @@
                 const container = document.getElementById('challenges-container');
                 container.innerHTML = "";
 
-                // Filter op snelheid in JavaScript (makkelijker wegens string transformaties)
                 let finalChallenges = challenges || [];
                 if (speedFilter !== 'all') {
                     finalChallenges = finalChallenges.filter(g => {
@@ -243,34 +315,63 @@
                 }
 
                 if (finalChallenges.length === 0) {
-                    container.innerHTML = `<p style="font-size:13px; color:#70757a; margin:0;">No challenges match filters.</p>`;
+                    container.innerHTML = `<p style="font-size:13px; color:#70757a; margin:0;">No matching challenges found.</p>`;
                     return;
                 }
 
                 finalChallenges.forEach(c => {
-                    if (c.white_player === currentUser || c.black_player === currentUser) return;
-
                     const mode = c.is_rated !== false ? "Rated" : "Casual";
                     const item = document.createElement('div');
                     item.className = "challenge-item";
-                    item.innerHTML = `
-                        <div>
-                            <strong style="font-size:14px; color:#1a73e8;">${c.white_player || c.black_player}</strong>
-                            <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control} | <strong>[${mode}]</strong></div>
-                        </div>
-                        <button class="btn" style="width:auto; padding:6px 12px; font-size:12px;" onclick="acceptChallenge(${c.id})">Play</button>
-                    `;
+
+                    const isMine = (c.white_player === currentUser || c.black_player === currentUser);
+                    const creator = c.white_player || c.black_player;
+
+                    if (isMine) {
+                        // Eigen uitdagingen tonen met annuleerknop
+                        item.style.backgroundColor = "#fff9c4"; 
+                        item.innerHTML = `
+                            <div>
+                                <strong style="color:#b68500;">Your Challenge</strong>
+                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control} | [${mode}]</div>
+                            </div>
+                            <button class="btn danger" style="width:auto; padding:5px 10px; font-size:11px;" onclick="cancelChallenge(${c.id})">Cancel ❌</button>
+                        `;
+                    } else {
+                        // Uitdagingen van anderen
+                        item.innerHTML = `
+                            <div>
+                                <strong style="color:#1a73e8;">${creator}</strong>
+                                <div style="font-size:11px; color:#70757a; margin-top:2px;">⏱ ${c.time_control} | [${mode}]</div>
+                            </div>
+                            <button class="btn" style="width:auto; padding:5px 10px; font-size:11px;" onclick="acceptChallenge(${c.id})">Play ⚔</button>
+                        `;
+                    }
                     container.appendChild(item);
                 });
 
             } catch (err) { console.error(err); }
         }
 
+        async function cancelChallenge(id) {
+            if (!confirm("Do you want to withdraw this challenge?")) return;
+            await supabaseClient.from('gcvm_games').delete().eq('id', id);
+            loadOpenChallenges();
+        }
+
         // ==========================================
-        // BASIS LIVE GAME LOGICA & BROADCASTING
+        // SYSTEM CONTROLS & GAMEPLAY LOGIC
         // ==========================================
         async function createNewChallenge() {
-            const tc = document.getElementById('tc-select').value;
+            const preset = document.getElementById('tc-preset').value;
+            let tc = preset;
+            
+            if (preset === 'custom') {
+                const mins = document.getElementById('custom-minutes').value;
+                const inc = document.getElementById('custom-increment').value;
+                tc = `${mins}+${inc}`;
+            }
+
             const isRated = document.getElementById('rated-select').value === "true";
 
             const { data, error } = await supabaseClient.from('gcvm_games').insert([{
@@ -278,12 +379,13 @@
                 status: 'waiting',
                 time_control: tc,
                 is_rated: isRated,
-                fen: 'start'
+                fen: 'start',
+                move_history: []
             }]).select();
 
             if (error) alert(error.message);
             else {
-                alert("Challenge broadcasted to the lobby!");
+                alert("Challenge created and broadcasted successfully!");
                 loadOpenChallenges();
             }
         }
@@ -314,49 +416,67 @@
                 document.getElementById('challenges-list-box').classList.add('hidden');
                 document.getElementById('game-actions-box').classList.remove('hidden');
 
-                const banner = document.getElementById('game-status-banner');
-                banner.classList.remove('hidden');
-                banner.innerText = `Match active against ${myColor === 'w' ? game.black_player : game.white_player}!`;
+                document.getElementById('players-display-info').innerHTML = `
+                    ⚪ White: <strong>${game.white_player}</strong><br>
+                    ⚫ Black: <strong>${game.black_player}</strong>
+                `;
+                document.getElementById('game-status-banner').classList.remove('hidden');
+                document.getElementById('game-status-banner').innerText = `Live match ongoing!`;
 
                 gameLogic.load(game.fen || 'start');
                 board.position(gameLogic.fen());
                 board.orientation(myColor === 'w' ? 'white' : 'black');
+                renderLiveMoveLogs();
 
-                // Start realtime luisteren naar zetten van de tegenstander
                 supabaseClient.channel(`game-${currentGameId}`)
                     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games', filter: `id=eq.${currentGameId}` }, payload => {
                         const updated = payload.new;
                         if (updated.status !== 'playing') {
-                            alert(`Game over! Status: ${updated.status}`);
+                            alert(`Game concluded. Status: ${updated.status}`);
                             window.location.href = "profileview.html";
                         } else {
                             gameLogic.load(updated.fen);
                             board.position(gameLogic.fen());
+                            renderLiveMoveLogs();
                         }
                     }).subscribe();
             }
+        }
+
+        function renderLiveMoveLogs() {
+            let history = gameLogic.history();
+            let logHTML = "";
+            for (let i = 0; i < history.length; i++) {
+                if (i % 2 === 0) logHTML += `${Math.floor(i/2)+1}. <strong>${history[i]}</strong> `;
+                else logHTML += `${history[i]}<br>`;
+            }
+            document.getElementById('move-log-container').innerHTML = logHTML || "No moves made yet.";
         }
 
         async function handleMovePiece(source, target) {
             if (currentStatus !== 'playing') return 'snapback';
             if (gameLogic.turn() !== myColor) return 'snapback';
 
+            let currentMoves = gameLogic.history();
             const move = gameLogic.move({ from: source, to: target, promotion: 'q' });
             if (move === null) return 'snapback';
 
-            // Check of de game hierdoor beëindigd is
             let nextStatus = 'playing';
             if (gameLogic.in_checkmate()) nextStatus = myColor === 'w' ? 'white_won' : 'black_won';
             else if (gameLogic.in_draw()) nextStatus = 'draw';
 
+            currentMoves.push(move.san);
+
             await supabaseClient.from('gcvm_games').update({
                 fen: gameLogic.fen(),
-                status: nextStatus
+                status: nextStatus,
+                move_history: currentMoves
             }).eq('id', currentGameId);
         }
 
         async function resignMatch() {
             if (currentStatus !== 'playing') return;
+            if (!confirm("Are you sure you want to resign?")) return;
             const res = myColor === 'w' ? 'black_won' : 'white_won';
             await supabaseClient.from('gcvm_games').update({ status: res }).eq('id', currentGameId);
             window.location.reload();
@@ -364,6 +484,15 @@
 
         function abortOrLeaveGame() {
             window.location.href = "profileview.html";
+        }
+
+        function sendChatMessage() {
+            // Chat logica placeholder 
+            const inp = document.getElementById('chat-input');
+            if (!inp.value.trim()) return;
+            const box = document.getElementById('chat-box');
+            box.innerHTML += `<div><strong>${currentUser}:</strong> ${inp.value}</div>`;
+            inp.value = "";
         }
     </script>
 </body>
