@@ -194,7 +194,7 @@
                 loadOpenChallenges();
                 setInterval(loadOpenChallenges, 4000); 
                 checkActiveLiveGame();
-                listenForLobbyChanges(); // Luister live naar lobby updates
+                listenForLobbyChanges();
             }
         };
 
@@ -218,7 +218,7 @@
         }
 
         // ==========================================
-        // REVIEW COMPONENT (Using database columns)
+        // REVIEW TIMELINE
         // ==========================================
         async function initReviewMode(gameId) {
             isReviewMode = true;
@@ -389,6 +389,10 @@
 
         async function acceptChallenge(gameId) {
             try {
+                // VEILIGHEID: Verwijder eerst eventuele openstaande uitdagingen van jezelf, zodat je database schoon is!
+                await supabaseClient.from('gcvm_games').delete().eq('white_player', currentUser).eq('status', 'waiting');
+
+                // Accepteer nu de geselecteerde match
                 const { error } = await supabaseClient.from('gcvm_games').update({
                     black_player: currentUser,
                     status: 'playing'
@@ -397,32 +401,44 @@
                 if (error) throw error;
                 currentStatus = 'playing';
                 checkActiveLiveGame();
-            } catch(err) { alert(err.message); }
+            } catch(err) { alert("Could not accept challenge: " + err.message); }
         }
 
         async function createNewChallenge() {
-            const preset = document.getElementById('tc-preset').value;
-            let tc = preset;
-            
-            if (preset === 'custom') {
-                const mins = document.getElementById('custom-minutes').value;
-                const inc = document.getElementById('custom-increment').value;
-                tc = `${mins}+${inc}`;
-            }
-
-            const isRated = document.getElementById('rated-select').value === "true";
-
-            const challengePayload = {
-                white_player: currentUser,
-                status: 'waiting',
-                time_control: tc,
-                is_rated: isRated,
-                fen: 'start',
-                move_history: [],
-                pgn_log: ""
-            };
-
             try {
+                // VEILIGHEID CHECK: Kijk of er al een openstaande challenge van deze gebruiker bestaat
+                const { data: existingChallenges } = await supabaseClient
+                    .from('gcvm_games')
+                    .select('id')
+                    .eq('white_player', currentUser)
+                    .eq('status', 'waiting');
+
+                if (existingChallenges && existingChallenges.length > 0) {
+                    alert("You already have an open challenge in the lobby! Cancel that one first before making a new one.");
+                    return; // Stop de executie direct!
+                }
+
+                const preset = document.getElementById('tc-preset').value;
+                let tc = preset;
+                
+                if (preset === 'custom') {
+                    const mins = document.getElementById('custom-minutes').value;
+                    const inc = document.getElementById('custom-increment').value;
+                    tc = `${mins}+${inc}`;
+                }
+
+                const isRated = document.getElementById('rated-select').value === "true";
+
+                const challengePayload = {
+                    white_player: currentUser,
+                    status: 'waiting',
+                    time_control: tc,
+                    is_rated: isRated,
+                    fen: 'start',
+                    move_history: [],
+                    pgn_log: ""
+                };
+
                 const { error } = await supabaseClient.from('gcvm_games').insert([challengePayload]);
                 if (error) throw error;
                 loadOpenChallenges();
@@ -441,7 +457,7 @@
 
                 if (games && games.length > 0) {
                     const game = games[0];
-                    if (currentGameId === game.id) return; // Al geladen
+                    if (currentGameId === game.id) return; 
                     
                     currentGameId = game.id;
                     currentStatus = 'playing';
