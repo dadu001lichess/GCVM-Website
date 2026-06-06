@@ -13,7 +13,7 @@
     <style>
         body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; color: #3c4043; }
         
-        /* SIDEBAR STYLING - EXACT OVERGENOMEN UIT INDEX.HTML */
+        /* SIDEBAR STYLING - EXACT IDENTIEK AAN INDEX.HTML */
         aside { 
             width: 280px; 
             background-color: #202124; 
@@ -25,41 +25,26 @@
             left: 0; 
             top: 0; 
             z-index: 10; 
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
         .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
-        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
+        
+        /* AUTH SECTION BOVENAAN SIDEBAR */
+        .auth-container { margin-bottom: 25px; }
+        .user-info { color: #bdc1c6; font-size: 14px; line-height: 1.4; }
+        .user-info strong { color: #8ab4f8; font-size: 15px; }
+        .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
+        .logout-link { display: inline-block; color: #f28b82; text-decoration: none; font-size: 12px; margin-top: 8px; cursor: pointer; }
+        .logout-link:hover { text-decoration: underline; }
+
+        /* NAVIGATIE LINKS */
+        nav { border-top: 1px solid #3c4043; padding-top: 15px; }
+        nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; transition: color 0.2s; }
         nav a:hover, nav a.active { color: #8ab4f8; }
         
-        /* ACCOUNT SECTIE ONDERAAN SIDEBAR */
-        .auth-footer {
-            border-top: 1px solid #3c4043;
-            padding-top: 20px;
-            margin-top: auto;
-        }
-        .profile-summary {
-            color: white;
-            font-size: 14px;
-        }
-        .profile-summary p { margin: 0 0 8px 0; color: #bdc1c6; }
-        .profile-summary strong { color: white; display: block; font-size: 16px; margin-bottom: 4px; }
-        .profile-link { display: inline-block; color: #8ab4f8; text-decoration: none; margin-right: 12px; font-size: 13px; }
-        .profile-link:hover { text-decoration: underline; }
-        .logout-btn {
-            background: transparent;
-            border: 1px solid #5f6368;
-            color: #e8eaed;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            width: 100%;
-            margin-top: 10px;
-            box-sizing: border-box;
-        }
-        .logout-btn:hover { background: #303134; border-color: #8ab4f8; }
+        summary { list-style: none; color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; outline: none; }
+        summary::-webkit-details-marker { display: none; }
+        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; margin-bottom: 10px; }
+        .sub-menu a { font-size: 14px; padding: 8px 0; }
 
         /* MAIN CONTENT INTERFACE */
         main { margin-left: 280px; width: calc(100% - 280px); padding: 40px; box-sizing: border-box; display: flex; gap: 40px; }
@@ -90,24 +75,51 @@
 <body>
 
     <aside>
-        <div>
-            <div class="logo">GC(V)M</div>
-            <nav>
-                <a href="index.html">Homepage</a>
-                <a href="profileview.html">Profile</a>
-                <a href="play.html" class="active">Play Chess</a>
-            </nav>
-        </div>
-
-        <div class="auth-footer">
-            <div id="user-profile-summary" class="profile-summary">
-                <p>Ingelogd als:</p>
-                <strong id="summary-username">Loading...</strong>
-                <span id="summary-role" style="font-size: 11px; color: #8ab4f8; display: block; margin-bottom: 8px;">User</span>
-                <a href="profileview.html" class="profile-link">Instellingen</a>
-                <button class="logout-btn" onclick="logoutUser()">Uitloggen</button>
+        <div class="logo">GC(V)M</div>
+        
+        <div class="auth-container">
+            <div id="profile-section">
+                <div class="user-info">
+                    Logged in as:<br>
+                    <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
+                    <span class="logout-link" onclick="logoutUser()">Log out</span>
+                </div>
             </div>
         </div>
+
+        <nav>
+            <a href="index.html">Homepage</a>
+            <a href="profileview.html">Profile</a>
+            <a href="Training.html">Training</a>
+            <a href="Coaches.html">Coaches</a>
+            <details>
+              <summary>Shards currency ⌵</summary>
+              <div class="sub-menu">
+                <a href="Shardsintro.html">How to get Shards?</a>
+                <a href="Daily puzzle.html">Daily puzzle</a>
+                <a href="Shards shop.html">Shards shop</a>
+              </div>
+            </details>
+            <a href="play.html" class="active">Play Chess</a>
+            <a href="Current games.html">Current games</a>
+            <a href="GoTM.html">Game of the month</a>
+            <a href="Jobs.html">Special mentions/Jobs</a>
+            <details>
+              <summary>Updates/News ⌵</summary>
+              <div class="sub-menu">
+                <a href="Updates.html">Updates</a>
+                <a href="News.html">Newspaper</a>
+              </div>    
+            </details>
+            <details>
+              <summary>Community ⌵</summary>
+              <div class="sub-menu">
+                <a href="Leaders.html">Mods/Leaders</a>
+                <a href="Contact.html">Contact</a>
+                <a href="MoTM.html">MoTM</a>
+              </div>    
+            </details>
+        </nav>
     </aside>
 
     <main>
@@ -227,7 +239,7 @@
         let board = null;
         let gameLogic = new Chess();
         let currentUser = localStorage.getItem('gcvm_db_session');
-        let currentRole = localStorage.getItem('gcvm_db_role') || 'User';
+        let currentRole = localStorage.getItem('gcvm_db_role') || 'user';
         let currentGameId = null;
         let myColor = 'w'; 
         let currentStatus = 'waiting';
@@ -238,14 +250,16 @@
         let reviewCurrentIndex = -1;
 
         window.onload = function() {
-            // RENDERING ACCOUNT IN SIDEBAR (Zoals in index.html)
+            // VERIFIEER EN RENDER DE LOGIN-STATUS BOVENAAN DE SIDEBAR (Net als index.html)
             if (!currentUser) {
-                alert("Please log in through the profile page first!");
-                window.location.href = "profileview.html";
+                alert("Please log in through the homepage or profile page first!");
+                window.location.href = "index.html";
                 return;
             } else {
-                document.getElementById('summary-username').innerText = currentUser;
-                document.getElementById('summary-role').innerText = currentRole.toUpperCase();
+                document.getElementById('displayed-username').innerText = currentUser;
+                if (currentRole === 'admin') {
+                    document.getElementById('admin-badge').classList.remove('hidden');
+                }
             }
 
             const urlParams = new URLSearchParams(window.location.search);
@@ -261,11 +275,10 @@
             }
         };
 
-        // LOGOUT FUNCTIE UIT INDEX.HTML
         function logoutUser() {
             localStorage.removeItem('gcvm_db_session');
             localStorage.removeItem('gcvm_db_role');
-            window.location.href = "profileview.html";
+            window.location.href = "index.html";
         }
 
         function initBoardConfig() {
@@ -328,8 +341,9 @@
                 `;
                 banner.innerHTML = `Reviewing Match Results: <strong>${game.status.toUpperCase().replace('_', ' ')}</strong>`;
 
-                if (game.move_history && Array.isArray(game.move_history) && game.move_history.length > 0) {
-                    reviewMovesList = game.move_history;
+                // CORRECTIE: Veranderd van move_history naar moves_list
+                if (game.moves_list && Array.isArray(game.moves_list) && game.moves_list.length > 0) {
+                    reviewMovesList = game.moves_list;
                 } else if (game.pgn_log && game.pgn_log.trim() !== "") {
                     reviewMovesList = game.pgn_log.trim().split(" ");
                 } else {
@@ -383,7 +397,6 @@
                     .eq('id', gameId);
                     
                 if (error) throw error;
-                alert("Challenge successfully cancelled!");
                 loadOpenChallenges();
             } catch(err) { 
                 alert("Supabase Error during cancel: " + err.message); 
@@ -435,8 +448,8 @@
 
                 let finalChallenges = challenges || [];
                 
-                if (typeFilter === 'rated') finalChallenges = finalChallenges.filter(g => g.rated === true || g.is_rated === true);
-                if (typeFilter === 'casual') finalChallenges = finalChallenges.filter(g => g.rated === false || g.is_rated === false);
+                if (typeFilter === 'rated') finalChallenges = finalChallenges.filter(g => g.is_rated === true);
+                if (typeFilter === 'casual') finalChallenges = finalChallenges.filter(g => g.is_rated === false);
 
                 if (speedFilter !== 'all') {
                     finalChallenges = finalChallenges.filter(g => {
@@ -455,7 +468,7 @@
                 }
 
                 finalChallenges.forEach(c => {
-                    const isRatedGame = c.rated ?? c.is_rated ?? false;
+                    const isRatedGame = c.is_rated ?? false;
                     const mode = isRatedGame ? "Rated" : "Casual";
                     const item = document.createElement('div');
                     item.className = "challenge-item";
@@ -463,6 +476,7 @@
                     const isMine = (c.white_player === currentUser || c.black_player === currentUser);
                     const creator = c.white_player || c.black_player || "Anonymous";
 
+                    // CORRECTIE: Aanhalingstekens toegevoegd rond de ID '${c.id}' om de JS syntax error op te lossen!
                     if (isMine) {
                         item.style.backgroundColor = "#fff9c4"; 
                         item.style.borderLeft = "4px solid #fbc02d";
@@ -520,18 +534,22 @@
 
                 const isRated = document.getElementById('rated-select').value === "true";
 
+                // CORRECTIE: payload kolomnamen aangepast naar match met database: `moves_list` en `is_rated`
                 const challengePayload = {
                     white_player: currentUser,
                     status: 'waiting',
                     time_control: tc,
-                    rated: isRated,
+                    is_rated: isRated,
                     fen: 'start',
-                    move_history: [],
+                    moves_list: [],
                     pgn_log: ""
                 };
 
                 const { error } = await supabaseClient.from('gcvm_games').insert([challengePayload]);
-                if (error) throw error;
+                if (error) {
+                    alert("Database rejection during Broadcast operation:\n" + error.message);
+                    return;
+                }
                 loadOpenChallenges();
             } catch (err) { alert(err.message); }
         }
@@ -586,7 +604,7 @@
                             const updated = payload.new;
                             if (updated.status !== 'playing') {
                                 alert(`Match Finished! Status: ${updated.status}`);
-                                window.location.href = "profileview.html";
+                                window.location.href = "index.html";
                             } else {
                                 gameLogic.load(updated.fen);
                                 board.position(gameLogic.fen());
@@ -626,10 +644,11 @@
             renderLiveMoveLogs();
 
             try {
+                // CORRECTIE: Veranderd van `move_history` naar `moves_list` om databasefout te voorkomen!
                 await supabaseClient.from('gcvm_games').update({
                     fen: gameLogic.fen(),
                     status: nextStatus,
-                    move_history: currentMoves,
+                    moves_list: currentMoves,
                     pgn_log: pgnString
                 }).eq('id', currentGameId);
             } catch(err) {
@@ -646,7 +665,7 @@
         }
 
         function abortOrLeaveGame() {
-            window.location.href = "profileview.html";
+            window.location.href = "index.html";
         }
 
         function sendChatMessage() {
