@@ -416,6 +416,9 @@
 } else if (step === 2) { 
     puzzleData[1][2] = ''; puzzleData[2][2] = 'bR'; 
                } 
+                drawBoard();
+            }, 600);
+        } 
 
         function handleSquareClick(r, c) {
             if (!selectedSquare) {
