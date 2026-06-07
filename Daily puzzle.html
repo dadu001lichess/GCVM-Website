@@ -357,22 +357,21 @@
 
         // --- PUZZLE DATA & SYSTEM ---
         let puzzleData = [
-            ['','','','','','','bK','bR'],
-            ['bP','','bP','','','bP','bP',''], 
-            ['','','','','','','bQ',''], 
-            ['','','','','','bB','',''],
-            ['','','','','','','bN',''],
-            ['','wP','wN','','','','','wP'],
-            ['wP','','','wB','wB','wP','wP','wK'],
-            ['','','','wR','wR','','','']  
-        ];
+    ['','','','','bR','bK','',''],
+    ['','','bQ','','bR','','',''],
+    ['','wP','wP','bP','','','','bP'],
+    ['wQ','','','bP','bP','','bP',''],
+    ['','','','','','','',''],
+    ['','','','','wP','','',''],
+    ['','','','','','','wP','wP'],
+    ['wR','','','','','wK','','']
+];
 
         const solution = [
-            "6-4 to 4-6",
-            "7-4 to 0-4",
-            "0-4 to 0-7",
-            "5-7 to 4-6"
-        ]; 
+    "3-0 to 1-2",
+    "7-0 to 0-0",
+    "0-0 to 0-5"
+];
 
         let currentStep = 0;
         let selectedSquare = null;
@@ -412,16 +411,11 @@
 
         function playWhiteResponse(step) {
             setTimeout(() => {
-                if (step === 1) { 
-                    puzzleData[3][5] = ''; puzzleData[4][6] = 'bB'; 
-                } else if (step === 2) { 
-                    puzzleData[0][6] = ''; puzzleData[1][7] = 'bK'; 
-                } else if (step === 3) { 
-                    puzzleData[1][7] = ''; puzzleData[0][7] = 'bK'; 
-                }
-                drawBoard();
-            }, 600);
-        }
+               if (step === 1) { 
+    puzzleData[1][4] = ''; puzzleData[1][2] = 'bR'; 
+} else if (step === 2) { 
+    puzzleData[1][2] = ''; puzzleData[2][2] = 'bR'; 
+               } 
 
         function handleSquareClick(r, c) {
             if (!selectedSquare) {
