@@ -22,28 +22,23 @@
         .logout-link { color: #f28b82; font-size: 12px; margin-top: 8px; cursor: pointer; display: inline-block; }
         nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
         nav a:hover, nav a.active { color: #8ab4f8; }
-        main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; box-sizing: border-box; position: relative; }
+        main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; box-sizing: border-box; }
         .banner { height: 120px; background-color: #f1f3f4; display: flex; align-items: center; padding-left: 40px; border-bottom: 1px solid #dadce0; }
         .banner h1 { font-size: 32px; font-weight: 400; margin: 0; color: #202124; }
         .content { max-width: 1000px; margin: 0 auto; padding: 40px; }
-        .top-right-search { position: absolute; top: 40px; right: 40px; display: flex; gap: 8px; z-index: 5; }
-        .search-input { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 200px; }
-        .search-btn { background: #3c4043; color: white; border: none; padding: 0 14px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; }
         .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; }
         .side-panel { border-right: 1px solid #dadce0; padding-right: 20px; }
-        .rating-card { background: #f8f9fa; border: 1px solid #dadce0; padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .rating-card { background: #f8f9fa; border: 1px solid #dadce0; padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; }
         .rating-name { font-weight: 600; font-size: 14px; }
-        .rating-val { color: #1a73e8; font-weight: 600; font-size: 16px; cursor: help; }
+        .rating-val { color: #1a73e8; font-weight: 600; font-size: 16px; }
         .rating-sub { font-size: 11px; color: #70757a; margin-top: 2px; }
         .main-panel { display: flex; flex-direction: column; gap: 25px; }
         .profile-header { border-bottom: 1px solid #dadce0; padding-bottom: 15px; }
         .profile-title { font-size: 28px; margin: 0 0 8px 0; font-weight: 400; }
-        .flair-display-box { font-size: 14px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 6px 14px; border-radius: 20px; width: fit-content; margin-top: 5px; }
+        .flair-display-box { font-size: 14px; font-weight: 600; color: #1a73e8; background: #e8f0fe; padding: 6px 14px; border-radius: 4px; width: fit-content; margin-top: 5px; }
         .bio-display-text { font-size: 15px; line-height: 1.6; white-space: pre-wrap; background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #dadce0; min-height: 100px; }
-        .edit-link-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 15px; text-decoration: none; display: inline-block; }
+        .edit-link-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 15px; }
         .filter-select { padding: 6px 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 13px; background: white; outline: none; }
-        .review-btn { background: #1a73e8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block; }
-        .review-btn:hover { background: #1557b0; }
         .alert-warn { background: #fce8e6; border: 1px solid #f28b82; color: #a51d24; padding: 15px; border-radius: 6px; text-align: center; font-weight: 600; }
         .hidden { display: none !important; }
     </style>
@@ -54,7 +49,7 @@
         <div class="logo">GC(V)M</div>
         <div class="auth-container">
             <div id="login-section" class="auth-input-group">
-                <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
+                <input type="text" id="username-input" class="auth-input" placeholder="Username...">
                 <input type="password" id="password-input" class="auth-input" placeholder="Password...">
                 <div class="auth-btn-container">
                     <button class="auth-btn" onclick="loginUser()">Login</button>
@@ -73,11 +68,6 @@
     </aside>
 
     <main>
-        <div class="top-right-search">
-            <input type="text" id="memberSearchField" class="search-input" placeholder="Search member...">
-            <button class="search-btn" onclick="searchOtherMember()">Search</button>
-        </div>
-
         <div class="banner">
             <h1 id="page-main-title">Member Profile</h1>
         </div>
@@ -89,38 +79,14 @@
                 <div class="profile-grid">
                     
                     <div class="side-panel">
-                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Elo Ratings</h3>
+                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Statistics</h3>
                         
                         <div class="rating-card">
                             <div>
-                                <div class="rating-name">Classical (≥29m)</div>
-                                <div class="rating-sub"><span id="count-classical">0</span> games</div>
+                                <div class="rating-name">Overall Rating</div>
+                                <div class="rating-sub">Games: <span id="count-total">0</span></div>
                             </div>
-                            <div class="rating-val" id="rating-classical" title="Loading...">1500</div>
-                        </div>
-
-                        <div class="rating-card">
-                            <div>
-                                <div class="rating-name">Rapid (&lt;29m)</div>
-                                <div class="rating-sub"><span id="count-rapid">0</span> games</div>
-                            </div>
-                            <div class="rating-val" id="rating-rapid" title="Loading...">1500</div>
-                        </div>
-
-                        <div class="rating-card">
-                            <div>
-                                <div class="rating-name">Blitz (&lt;10m)</div>
-                                <div class="rating-sub"><span id="count-blitz">0</span> games</div>
-                            </div>
-                            <div class="rating-val" id="rating-blitz" title="Loading...">1500</div>
-                        </div>
-
-                        <div class="rating-card">
-                            <div>
-                                <div class="rating-name">Bullet (&lt;3m)</div>
-                                <div class="rating-sub"><span id="count-bullet">0</span> games</div>
-                            </div>
-                            <div class="rating-val" id="rating-bullet" title="Loading...">1500</div>
+                            <div class="rating-val" id="rating-overall">1500</div>
                         </div>
 
                         <div class="rating-card" style="display: block;">
@@ -135,7 +101,7 @@
                     <div class="main-panel">
                         <div class="profile-header">
                             <h2 class="profile-title" id="view-username">Username</h2>
-                            <div id="flair-badge-text" class="flair-display-box hidden">No Flair</div>
+                            <div id="flair-badge-text" class="flair-display-box hidden"></div>
                         </div>
 
                         <div>
@@ -149,15 +115,14 @@
                                 <h3 style="margin:0; font-size:16px;">Match History</h3>
                                 <div style="display:flex; gap:8px;">
                                     <select id="chronologyFilter" class="filter-select" onchange="filterHistory()">
-                                        <option value="newest">Newest to Oldest</option>
-                                        <option value="oldest">Oldest to Newest</option>
+                                        <option value="newest">Newest First</option>
+                                        <option value="oldest">Oldest First</option>
                                     </select>
                                     <select id="historyFilter" class="filter-select" onchange="filterHistory()">
-                                        <option value="all">All Statuses</option>
-                                        <option value="rated">Rated Only</option>
-                                        <option value="casual">Casual Only</option>
+                                        <option value="all">All Games</option>
                                         <option value="wins">Victories</option>
                                         <option value="losses">Defeats</option>
+                                        <option value="draws">Draws</option>
                                     </select>
                                 </div>
                             </div>
@@ -200,8 +165,8 @@
             globalTargetUser = username;
 
             try {
-                const { data: users, error } = await supabaseClient.from('gcvm_users').select('*');
-                if (error) throw error;
+                const { data: users } = await supabaseClient.from('gcvm_users').select('*');
+                if (!users) return;
 
                 const user = users.find(u => u.username && u.username.toLowerCase() === username.toLowerCase());
                 if (!user) {
@@ -228,100 +193,58 @@
                     editBtn.classList.add('hidden');
                 }
 
-                const userRD = user.rd !== undefined && user.rd !== null ? user.rd : 350;
-                const showQuestionMark = userRD > 110 ? "?" : "";
-                
-                await fetchAndCalculateStats(user.username, showQuestionMark, userRD);
+                await fetchAndCalculateStats(user.username, user.rating || 1500);
 
             } catch(err) { 
                 console.error(err); 
-                document.getElementById('bio-text-container').innerText = "Error loading user profile details.";
             }
         }
 
-        async function fetchAndCalculateStats(targetUsername, qMark, currentRD) {
+        async function fetchAndCalculateStats(targetUsername, currentRating) {
             try {
-                const { data: games, error } = await supabaseClient
-                    .from('gcvm_games')
-                    .select('*')
+                const { data: games } = await supabaseClient.from('gcvm_games').select('*')
                     .or(`white_player.ilike.${targetUsername},black_player.ilike.${targetUsername}`);
-
-                if (error) throw error;
 
                 const finishedGames = games ? games.filter(g => g.status !== 'playing' && g.status !== 'waiting') : [];
                 globalGamesCache = finishedGames; 
                 const totalGames = finishedGames.length;
-
-                let timeControls = {
-                    classical: { count: 0, rating: 1500 },
-                    rapid: { count: 0, rating: 1500 },
-                    blitz: { count: 0, rating: 1500 },
-                    bullet: { count: 0, rating: 1500 }
-                };
 
                 if (totalGames === 0) {
                     document.getElementById('stat-winrate').innerText = "0%";
                     document.getElementById('stat-total').innerText = "0";
                     document.getElementById('stat-white-pct').innerText = "0%";
                     document.getElementById('stat-black-pct').innerText = "0%";
-                    updateRatingUI(timeControls, qMark, currentRD);
+                    document.getElementById('count-total').innerText = "0";
+                    document.getElementById('rating-overall').innerText = "1500";
                     renderMatchHistoryList([], targetUsername);
                     return;
                 }
 
-                let wins = 0;
-                let whiteCount = 0;
-                let blackCount = 0;
+                let wins = 0, whiteCount = 0, blackCount = 0;
 
-                // Bereken de ratings chronologisch (van oud naar nieuw)
-                [...finishedGames].sort((a,b) => a.id - b.id).forEach(game => {
+                finishedGames.forEach(game => {
                     const isWhite = game.white_player && game.white_player.toLowerCase() === targetUsername.toLowerCase();
                     if (isWhite) whiteCount++; else blackCount++;
 
                     if ((game.status === 'white_won' && isWhite) || (game.status === 'black_won' && !isWhite)) {
                         wins++;
                     }
-
-                    let tc = 'rapid'; 
-                    if (game.time_control) {
-                        const parts = game.time_control.split('+');
-                        const mins = parseInt(parts[0]) || 10;
-                        const inc = parseInt(parts[1]) || 0;
-                        const totalEstimatedTime = mins + (inc * 40 / 60);
-
-                        if (totalEstimatedTime < 3) tc = 'bullet';
-                        else if (totalEstimatedTime < 10) tc = 'blitz';
-                        else if (totalEstimatedTime < 29) tc = 'rapid';
-                        else tc = 'classical';
-                    }
-
-                    if (game.is_rated !== false) {
-                        timeControls[tc].count++;
-                        if (isWhite && game.white_rating) timeControls[tc].rating = game.white_rating;
-                        else if (!isWhite && game.black_rating) timeControls[tc].rating = game.black_rating;
-                    }
                 });
 
-                document.getElementById('stat-winrate').innerText = `${((wins / totalGames) * 100).toFixed(1)}%`;
-                document.getElementById('stat-total').innerText = totalGames;
-                document.getElementById('stat-white-pct').innerText = `${((whiteCount / totalGames) * 100).toFixed(1)}%`;
-                document.getElementById('stat-black-pct').innerText = `${((blackCount / totalGames) * 100).toFixed(1)}%`;
+                const winRate = ((wins / totalGames) * 100).toFixed(1);
+                const whitePct = ((whiteCount / totalGames) * 100).toFixed(1);
+                const blackPct = ((blackCount / totalGames) * 100).toFixed(1);
 
-                updateRatingUI(timeControls, qMark, currentRD);
-                filterHistory(); // Rendert de lijst gesorteerd op basis van de geselecteerde criteria
+                document.getElementById('stat-winrate').innerText = `${winRate}%`;
+                document.getElementById('stat-total').innerText = totalGames;
+                document.getElementById('stat-white-pct').innerText = `${whitePct}%`;
+                document.getElementById('stat-black-pct').innerText = `${blackPct}%`;
+                document.getElementById('count-total').innerText = totalGames;
+                document.getElementById('rating-overall').innerText = Math.round(currentRating);
+
+                filterHistory();
 
             } catch (err) { console.error(err); }
-        }
-
-        function updateRatingUI(timeControls, qMark, currentRD) {
-            const types = ['classical', 'rapid', 'blitz', 'bullet'];
-            types.forEach(t => {
-                document.getElementById(`count-${t}`).innerText = timeControls[t].count;
-                const displayMark = timeControls[t].count === 0 ? "?" : qMark;
-                const targetEl = document.getElementById(`rating-${t}`);
-                targetEl.innerText = timeControls[t].rating + displayMark;
-                targetEl.title = timeControls[t].count === 0 ? "Provisional (RD: 350)" : `Rating Deviation: ±${Math.round(currentRD)}`;
-            });
         }
 
         function filterHistory() {
@@ -330,9 +253,7 @@
             
             let filtered = [...globalGamesCache];
 
-            if (statusVal === 'rated') filtered = filtered.filter(g => g.is_rated !== false);
-            else if (statusVal === 'casual') filtered = filtered.filter(g => g.is_rated === false);
-            else if (statusVal === 'wins') {
+            if (statusVal === 'wins') {
                 filtered = filtered.filter(g => {
                     const isWhite = g.white_player && g.white_player.toLowerCase() === globalTargetUser.toLowerCase();
                     return (g.status === 'white_won' && isWhite) || (g.status === 'black_won' && !isWhite);
@@ -342,9 +263,10 @@
                     const isWhite = g.white_player && g.white_player.toLowerCase() === globalTargetUser.toLowerCase();
                     return (g.status === 'white_won' && !isWhite) || (g.status === 'black_won' && isWhite);
                 });
+            } else if (statusVal === 'draws') {
+                filtered = filtered.filter(g => g.status === 'draw');
             }
 
-            // TIJD EN ID SORTERING (Probleem 4)
             if (chronoVal === 'newest') {
                 filtered.sort((a, b) => b.id - a.id);
             } else {
@@ -358,57 +280,48 @@
             const box = document.getElementById('history-list-box');
             box.innerHTML = "";
             if (gamesList.length === 0) {
-                box.innerHTML = `<p style="color: #70757a; font-size: 14px;">No matches found matching criteria.</p>`;
+                box.innerHTML = `<p style="color: #70757a; font-size: 14px;">No matches found.</p>`;
                 return;
             }
 
             gamesList.forEach(match => {
                 const isWhite = match.white_player && match.white_player.toLowerCase() === targetUsername.toLowerCase();
                 const opponent = isWhite ? match.black_player : match.white_player;
-                const modeText = match.is_rated !== false ? "Rated" : "Casual";
                 
-                let resultLabel = "Draw 🤝";
+                let resultLabel = "Draw";
                 let cardBorderColor = "#dadce0";
                 if ((match.status === 'white_won' && isWhite) || (match.status === 'black_won' && !isWhite)) {
-                    resultLabel = "Victory 🏆"; cardBorderColor = "#34a853";
+                    resultLabel = "Victory"; 
+                    cardBorderColor = "#34a853";
                 } else if ((match.status === 'white_won' && !isWhite) || (match.status === 'black_won' && isWhite)) {
-                    resultLabel = "Defeat 💥"; cardBorderColor = "#d93025";
+                    resultLabel = "Defeat"; 
+                    cardBorderColor = "#d93025";
                 }
 
                 let changeText = "";
-                if (match.is_rated !== false) {
+                if (match.white_rating_change !== undefined && match.black_rating_change !== undefined) {
                     const diff = isWhite ? match.white_rating_change : match.black_rating_change;
-                    if (diff !== undefined && diff !== null) {
-                        if (diff > 0) changeText = ` <span style="color:#34a853; font-weight:bold;">(+${diff})</span>`;
-                        else if (diff < 0) changeText = ` <span style="color:#d93025; font-weight:bold;">(${diff})</span>`;
-                        else changeText = ` <span style="color:#70757a;">(0)</span>`;
-                    }
+                    if (diff > 0) changeText = ` (+${diff})`;
+                    else if (diff < 0) changeText = ` (${diff})`;
+                    else changeText = ` (0)`;
                 }
 
                 const matchCard = document.createElement('div');
-                matchCard.style = `border:1px solid ${cardBorderColor}; border-left:5px solid ${cardBorderColor}; padding:14px 18px; border-radius:6px; background:white; display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;`;
+                matchCard.style = `border:1px solid ${cardBorderColor}; border-left:5px solid ${cardBorderColor}; padding:14px 18px; border-radius:6px; background:white; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);`;
                 
-                // USER PROFILE LINKS TOEGEVOEGD (Probleem 5)
                 matchCard.innerHTML = `
                     <div>
                         <span style="font-size:11px; font-weight:600; text-transform:uppercase; padding:3px 8px; border-radius:4px; background:#f1f3f4; color:#3c4043;">${resultLabel}${changeText}</span>
-                        <span style="font-size:11px; font-weight:600; margin-left:5px; padding:3px 8px; border-radius:4px; background:${match.is_rated !== false ? '#e8f0fe':'#f5f5f5'}; color:${match.is_rated !== false ? '#1a73e8':'#616161'};">[${modeText}]</span>
                         <div style="margin-top:8px; font-size:15px; color:#202124;">
-                            Playing as <strong>${isWhite ? 'White':'Black'}</strong> against 
-                            <a href="profileview.html?user=${opponent}" style="color:#1a73e8; font-weight:600; text-decoration:none;">${opponent || 'Unknown'}</a>
+                            Playing as <strong>${isWhite ? 'White':'Black'}</strong> against <span style="color:#1a73e8; font-weight:600;">${opponent || 'Unknown'}</span>
                         </div>
                     </div>
-                    <div style="text-align:right; font-size:13px; color:#70757a; display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-                        <div>Game ID: #${match.id} | TC: ${match.time_control || 'Custom'}</div>
-                        <a href="play.html?gameId=${match.id}" class="review-btn">Review Game 🔎</a>
+                    <div style="text-align:right; font-size:13px; color:#70757a;">
+                        <div>Game #${match.id}</div>
+                        <div style="font-size: 11px; margin-top: 4px;">Type: ${match.time_control || 'Custom'}</div>
                     </div>`;
                 box.appendChild(matchCard);
             });
-        }
-
-        function searchOtherMember() {
-            const name = document.getElementById('memberSearchField').value.trim();
-            if (name) window.location.href = `profileview.html?user=${name}`;
         }
 
         async function loginUser() {
@@ -424,7 +337,7 @@
         async function registerUser() {
             const username = document.getElementById('username-input').value.trim();
             const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) return alert("Fill in fields!");
+            if (!username || !password) return alert("Fill in all fields!");
             await supabaseClient.from('gcvm_users').insert([{ username, password, role: 'user', bio: '', flair: '', rating: 1500, rd: 350 }]);
             alert("Account created!");
         }
