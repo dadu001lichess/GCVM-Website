@@ -33,7 +33,7 @@
         .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
         
         .admin-action-btn {
-            display: block; width: 100%; padding: 8px; margin-top: 10px; background-color: #d93025; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center;
+            display: block; width: 100%; padding: 8px; margin-top: 10px; background-color: #d93025; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;
         }
         .logout-link { display: inline-block; color: #f28b82; text-decoration: none; font-size: 12px; margin-top: 8px; cursor: pointer; }
 
@@ -55,7 +55,7 @@
         .btn.danger { background: #d93025; }
         .btn.success { background: #34a853; color: white; }
         
-        .challenge-item { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; background: white; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .challenge-item { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; background: white; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
         .status-banner { padding: 12px; background: #e8f0fe; color: #1a73e8; font-weight: 600; border-radius: 6px; text-align: center; font-size: 15px; }
         
         /* HOOGWAARDIGE NATIVE SCHAAKBORD GRID STYLING */
@@ -196,6 +196,8 @@
         
         let whiteTime = 600, blackTime = 600;
         let clockInterval = null;
+        let initialTimeControl = { base: 600, increment: 0 };
+        let gameStarted = false;
 
         const UNICODE_PIECES = {
             'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚',
@@ -227,6 +229,17 @@
             }
         }
 
+        // Parse time control string (e.g., "10+0" -> {base: 600, increment: 0})
+        function parseTimeControl(tcString) {
+            const parts = tcString.split('+');
+            const baseMinutes = parseInt(parts[0]) || 10;
+            const incrementSeconds = parseInt(parts[1]) || 0;
+            return {
+                base: baseMinutes * 60,
+                increment: incrementSeconds
+            };
+        }
+
         // GENERERING VAN HET BORD ZONDER EXTERNE AFHANKELIJKHEDEN
         function renderBoardHTML() {
             const boardDiv = document.getElementById('chess-board');
@@ -255,6 +268,17 @@
             });
         }
 
+        function updateMoveLog() {
+            const moveLog = document.getElementById('move-log-container');
+            const moves = gameLogic.history();
+            moveLog.innerHTML = moves.map((move, idx) => {
+                const pairNum = Math.floor(idx / 2) + 1;
+                const color = idx % 2 === 0 ? '⚪' : '⚫';
+                return `<div style="margin: 4px 0;"><strong>${color} ${pairNum}.</strong> ${move}</div>`;
+            }).join('');
+            moveLog.scrollTop = moveLog.scrollHeight;
+        }
+
         function handleSquareClick(coord) {
             if (gameLogic.turn() !== myColor || currentStatus !== 'playing') return;
 
@@ -270,6 +294,7 @@
                 const move = gameLogic.move({ from: selectedSquare, to: coord, promotion: 'q' });
                 if (move) {
                     clearHighlights();
+                    updateMoveLog();
                     syncMatchState(gameLogic.fen(), gameLogic.history());
                     return;
                 }
@@ -300,15 +325,86 @@
 
         async function syncMatchState(fen, historyArray) {
             let status = 'playing';
-            if (gameLogic.in_checkmate()) status = myColor === 'w' ? 'white_won' : 'black_won';
-            else if (gameLogic.in_draw()) status = 'draw';
+            if (gameLogic.in_checkmate()) {
+                status = gameLogic.turn() === 'w' ? 'black_won' : 'white_won';
+            } else if (gameLogic.in_draw()) {
+                status = 'draw';
+            }
 
             await supabaseClient.from('gcvm_games').update({
                 fen: fen,
                 moves_list: historyArray,
                 pgn_log: historyArray.join(" "),
-                status: status
+                status: status,
+                white_time: whiteTime,
+                black_time: blackTime
             }).eq('id', currentGameId);
+
+            if (status !== 'playing') {
+                await completeGame(status);
+            }
+        }
+
+        // Calculate Elo rating change using simplified Elo formula
+        function calculateEloChange(playerRating, opponentRating, result) {
+            const K = 32; // K-factor
+            const expectedScore = 1 / (1 + Math.pow(10, (opponentRating - playerRating) / 400));
+            const actualScore = result === 'win' ? 1 : result === 'draw' ? 0.5 : 0;
+            return Math.round(K * (actualScore - expectedScore));
+        }
+
+        async function completeGame(finalStatus) {
+            try {
+                const { data: gameData } = await supabaseClient.from('gcvm_games').select('*').eq('id', currentGameId).single();
+                
+                if (!gameData) return;
+
+                // Get player data
+                const { data: players } = await supabaseClient.from('gcvm_users').select('*')
+                    .in('username', [gameData.white_player, gameData.black_player]);
+
+                if (!players || players.length < 2) return;
+
+                const whitePlayer = players.find(p => p.username === gameData.white_player);
+                const blackPlayer = players.find(p => p.username === gameData.black_player);
+
+                // Calculate rating changes
+                let whiteRatingChange = 0, blackRatingChange = 0;
+
+                if (finalStatus === 'white_won') {
+                    whiteRatingChange = calculateEloChange(whitePlayer.rating, blackPlayer.rating, 'win');
+                    blackRatingChange = calculateEloChange(blackPlayer.rating, whitePlayer.rating, 'loss');
+                } else if (finalStatus === 'black_won') {
+                    whiteRatingChange = calculateEloChange(whitePlayer.rating, blackPlayer.rating, 'loss');
+                    blackRatingChange = calculateEloChange(blackPlayer.rating, whitePlayer.rating, 'win');
+                } else if (finalStatus === 'draw') {
+                    whiteRatingChange = calculateEloChange(whitePlayer.rating, blackPlayer.rating, 'draw');
+                    blackRatingChange = calculateEloChange(blackPlayer.rating, whitePlayer.rating, 'draw');
+                }
+
+                // Update game with rating changes
+                await supabaseClient.from('gcvm_games').update({
+                    white_rating: whitePlayer.rating,
+                    black_rating: blackPlayer.rating,
+                    white_rating_change: whiteRatingChange,
+                    black_rating_change: blackRatingChange
+                }).eq('id', currentGameId);
+
+                // Update player ratings
+                await supabaseClient.from('gcvm_users').update({
+                    rating: whitePlayer.rating + whiteRatingChange
+                }).eq('username', whitePlayer.username);
+
+                await supabaseClient.from('gcvm_users').update({
+                    rating: blackPlayer.rating + blackRatingChange
+                }).eq('username', blackPlayer.username);
+
+                alert(`Game Over! ${finalStatus}\n\n${whitePlayer.username}: ${whiteRatingChange > 0 ? '+' : ''}${whiteRatingChange}\n${blackPlayer.username}: ${blackRatingChange > 0 ? '+' : ''}${blackRatingChange}`);
+                location.reload();
+
+            } catch (err) {
+                console.error("Error completing game:", err);
+            }
         }
 
         // ==========================================
@@ -323,7 +419,10 @@
             const panel = document.getElementById('incoming-request-panel');
             panel.innerHTML = "";
 
-            if (status === 'draw_offered' && gameData.white_player !== currentUser && myColor === 'b' || status === 'draw_offered' && gameData.black_player !== currentUser && myColor === 'w') {
+            const isOpponentDraw = status === 'draw_offered' && ((gameData.white_player === currentUser && myColor === 'b') || (gameData.black_player === currentUser && myColor === 'w'));
+            const isOpponentTakeback = status === 'takeback_requested' && ((gameData.white_player === currentUser && myColor === 'b') || (gameData.black_player === currentUser && myColor === 'w'));
+
+            if (isOpponentDraw) {
                 panel.classList.remove('hidden');
                 panel.innerHTML = `
                     <div class="pop-request-box">
@@ -331,7 +430,7 @@
                         <button class="btn success" style="padding:4px 8px; font-size:12px; width:auto; margin-right:5px;" onclick="resolveRequest('draw')">Accept</button>
                         <button class="btn danger" style="padding:4px 8px; font-size:12px; width:auto;" onclick="resolveRequest('reject')">Decline</button>
                     </div>`;
-            } else if (status === 'takeback_requested' && gameData.white_player !== currentUser && myColor === 'b' || status === 'takeback_requested' && gameData.black_player !== currentUser && myColor === 'w') {
+            } else if (isOpponentTakeback) {
                 panel.classList.remove('hidden');
                 panel.innerHTML = `
                     <div class="pop-request-box">
@@ -349,6 +448,7 @@
                 await supabaseClient.from('gcvm_games').update({ status: 'draw' }).eq('id', currentGameId);
             } else if (decision === 'takeback') {
                 gameLogic.undo(); // Vorige zet wissen
+                updateMoveLog();
                 await supabaseClient.from('gcvm_games').update({ fen: gameLogic.fen(), moves_list: gameLogic.history(), status: 'playing' }).eq('id', currentGameId);
             } else {
                 await supabaseClient.from('gcvm_games').update({ status: 'playing' }).eq('id', currentGameId);
@@ -359,13 +459,18 @@
         // REALTIME SUBSCRIPTION ENGINE
         // ==========================================
         async function checkActiveLiveGame(forceRejoin = false) {
-            const { data: games } = await supabaseClient.from('gcvm_games').select('*').or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`).in('status', ['playing','draw_offered','takeback_requested']);
+            const { data: games } = await supabaseClient.from('gcvm_games').select('*').or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`).in('status', ['playing','draw_offered','takeback_requested','draw','white_won','black_won']);
             
             if (games && games.length > 0) {
                 const game = games[0];
                 currentGameId = game.id;
                 currentStatus = 'playing';
                 myColor = (game.white_player === currentUser) ? 'w' : 'b';
+
+                // Parse time control
+                initialTimeControl = parseTimeControl(game.time_control || '10+0');
+                whiteTime = game.white_time !== null ? game.white_time : initialTimeControl.base;
+                blackTime = game.black_time !== null ? game.black_time : initialTimeControl.base;
 
                 document.getElementById('lobby-empty-state').classList.add('hidden');
                 document.getElementById('create-challenge-box').classList.add('hidden');
@@ -378,6 +483,7 @@
                 
                 gameLogic.load(game.fen && game.fen !== 'start' ? game.fen : 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
                 renderBoardHTML();
+                updateMoveLog();
                 renderChat(game.chat_log);
                 checkIncomingRequests(game.status, game);
                 runLocalClockEngine();
@@ -387,11 +493,14 @@
                     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games', filter: `id=eq.${currentGameId}` }, payload => {
                         const u = payload.new;
                         if (u.status === 'white_won' || u.status === 'black_won' || u.status === 'draw') {
-                            alert("Match concluded! Result: " + u.status);
-                            location.reload();
+                            currentStatus = u.status;
+                            completeGame(u.status);
                         } else {
                             gameLogic.load(u.fen);
+                            whiteTime = u.white_time || whiteTime;
+                            blackTime = u.black_time || blackTime;
                             renderBoardHTML();
+                            updateMoveLog();
                             renderChat(u.chat_log);
                             checkIncomingRequests(u.status, u);
                         }
@@ -428,16 +537,34 @@
                     whiteTime = Math.max(0, whiteTime - 1);
                     document.getElementById('card-clk-w').classList.add('active-turn');
                     document.getElementById('card-clk-b').classList.remove('active-turn');
+                    
+                    if (whiteTime === 0) {
+                        clearInterval(clockInterval);
+                        handleTimeout('w');
+                        return;
+                    }
                 } else {
                     blackTime = Math.max(0, blackTime - 1);
                     document.getElementById('card-clk-b').classList.add('active-turn');
                     document.getElementById('card-clk-w').classList.remove('active-turn');
+                    
+                    if (blackTime === 0) {
+                        clearInterval(clockInterval);
+                        handleTimeout('b');
+                        return;
+                    }
                 }
                 
                 const fmt = (t) => `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
                 document.getElementById('clock-white').innerText = fmt(whiteTime);
                 document.getElementById('clock-black').innerText = fmt(blackTime);
             }, 1000);
+        }
+
+        async function handleTimeout(timedOutColor) {
+            const result = timedOutColor === 'w' ? 'black_won' : 'white_won';
+            await supabaseClient.from('gcvm_games').update({ status: result }).eq('id', currentGameId);
+            await completeGame(result);
         }
 
         // ==========================================
@@ -457,7 +584,7 @@
                 const div = document.createElement('div');
                 div.className = "challenge-item";
                 if (c.white_player === currentUser) {
-                    div.innerHTML = `<div>Your challenge (${c.time_control})</div><button class="btn danger" style="width:auto;padding:4px 8px;" onclick="supabaseClient.from('gcvm_games').delete().eq('id','${c.id}')">Cancel</button>`;
+                    div.innerHTML = `<div>Your challenge (${c.time_control})</div><button class="btn danger" style="width:auto;padding:4px 8px;" onclick="supabaseClient.from('gcvm_games').delete().eq('id', '${c.id}').then(() => loadOpenChallenges())">Cancel</button>`;
                 } else {
                     div.innerHTML = `<div>${c.white_player} (${c.time_control})</div><button class="btn" style="width:auto;padding:4px 8px;" onclick="acceptChallenge('${c.id}')">Accept</button>`;
                 }
@@ -471,7 +598,21 @@
         }
 
         async function createNewChallenge() {
-            await supabaseClient.from('gcvm_games').insert([{ white_player: currentUser, status: 'waiting', time_control: document.getElementById('tc-preset').value, fen: 'start', moves_list: [], chat_log: [] }]);
+            const tc = document.getElementById('tc-preset').value;
+            const parsed = parseTimeControl(tc);
+            await supabaseClient.from('gcvm_games').insert([{ 
+                white_player: currentUser, 
+                status: 'waiting', 
+                time_control: tc, 
+                fen: 'start', 
+                moves_list: [], 
+                chat_log: [],
+                white_time: parsed.base,
+                black_time: parsed.base,
+                white_rating: 1500,
+                black_rating: 1500,
+                is_rated: true
+            }]);
             loadOpenChallenges();
         }
 
@@ -483,7 +624,9 @@
 
         async function resignMatch() {
             if(confirm("Confirm resignation?")) {
-                await supabaseClient.from('gcvm_games').update({ status: myColor === 'w' ? 'black_won' : 'white_won' }).eq('id', currentGameId);
+                const result = myColor === 'w' ? 'black_won' : 'white_won';
+                await supabaseClient.from('gcvm_games').update({ status: result }).eq('id', currentGameId);
+                await completeGame(result);
             }
         }
     </script>
