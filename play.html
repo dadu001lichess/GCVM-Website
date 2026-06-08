@@ -50,7 +50,7 @@
         .status-banner { padding: 12px; background: #e8f0fe; color: #1a73e8; font-weight: 600; border-radius: 6px; text-align: center; font-size: 15px; }
         
         .chess-grid { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; aspect-ratio: 1; border: 4px solid #3c4043; border-radius: 4px; box-sizing: border-box; }
-        .square { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 42px; cursor: pointer; user-select: none; position: relative; }
+        .square { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 42px; cursor: pointer; user-select: none; position: relative; font-family: 'Arial Unicode MS', Arial, sans-serif; }
         .light-sq { background-color: #f0d9b5; }
         .dark-sq { background-color: #b58863; }
         .square.selected { background-color: #f7f785 !important; }
@@ -182,8 +182,9 @@
         let clockInterval = null;
         let initialTimeControl = { base: 600, increment: 0 };
 
+        // Wikipedia chess symbols
         const UNICODE_PIECES = {
-            'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚',
+            'p': '♟︎', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚',
             'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔'
         };
 
@@ -344,25 +345,28 @@
                     blackRatingChange = calculateEloChange(blackPlayer.rating, whitePlayer.rating, 'draw');
                 }
 
-                const newWhiteRating = whitePlayer.rating + whiteRatingChange;
-                const newBlackRating = blackPlayer.rating + blackRatingChange;
+                const newWhiteRating = Math.max(1, whitePlayer.rating + whiteRatingChange);
+                const newBlackRating = Math.max(1, blackPlayer.rating + blackRatingChange);
 
+                // Update game with rating changes
                 await supabaseClient.from('gcvm_games').update({
                     white_rating: whitePlayer.rating,
                     black_rating: blackPlayer.rating,
                     white_rating_change: whiteRatingChange,
-                    black_rating_change: blackRatingChange
+                    black_rating_change: blackRatingChange,
+                    is_rated: true
                 }).eq('id', currentGameId);
 
-                await supabaseClient.from('gcvm_users').update({ rating: newWhiteRating }).eq('username', whitePlayer.username);
-                await supabaseClient.from('gcvm_users').update({ rating: newBlackRating }).eq('username', blackPlayer.username);
+                // Update player ratings
+                await supabaseClient.from('gcvm_users').update({ rating: newWhiteRating, rd: Math.max(30, whitePlayer.rd - 5) }).eq('username', whitePlayer.username);
+                await supabaseClient.from('gcvm_users').update({ rating: newBlackRating, rd: Math.max(30, blackPlayer.rd - 5) }).eq('username', blackPlayer.username);
 
                 const resultText = finalStatus === 'white_won' ? 'White won' : finalStatus === 'black_won' ? 'Black won' : 'Draw';
                 alert(`Game Over: ${resultText}`);
                 
                 clearInterval(clockInterval);
                 currentGameId = null;
-                location.reload();
+                setTimeout(() => location.reload(), 1000);
 
             } catch (err) {
                 console.error("Error completing game:", err);
@@ -553,13 +557,8 @@
         }
 
         async function createNewChallenge() {
-            // Check if user already has an open challenge
-            const { data: existingChallenge } = await supabaseClient.from('gcvm_games').select('id').eq('white_player', currentUser).eq('status', 'waiting');
-            
-            if (existingChallenge && existingChallenge.length > 0) {
-                alert("You already have an open challenge! Cancel it before creating a new one.");
-                return;
-            }
+            // Delete all old waiting challenges from this user
+            await supabaseClient.from('gcvm_games').delete().eq('white_player', currentUser).eq('status', 'waiting');
 
             const tc = document.getElementById('tc-preset').value;
             const parsed = parseTimeControl(tc);
