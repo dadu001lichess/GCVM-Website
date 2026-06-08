@@ -7,12 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
     <style>
         body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; color: #3c4043; }
         
-        /* SIDEBAR STYLING - EXACT IDENTIEK AAN INDEX.HTML */
         aside { 
             width: 280px; 
             background-color: #202124; 
@@ -32,19 +30,12 @@
         .user-info strong { color: #8ab4f8; font-size: 15px; }
         .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
         
-        .admin-action-btn {
-            display: block; width: 100%; padding: 8px; margin-top: 10px; background-color: #d93025; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;
-        }
         .logout-link { display: inline-block; color: #f28b82; text-decoration: none; font-size: 12px; margin-top: 8px; cursor: pointer; }
 
         nav { border-top: 1px solid #3c4043; padding-top: 15px; }
         nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
         nav a:hover, nav a.active { color: #8ab4f8; }
-        summary { list-style: none; color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; }
-        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; margin-bottom: 10px; }
-        .sub-menu a { font-size: 14px; padding: 8px 0; }
 
-        /* MAIN CONTENT INTERFACE */
         main { margin-left: 280px; width: calc(100% - 280px); padding: 40px; box-sizing: border-box; display: flex; gap: 40px; }
         .game-area { flex: 1; max-width: 600px; display: flex; flex-direction: column; gap: 15px; }
         .sidebar-right { width: 360px; display: flex; flex-direction: column; gap: 20px; }
@@ -58,7 +49,6 @@
         .challenge-item { padding: 12px; border: 1px solid #dadce0; border-radius: 4px; background: white; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
         .status-banner { padding: 12px; background: #e8f0fe; color: #1a73e8; font-weight: 600; border-radius: 6px; text-align: center; font-size: 15px; }
         
-        /* HOOGWAARDIGE NATIVE SCHAAKBORD GRID STYLING */
         .chess-grid { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; aspect-ratio: 1; border: 4px solid #3c4043; border-radius: 4px; box-sizing: border-box; }
         .square { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 42px; cursor: pointer; user-select: none; position: relative; }
         .light-sq { background-color: #f0d9b5; }
@@ -66,7 +56,6 @@
         .square.selected { background-color: #f7f785 !important; }
         .square.dot-target::after { content: ""; width: 16px; height: 16px; background-color: rgba(26, 115, 232, 0.5); border-radius: 50%; position: absolute; }
 
-        /* UPGRADED CLOCK LAYOUT */
         .clock-container { display: flex; gap: 12px; justify-content: space-between; margin-bottom: 5px; }
         .clock-card { flex: 1; background: #202124; border-radius: 6px; padding: 10px; text-align: center; border: 2px solid #3c4043; }
         .clock-card.active-turn { border-color: #ff9800; box-shadow: 0 0 8px rgba(255,152,0,0.4); }
@@ -78,7 +67,6 @@
         .hidden { display: none !important; }
         .lobby-placeholder { text-align: center; padding: 30px 20px; border: 2px dashed #dadce0; border-radius: 8px; color: #70757a; background: #f8f9fa; }
         
-        /* INCOMING POPUP MODAL STYLING */
         .pop-request-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 13px; color: #856404; }
     </style>
 </head>
@@ -91,7 +79,6 @@
                 <div class="user-info">
                     Logged in as:<br>
                     <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
-                    <button id="admin-view-btn" class="admin-action-btn hidden" onclick="location.href='index.html?openAdmin=true'">Open Admin Panel</button>
                     <span class="logout-link" onclick="logoutUser()">Log out</span>
                 </div>
             </div>
@@ -112,9 +99,6 @@
             </div>
 
             <div id="lobby-empty-state" class="lobby-placeholder">
-                <div id="rejoin-action-wrapper" class="hidden" style="margin-bottom: 20px;">
-                    <button class="btn success" style="font-size:16px; padding:15px;" onclick="checkActiveLiveGame(true)">🚨 You have an active match! Click here to rejoin</button>
-                </div>
                 <h3>Welcome to the Match Room</h3>
                 <p>Create a challenge on the right side or accept an open challenge from the lobby list to display the chessboard and start playing!</p>
             </div>
@@ -146,11 +130,11 @@
                     
                     <div class="clock-container">
                         <div class="clock-card" id="card-clk-w">
-                            <div class="clock-label">⚪ White</div>
+                            <div class="clock-label">White</div>
                             <div class="clock-time" id="clock-white">10:00</div>
                         </div>
                         <div class="clock-card" id="card-clk-b">
-                            <div class="clock-label">⚫ Black</div>
+                            <div class="clock-label">Black</div>
                             <div class="clock-time" id="clock-black">10:00</div>
                         </div>
                     </div>
@@ -170,8 +154,8 @@
                     </div>
 
                     <div style="display:flex; gap:8px;">
-                        <button class="btn secondary" style="flex:1; font-size:12px;" onclick="proposeMatchAction('draw_offered')">Offer Draw 🤝</button>
-                        <button class="btn secondary" style="flex:1; font-size:12px;" onclick="proposeMatchAction('takeback_requested')">Takeback ↩</button>
+                        <button class="btn secondary" style="flex:1; font-size:12px;" onclick="proposeMatchAction('draw_offered')">Offer Draw</button>
+                        <button class="btn secondary" style="flex:1; font-size:12px;" onclick="proposeMatchAction('takeback_requested')">Takeback</button>
                     </div>
 
                     <button class="btn danger" onclick="resignMatch()">Resign Match</button>
@@ -197,7 +181,6 @@
         let whiteTime = 600, blackTime = 600;
         let clockInterval = null;
         let initialTimeControl = { base: 600, increment: 0 };
-        let gameStarted = false;
 
         const UNICODE_PIECES = {
             'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚',
@@ -209,38 +192,24 @@
             document.getElementById('displayed-username').innerText = currentUser;
             if (currentRole === 'admin') {
                 document.getElementById('admin-badge').classList.remove('hidden');
-                document.getElementById('admin-view-btn').classList.remove('hidden');
             }
             loadOpenChallenges();
-            scanForActiveGameButton();
             setInterval(loadOpenChallenges, 4000);
             listenForLobbyChanges();
+            checkActiveLiveGame();
         };
 
         function logoutUser() {
             localStorage.clear(); window.location.href = "index.html";
         }
 
-        // CONTROLEREN OP BESTAANDE LIVE WEDSTRIJD VOOR DE HOME-KNOP
-        async function scanForActiveGameButton() {
-            const { data } = await supabaseClient.from('gcvm_games').select('id').or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`).eq('status', 'playing');
-            if (data && data.length > 0) {
-                document.getElementById('rejoin-action-wrapper').classList.remove('hidden');
-            }
-        }
-
-        // Parse time control string (e.g., "10+0" -> {base: 600, increment: 0})
         function parseTimeControl(tcString) {
             const parts = tcString.split('+');
             const baseMinutes = parseInt(parts[0]) || 10;
             const incrementSeconds = parseInt(parts[1]) || 0;
-            return {
-                base: baseMinutes * 60,
-                increment: incrementSeconds
-            };
+            return { base: baseMinutes * 60, increment: incrementSeconds };
         }
 
-        // GENERERING VAN HET BORD ZONDER EXTERNE AFHANKELIJKHEDEN
         function renderBoardHTML() {
             const boardDiv = document.getElementById('chess-board');
             boardDiv.innerHTML = "";
@@ -261,7 +230,6 @@
                         squareHTML.innerText = UNICODE_PIECES[symbol] || "";
                     }
 
-                    // Tapping / Click handler
                     squareHTML.onclick = () => handleSquareClick(coord);
                     boardDiv.appendChild(squareHTML);
                 });
@@ -273,7 +241,7 @@
             const moves = gameLogic.history();
             moveLog.innerHTML = moves.map((move, idx) => {
                 const pairNum = Math.floor(idx / 2) + 1;
-                const color = idx % 2 === 0 ? '⚪' : '⚫';
+                const color = idx % 2 === 0 ? 'W' : 'B';
                 return `<div style="margin: 4px 0;"><strong>${color} ${pairNum}.</strong> ${move}</div>`;
             }).join('');
             moveLog.scrollTop = moveLog.scrollHeight;
@@ -290,7 +258,6 @@
             }
 
             if (selectedSquare) {
-                // Voer zet uit
                 const move = gameLogic.move({ from: selectedSquare, to: coord, promotion: 'q' });
                 if (move) {
                     clearHighlights();
@@ -300,13 +267,11 @@
                 }
             }
 
-            // Selecteer nieuw stuk
             if (clickedPiece && clickedPiece.color === myColor) {
                 clearHighlights();
                 selectedSquare = coord;
                 document.querySelector(`[data-coord="${coord}"]`).classList.add('selected');
                 
-                // Mogelijke zetten markeren
                 const legalMoves = gameLogic.moves({ square: coord, verbose: true });
                 legalMoves.forEach(m => {
                     document.querySelector(`[data-coord="${m.to}"]`).classList.add('dot-target');
@@ -345,9 +310,8 @@
             }
         }
 
-        // Calculate Elo rating change using simplified Elo formula
         function calculateEloChange(playerRating, opponentRating, result) {
-            const K = 32; // K-factor
+            const K = 32;
             const expectedScore = 1 / (1 + Math.pow(10, (opponentRating - playerRating) / 400));
             const actualScore = result === 'win' ? 1 : result === 'draw' ? 0.5 : 0;
             return Math.round(K * (actualScore - expectedScore));
@@ -359,7 +323,6 @@
                 
                 if (!gameData) return;
 
-                // Get player data
                 const { data: players } = await supabaseClient.from('gcvm_users').select('*')
                     .in('username', [gameData.white_player, gameData.black_player]);
 
@@ -368,7 +331,6 @@
                 const whitePlayer = players.find(p => p.username === gameData.white_player);
                 const blackPlayer = players.find(p => p.username === gameData.black_player);
 
-                // Calculate rating changes
                 let whiteRatingChange = 0, blackRatingChange = 0;
 
                 if (finalStatus === 'white_won') {
@@ -382,7 +344,9 @@
                     blackRatingChange = calculateEloChange(blackPlayer.rating, whitePlayer.rating, 'draw');
                 }
 
-                // Update game with rating changes
+                const newWhiteRating = whitePlayer.rating + whiteRatingChange;
+                const newBlackRating = blackPlayer.rating + blackRatingChange;
+
                 await supabaseClient.from('gcvm_games').update({
                     white_rating: whitePlayer.rating,
                     black_rating: blackPlayer.rating,
@@ -390,16 +354,14 @@
                     black_rating_change: blackRatingChange
                 }).eq('id', currentGameId);
 
-                // Update player ratings
-                await supabaseClient.from('gcvm_users').update({
-                    rating: whitePlayer.rating + whiteRatingChange
-                }).eq('username', whitePlayer.username);
+                await supabaseClient.from('gcvm_users').update({ rating: newWhiteRating }).eq('username', whitePlayer.username);
+                await supabaseClient.from('gcvm_users').update({ rating: newBlackRating }).eq('username', blackPlayer.username);
 
-                await supabaseClient.from('gcvm_users').update({
-                    rating: blackPlayer.rating + blackRatingChange
-                }).eq('username', blackPlayer.username);
-
-                alert(`Game Over! ${finalStatus}\n\n${whitePlayer.username}: ${whiteRatingChange > 0 ? '+' : ''}${whiteRatingChange}\n${blackPlayer.username}: ${blackRatingChange > 0 ? '+' : ''}${blackRatingChange}`);
+                const resultText = finalStatus === 'white_won' ? 'White won' : finalStatus === 'black_won' ? 'Black won' : 'Draw';
+                alert(`Game Over: ${resultText}`);
+                
+                clearInterval(clockInterval);
+                currentGameId = null;
                 location.reload();
 
             } catch (err) {
@@ -407,12 +369,9 @@
             }
         }
 
-        // ==========================================
-        // DRAW / TAKEBACK AFHANDELING (INTERACTIEF!)
-        // ==========================================
         async function proposeMatchAction(actionType) {
             await supabaseClient.from('gcvm_games').update({ status: actionType }).eq('id', currentGameId);
-            sendChatMessageToServer(`[SYSTEM: ${currentUser} ingediend verzoek: ${actionType.replace('_', ' ')}]`);
+            sendChatMessageToServer(`[SYSTEM: ${currentUser} proposed: ${actionType.replace('_', ' ')}]`);
         }
 
         function checkIncomingRequests(status, gameData) {
@@ -426,7 +385,7 @@
                 panel.classList.remove('hidden');
                 panel.innerHTML = `
                     <div class="pop-request-box">
-                        <strong>Draw Offer received!</strong><br><br>
+                        <strong>Draw Offer received</strong><br><br>
                         <button class="btn success" style="padding:4px 8px; font-size:12px; width:auto; margin-right:5px;" onclick="resolveRequest('draw')">Accept</button>
                         <button class="btn danger" style="padding:4px 8px; font-size:12px; width:auto;" onclick="resolveRequest('reject')">Decline</button>
                     </div>`;
@@ -434,7 +393,7 @@
                 panel.classList.remove('hidden');
                 panel.innerHTML = `
                     <div class="pop-request-box">
-                        <strong>Takeback requested by opponent!</strong><br><br>
+                        <strong>Takeback requested</strong><br><br>
                         <button class="btn success" style="padding:4px 8px; font-size:12px; width:auto; margin-right:5px;" onclick="resolveRequest('takeback')">Allow</button>
                         <button class="btn danger" style="padding:4px 8px; font-size:12px; width:auto;" onclick="resolveRequest('reject')">Decline</button>
                     </div>`;
@@ -447,7 +406,7 @@
             if (decision === 'draw') {
                 await supabaseClient.from('gcvm_games').update({ status: 'draw' }).eq('id', currentGameId);
             } else if (decision === 'takeback') {
-                gameLogic.undo(); // Vorige zet wissen
+                gameLogic.undo();
                 updateMoveLog();
                 await supabaseClient.from('gcvm_games').update({ fen: gameLogic.fen(), moves_list: gameLogic.history(), status: 'playing' }).eq('id', currentGameId);
             } else {
@@ -455,11 +414,8 @@
             }
         }
 
-        // ==========================================
-        // REALTIME SUBSCRIPTION ENGINE
-        // ==========================================
-        async function checkActiveLiveGame(forceRejoin = false) {
-            const { data: games } = await supabaseClient.from('gcvm_games').select('*').or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`).in('status', ['playing','draw_offered','takeback_requested','draw','white_won','black_won']);
+        async function checkActiveLiveGame() {
+            const { data: games } = await supabaseClient.from('gcvm_games').select('*').or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`).eq('status', 'playing');
             
             if (games && games.length > 0) {
                 const game = games[0];
@@ -467,7 +423,6 @@
                 currentStatus = 'playing';
                 myColor = (game.white_player === currentUser) ? 'w' : 'b';
 
-                // Parse time control
                 initialTimeControl = parseTimeControl(game.time_control || '10+0');
                 whiteTime = game.white_time !== null ? game.white_time : initialTimeControl.base;
                 blackTime = game.black_time !== null ? game.black_time : initialTimeControl.base;
@@ -479,7 +434,7 @@
                 document.getElementById('board-wrapper').classList.remove('hidden');
                 document.getElementById('game-actions-box').classList.remove('hidden');
 
-                document.getElementById('players-display-info').innerHTML = `⚪ White: <strong>${game.white_player}</strong> | ⚫ Black: <strong>${game.black_player}</strong>`;
+                document.getElementById('players-display-info').innerHTML = `White: ${game.white_player} | Black: ${game.black_player}`;
                 
                 gameLogic.load(game.fen && game.fen !== 'start' ? game.fen : 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
                 renderBoardHTML();
@@ -508,7 +463,6 @@
             }
         }
 
-        // REALTIME LIVE CHAT IMPLEMENTATIE
         async function sendChatMessage() {
             const input = document.getElementById('chat-input');
             if (!input.value.trim()) return;
@@ -529,7 +483,6 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // LIVE KLOK ENGINE & VISUELE HIGHLIGHTS PER TURN
         function runLocalClockEngine() {
             if (clockInterval) clearInterval(clockInterval);
             clockInterval = setInterval(() => {
@@ -567,16 +520,13 @@
             await completeGame(result);
         }
 
-        // ==========================================
-        // LOBBY CHALLENGES FUNCTIES
-        // ==========================================
         async function loadOpenChallenges() {
             let { data } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
             const container = document.getElementById('challenges-container');
             container.innerHTML = "";
             
             if (!data || data.length === 0) {
-                container.innerHTML = "<p style='font-size:12px;color:#70757a;'>No challenges broadcasted.</p>";
+                container.innerHTML = "<p style='font-size:12px;color:#70757a;'>No open challenges</p>";
                 return;
             }
 
@@ -584,12 +534,17 @@
                 const div = document.createElement('div');
                 div.className = "challenge-item";
                 if (c.white_player === currentUser) {
-                    div.innerHTML = `<div>Your challenge (${c.time_control})</div><button class="btn danger" style="width:auto;padding:4px 8px;" onclick="supabaseClient.from('gcvm_games').delete().eq('id', '${c.id}').then(() => loadOpenChallenges())">Cancel</button>`;
+                    div.innerHTML = `<div>${c.white_player} (${c.time_control})</div><button class="btn danger" style="width:auto;padding:4px 8px;" onclick="cancelChallenge('${c.id}')">Cancel</button>`;
                 } else {
                     div.innerHTML = `<div>${c.white_player} (${c.time_control})</div><button class="btn" style="width:auto;padding:4px 8px;" onclick="acceptChallenge('${c.id}')">Accept</button>`;
                 }
                 container.appendChild(div);
             });
+        }
+
+        async function cancelChallenge(id) {
+            await supabaseClient.from('gcvm_games').delete().eq('id', id);
+            loadOpenChallenges();
         }
 
         async function acceptChallenge(id) {
@@ -598,6 +553,14 @@
         }
 
         async function createNewChallenge() {
+            // Check if user already has an open challenge
+            const { data: existingChallenge } = await supabaseClient.from('gcvm_games').select('id').eq('white_player', currentUser).eq('status', 'waiting');
+            
+            if (existingChallenge && existingChallenge.length > 0) {
+                alert("You already have an open challenge! Cancel it before creating a new one.");
+                return;
+            }
+
             const tc = document.getElementById('tc-preset').value;
             const parsed = parseTimeControl(tc);
             await supabaseClient.from('gcvm_games').insert([{ 
@@ -618,7 +581,7 @@
 
         function listenForLobbyChanges() {
             supabaseClient.channel('lobby').on('postgres_changes', { event: '*', schema: 'public', table: 'gcvm_games' }, () => {
-                loadOpenChallenges(); checkActiveLiveGame();
+                loadOpenChallenges();
             }).subscribe();
         }
 
