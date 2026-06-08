@@ -9,77 +9,29 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            margin: 0;
-            display: flex;
-            background-color: white;
-            color: #3c4043;
-        }
+        body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; color: #3c4043; }
 
-        aside {
-            width: 280px;
-            background-color: #202124; 
-            height: 100vh;
-            position: fixed;
-            padding: 40px 24px;
-            box-sizing: border-box;
-            overflow-y: auto;
-            left: 0;
-            top: 0;
-            z-index: 10;
-        }
-
+        aside { width: 280px; background-color: #202124; height: 100vh; position: fixed; padding: 40px 24px; box-sizing: border-box; overflow-y: auto; left: 0; top: 0; z-index: 10; }
         .logo { color: white; font-size: 22px; font-weight: 300; margin-bottom: 20px; letter-spacing: 0.5px; }
         .auth-container { margin-bottom: 25px; }
-        .auth-input-group { display: flex; flex-direction: column; gap: 6px; }
-        
-        .auth-input {
-            width: 100%; padding: 8px 12px; border: 1px solid #3c4043; border-radius: 4px;
-            background-color: #303134; color: white; font-size: 13px; box-sizing: border-box; outline: none;
-        }
-
-        .auth-btn-container { display: flex; gap: 6px; margin-top: 4px; }
-        .auth-btn {
-            flex: 1; padding: 10px; background-color: #1a73e8; color: white; border: none;
-            border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;
-        }
-        .auth-btn.secondary { background-color: #3c4043; color: #bdc1c6; }
-        .user-info { color: #bdc1c6; font-size: 14px; }
+        .user-info { color: #bdc1c6; font-size: 14px; line-height: 1.4; }
         .user-info strong { color: #8ab4f8; font-size: 15px; }
         .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; }
         .logout-link { color: #f28b82; font-size: 12px; margin-top: 8px; cursor: pointer; display: inline-block; }
 
+        nav { border-top: 1px solid #3c4043; padding-top: 15px; }
         nav a { display: block; color: #bdc1c6; text-decoration: none; padding: 12px 0; font-size: 15px; }
         nav a:hover, nav a.active { color: #8ab4f8; }
-        summary { color: #bdc1c6; padding: 12px 0; font-size: 15px; cursor: pointer; list-style: none; }
-        .sub-menu { padding-left: 20px; border-left: 1px solid #3c4043; }
-        .sub-menu a { font-size: 14px; padding: 8px 0; }
 
-        main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; box-sizing: border-box; position: relative; }
+        main { margin-left: 280px; width: calc(100% - 280px); min-height: 100vh; box-sizing: border-box; }
         .banner { height: 120px; background-color: #f1f3f4; display: flex; align-items: center; padding-left: 40px; border-bottom: 1px solid #dadce0; }
         .banner h1 { font-size: 32px; font-weight: 400; margin: 0; color: #202124; }
         .content { max-width: 1000px; margin: 0 auto; padding: 40px; }
 
-        .top-right-search {
-            position: absolute;
-            top: 40px;
-            right: 40px;
-            display: flex;
-            gap: 8px;
-            z-index: 5;
-        }
-        .search-input { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 200px; }
-        .search-btn { background: #3c4043; color: white; border: none; padding: 0 14px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        .search-btn:hover { background: #202124; }
-
         .profile-grid { display: grid; grid-template-columns: 260px 1fr; gap: 40px; }
         .side-panel { border-right: 1px solid #dadce0; padding-right: 20px; }
         
-        .rating-card {
-            background: #f8f9fa; border: 1px solid #dadce0; padding: 12px 16px; border-radius: 6px;
-            margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-        }
+        .rating-card { background: #f8f9fa; border: 1px solid #dadce0; padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .rating-name { font-weight: 600; font-size: 14px; }
         .rating-val { color: #1a73e8; font-weight: 600; font-size: 16px; }
         .rating-sub { font-size: 11px; color: #70757a; margin-top: 2px; }
@@ -89,13 +41,10 @@
         .profile-title { font-size: 28px; margin: 0; font-weight: 400; }
 
         .flair-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 5px; }
-        .edit-select { width: 100%; max-width: 320px; padding: 10px 12px; border: 1px solid #dadce0; border-radius: 4px; font-family: inherit; font-size: 14px; background-color: #fff; color: #3c4043; outline: none; }
+        .edit-select { width: 100%; max-width: 320px; padding: 10px 12px; border: 1px solid #dadce0; border-radius: 4px; font-family: inherit; font-size: 14px; background-color: #fff; color: #3c4043; }
         .edit-select:focus { border-color: #1a73e8; }
         
-        .bio-textarea { 
-            width: 100%; height: 140px; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; 
-            resize: none; font-family: inherit; font-size: 15px; box-sizing: border-box; background-color: #fff; color: #3c4043; outline: none;
-        }
+        .bio-textarea { width: 100%; height: 140px; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; resize: none; font-family: inherit; font-size: 15px; box-sizing: border-box; background-color: #fff; color: #3c4043; outline: none; }
         .bio-textarea:focus { border-color: #1a73e8; }
         
         .save-btn { background: #34a853; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; width: fit-content; margin-top: 10px; }
@@ -110,15 +59,7 @@
     <aside>
         <div class="logo">GC(V)M</div>
         <div class="auth-container">
-            <div id="login-section" class="auth-input-group">
-                <input type="text" id="username-input" class="auth-input" placeholder="Lichess username...">
-                <input type="password" id="password-input" class="auth-input" placeholder="Password...">
-                <div class="auth-btn-container">
-                    <button class="auth-btn" onclick="loginUser()">Login</button>
-                    <button class="auth-btn secondary" onclick="registerUser()">Register</button>
-                </div>
-            </div>
-            <div id="profile-section" class="hidden">
+            <div id="profile-section">
                 <div class="user-info">
                     Logged in as:<br>
                     <strong id="displayed-username">...</strong><span id="admin-badge" class="badge hidden">Admin</span><br>
@@ -129,62 +70,29 @@
         <nav>
             <a href="index.html">Homepage</a>
             <a href="profileview.html" class="active">Profile</a>
-            <a href="Training.html">Training</a>
-            <a href="Coaches.html">Coaches</a>
-            <details>
-              <summary>Shards currency ⌵</summary>
-              <div class="sub-menu">
-                <a href="Shardsintro.html">How to get Shards?</a>
-                <a href="Daily puzzle.html">Daily puzzle</a>
-                <a href="Shards shop.html">Shards shop</a>
-              </div>
-            </details>
             <a href="play.html">Play Chess</a>
-            <a href="Current games.html">Current games</a>
-            <a href="GoTM.html">Game of the month</a>
-            <a href="Jobs.html">Special mentions/Jobs</a>
-            <details>
-              <summary>Updates/News ⌵</summary>
-              <div class="sub-menu">
-                <a href="Updates.html">Updates</a>
-                <a href="News.html">Newspaper</a>
-              </div>    
-            </details>
-            <details>
-              <summary>Community ⌵</summary>
-              <div class="sub-menu">
-                <a href="Leaders.html">Mods/Leaders</a>
-                <a href="Contact.html">Contact</a>
-                <a href="MoTM.html">MoTM</a>
-              </div>    
-            </details>
         </nav>
     </aside>
 
     <main>
-        <div class="top-right-search">
-            <input type="text" id="memberSearchField" class="search-input" placeholder="Search member...">
-            <button class="search-btn" onclick="searchOtherMember()">Search</button>
-        </div>
-
         <div class="banner">
-            <h1 id="page-main-title">Profile Editor</h1>
+            <h1 id="page-main-title">Edit Profile</h1>
         </div>
 
         <div class="content">
             <div id="logged-out-warning" class="alert-warn">
-                Please log in through the sidebar to view or customize your profile!
+                Please log in to edit your profile!
             </div>
 
             <div id="profile-page-content" class="hidden">
                 <div class="profile-grid">
                     
                     <div class="side-panel">
-                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Live Statistics</h3>
+                        <h3 style="margin-top:0; font-weight:600; font-size:16px;">Statistics</h3>
                         <div class="rating-card">
                             <div>
-                                <div class="rating-name">Live Rating</div>
-                                <div class="rating-sub">Deviation: <span id="user-rd">±350</span></div>
+                                <div class="rating-name">Rating</div>
+                                <div class="rating-sub">Deviation: <span id="user-rd">350</span></div>
                             </div>
                             <div class="rating-val" id="user-rating">1500</div>
                         </div>
@@ -206,20 +114,19 @@
                         <div class="flair-group">
                             <label style="font-size:14px; font-weight:600; color:#202124;">Select your flair:</label>
                             <select id="flair-select" class="edit-select">
-                                <option value="">No Flair</option>
-                                <option value="⚔️ ">⚔️ </option>
-                                <option value="🛡️ ">🛡️ </option>
-                                <option value="🎓 ">🎓 </option>
-                                <option value="🧩 ">🧩 </option>
-                                <option value="⚡ ">⚡ </option>
-                                <option value="🚀 ">🚀 </option>
-                                <option value="🌌 ">🌌 </option>
-                                <option value="🍌 ">🍌 </option>
-                                <option value="☕ ">☕ </option>
-                                <option value="📈 ">📈 </option>
-                                <option value="🧠 ">🧠 </option>
-                                <option value="🐴 ">🐴 </option>
-                                <option value="🐼 ">🐼 </option>
+                                <option value="">None</option>
+                                <option value="Scholar">Scholar</option>
+                                <option value="Master">Master</option>
+                                <option value="Champion">Champion</option>
+                                <option value="Coach">Coach</option>
+                                <option value="Innovator">Innovator</option>
+                                <option value="Rising Star">Rising Star</option>
+                                <option value="Analyst">Analyst</option>
+                                <option value="Tactician">Tactician</option>
+                                <option value="Strategist">Strategist</option>
+                                <option value="Warrior">Warrior</option>
+                                <option value="Pioneer">Pioneer</option>
+                                <option value="Legend">Legend</option>
                             </select>
                         </div>
 
@@ -254,7 +161,6 @@
                 showSidebarLoggedIn(currentSession, currentRole);
                 document.getElementById('logged-out-warning').classList.add('hidden');
                 document.getElementById('profile-page-content').classList.remove('hidden');
-                
                 loadProfileData(currentSession);
             }
         };
@@ -268,24 +174,17 @@
             }
 
             try {
-                const { data: users, error } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('username, bio, flair, rating, rd')
-                    .ilike('username', username);
+                const { data: users } = await supabaseClient.from('gcvm_users').select('*').ilike('username', username);
 
-                if (error) throw error;
                 if (!users || users.length === 0) return;
 
                 const user = users[0];
                 document.getElementById('bio-textarea-input').value = user.bio || "";
                 document.getElementById('flair-select').value = user.flair || "";
                 document.getElementById('view-username').innerText = user.username;
-
-                // Bind Live Rating values
                 document.getElementById('user-rating').innerText = user.rating || 1500;
-                document.getElementById('user-rd').innerText = `±${Math.round(user.rd || 350)}`;
+                document.getElementById('user-rd').innerText = Math.round(user.rd || 350);
 
-                // Compute match breakdowns
                 await fetchAndCalculateStats(user.username);
 
             } catch(err) { console.error(err); }
@@ -293,12 +192,8 @@
 
         async function fetchAndCalculateStats(targetUsername) {
             try {
-                const { data: games, error } = await supabaseClient
-                    .from('gcvm_games')
-                    .select('*')
+                const { data: games } = await supabaseClient.from('gcvm_games').select('*')
                     .or(`white_player.ilike.${targetUsername},black_player.ilike.${targetUsername}`);
-
-                if (error) throw error;
 
                 const finishedGames = games ? games.filter(g => g.status !== 'playing' && g.status !== 'waiting') : [];
                 const totalGames = finishedGames.length;
@@ -312,9 +207,7 @@
                     return;
                 }
 
-                let wins = 0;
-                let whiteCount = 0;
-                let blackCount = 0;
+                let wins = 0, whiteCount = 0, blackCount = 0;
 
                 finishedGames.forEach(game => {
                     const isWhite = game.white_player && game.white_player.toLowerCase() === targetUsername.toLowerCase();
@@ -337,7 +230,7 @@
                 renderMatchHistoryList(finishedGames, targetUsername);
 
             } catch (err) {
-                console.error("Failed loading stats in editor:", err.message);
+                console.error("Failed loading stats:", err);
             }
         }
 
@@ -350,8 +243,7 @@
                 return;
             }
 
-            // Sort matches descending by id
-            gamesList.sort((a, b) => b.id - a.id); 
+            gamesList.sort((a, b) => b.id - a.id);
 
             gamesList.forEach(match => {
                 const isWhite = match.white_player && match.white_player.toLowerCase() === targetUsername.toLowerCase();
@@ -375,23 +267,11 @@
                 }
 
                 const matchCard = document.createElement('div');
-                matchCard.style = `
-                    border: 1px solid ${cardBorderColor}; 
-                    border-left: 5px solid ${cardBorderColor};
-                    padding: 14px 18px; 
-                    border-radius: 6px; 
-                    background: white; 
-                    display: flex; 
-                    justify-content: space-between; 
-                    align-items: center;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-                `;
+                matchCard.style = `border: 1px solid ${cardBorderColor}; border-left: 5px solid ${cardBorderColor}; padding: 14px 18px; border-radius: 6px; background: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);`;
 
                 matchCard.innerHTML = `
                     <div>
-                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; background: ${badgeBackground}; color: ${badgeColor}; padding: 3px 8px; border-radius: 4px;">
-                            ${resultLabel}
-                        </span>
+                        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; background: ${badgeBackground}; color: ${badgeColor}; padding: 3px 8px; border-radius: 4px;">${resultLabel}</span>
                         <div style="margin-top: 8px; font-size: 15px; color: #202124;">
                             Playing as <strong>${isWhite ? 'White' : 'Black'}</strong> against <span style="color: #1a73e8; font-weight:600;">${opponent || 'Unknown'}</span>
                         </div>
@@ -413,64 +293,20 @@
             if (!username) return;
 
             try {
-                const { error } = await supabaseClient
-                    .from('gcvm_users')
+                const { error } = await supabaseClient.from('gcvm_users')
                     .update({ bio: newBio, flair: newFlair })
                     .ilike('username', username);
 
                 if (error) throw error;
 
-                alert("Profile changes successfully saved to the cloud database!");
+                alert("Profile changes saved successfully!");
                 window.location.href = "profileview.html";
             } catch (err) {
                 alert("Failed to save: " + err.message);
             }
         }
 
-        function searchOtherMember() {
-            const name = document.getElementById('memberSearchField').value.trim();
-            if (name) window.location.href = `profileview.html?user=${name}`;
-        }
-
-        async function loginUser() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) return alert("Fill in all fields!");
-
-            try {
-                const { data: users, error } = await supabaseClient
-                    .from('gcvm_users')
-                    .select('*')
-                    .ilike('username', username)
-                    .eq('password', password);
-                
-                if (error || !users || users.length === 0) { alert("Invalid credentials!"); return; }
-
-                const user = users[0];
-                localStorage.setItem('gcvm_db_session', user.username);
-                localStorage.setItem('gcvm_db_role', user.role);
-                window.location.reload();
-            } catch (err) { alert(err.message); }
-        }
-
-        async function registerUser() {
-            const username = document.getElementById('username-input').value.trim();
-            const password = document.getElementById('password-input').value.trim();
-            if (!username || !password) return alert("Fill in all fields!");
-
-            try {
-                const { error } = await supabaseClient
-                    .from('gcvm_users')
-                    .insert([{ username, password, role: 'user', bio: '', flair: '', rating: 1500, rd: 350 }]);
-                
-                if (error) throw error;
-                alert("Account created!");
-            } catch (err) { alert("Error: " + err.message); }
-        }
-
         function showSidebarLoggedIn(username, role) {
-            document.getElementById('login-section').classList.add('hidden');
-            document.getElementById('profile-section').classList.remove('hidden');
             document.getElementById('displayed-username').innerText = username;
             if (role === 'admin') document.getElementById('admin-badge').classList.remove('hidden');
         }
