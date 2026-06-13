@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
     <style>
         body { font-family: 'Open Sans', sans-serif; margin: 0; display: flex; background-color: white; color: #3c4043; }
         
@@ -29,7 +31,6 @@
         .user-info { color: #bdc1c6; font-size: 14px; line-height: 1.4; }
         .user-info strong { color: #8ab4f8; font-size: 15px; }
         .badge { display: inline-block; font-size: 10px; padding: 2px 6px; background-color: #34a853; color: white; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
-        
         .logout-link { display: inline-block; color: #f28b82; text-decoration: none; font-size: 12px; margin-top: 8px; cursor: pointer; }
 
         nav { border-top: 1px solid #3c4043; padding-top: 15px; }
@@ -50,7 +51,7 @@
         .status-banner { padding: 12px; background: #e8f0fe; color: #1a73e8; font-weight: 600; border-radius: 6px; text-align: center; font-size: 15px; }
         
         .chess-grid { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; aspect-ratio: 1; border: 4px solid #3c4043; border-radius: 4px; box-sizing: border-box; }
-        .square { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 42px; cursor: pointer; user-select: none; position: relative; font-family: 'Arial Unicode MS', Arial, sans-serif; }
+        .square { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 42px; cursor: pointer; user-select: none; position: relative; }
         .light-sq { background-color: #f0d9b5; }
         .dark-sq { background-color: #b58863; }
         .square.selected { background-color: #f7f785 !important; }
@@ -66,8 +67,6 @@
         .chat-container { border: 1px solid #dadce0; background: white; height: 120px; overflow-y: auto; padding: 10px; font-size: 13px; border-radius: 4px; }
         .hidden { display: none !important; }
         .lobby-placeholder { text-align: center; padding: 30px 20px; border: 2px dashed #dadce0; border-radius: 8px; color: #70757a; background: #f8f9fa; }
-        
-        .pop-request-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 13px; color: #856404; }
     </style>
 </head>
 <body>
@@ -99,8 +98,8 @@
             </div>
 
             <div id="lobby-empty-state" class="lobby-placeholder">
-                <h3>Welcome to the Match Room</h3>
-                <p>Create a challenge on the right side or accept an open challenge from the lobby list to display the chessboard and start playing!</p>
+                <h3>Match Room</h3>
+                <p>Create a challenge on the right side or accept an open challenge from the lobby list to start playing!</p>
             </div>
         </div>
 
@@ -108,9 +107,16 @@
             <div class="card" id="create-challenge-box">
                 <h3 style="margin-top:0;">Create Challenge</h3>
                 <select id="tc-preset" class="btn secondary" style="background:white; color:black; border:1px solid #dadce0; margin-bottom:10px;">
-                    <option value="10+0">10+0 (Rapid)</option>
-                    <option value="3+2">3+2 (Blitz)</option>
+                    <option value="0.25+0">0:15+0 (Bullet)</option>
                     <option value="1+0">1+0 (Bullet)</option>
+                    <option value="2+1">2+1 (Blitz)</option>
+                    <option value="3+2">3+2 (Blitz)</option>
+                    <option value="5+3">5+3 (Blitz)</option>
+                    <option value="10+0">10+0 (Rapid)</option>
+                    <option value="15+10">15+10 (Rapid)</option>
+                    <option value="30+20">30+20 (Rapid)</option>
+                    <option value="60+30">60+30 (Classical)</option>
+                    <option value="180+180">180+180 (Classical)</option>
                 </select>
                 <button class="btn" onclick="createNewChallenge()">Broadcast Challenge</button>
             </div>
@@ -123,8 +129,6 @@
             <div class="card hidden" id="game-actions-box">
                 <h3 style="margin-top:0; margin-bottom:10px;">Match Console</h3>
                 
-                <div id="incoming-request-panel" class="hidden"></div>
-
                 <div style="display:flex; flex-direction:column; gap:12px;">
                     <div id="players-display-info" style="font-size:13px; font-weight:600;"></div>
                     
@@ -180,416 +184,360 @@
         
         let whiteTime = 600, blackTime = 600;
         let clockInterval = null;
-        let initialTimeControl = { base: 600, increment: 0 };
 
-        // Wikipedia chess symbols
         const UNICODE_PIECES = {
-            'p': '♟︎', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚',
-            'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔'
+            'wK': '♔', 'wQ': '♕', 'wR': '♖', 'wB': '♗', 'wN': '♘', 'wP': '♙',
+            'bK': '♚', 'bQ': '♛', 'bR': '♜', 'bB': '♝', 'bN': '♞', 'bP': '♟'
         };
 
-        window.onload = function() {
-            if (!currentUser) { window.location.href = "index.html"; return; }
+        window.onload = async function() {
+            if (!currentUser) {
+                alert("Please log in first!");
+                window.location.href = 'index.html';
+                return;
+            }
+            displayUsername();
+            loadLobbyChallenges();
+            setInterval(loadLobbyChallenges, 3000);
+        };
+
+        function displayUsername() {
             document.getElementById('displayed-username').innerText = currentUser;
             if (currentRole === 'admin') {
                 document.getElementById('admin-badge').classList.remove('hidden');
             }
-            loadOpenChallenges();
-            setInterval(loadOpenChallenges, 4000);
-            listenForLobbyChanges();
-            checkActiveLiveGame();
-        };
-
-        function logoutUser() {
-            localStorage.clear(); window.location.href = "index.html";
-        }
-
-        function parseTimeControl(tcString) {
-            const parts = tcString.split('+');
-            const baseMinutes = parseInt(parts[0]) || 10;
-            const incrementSeconds = parseInt(parts[1]) || 0;
-            return { base: baseMinutes * 60, increment: incrementSeconds };
-        }
-
-        function renderBoardHTML() {
-            const boardDiv = document.getElementById('chess-board');
-            boardDiv.innerHTML = "";
-            
-            const ranks = myColor === 'w' ? [8,7,6,5,4,3,2,1] : [1,2,3,4,5,6,7,8];
-            const files = myColor === 'w' ? ['a','b','c','d','e','f','g','h'] : ['h','g','f','e','d','c','b','a'];
-
-            ranks.forEach(rank => {
-                files.forEach(file => {
-                    const coord = file + rank;
-                    const squareHTML = document.createElement('div');
-                    squareHTML.className = `square ${((rank + files.indexOf(file)) % 2 === 0) ? 'dark-sq' : 'light-sq'}`;
-                    squareHTML.setAttribute('data-coord', coord);
-
-                    const piece = gameLogic.get(coord);
-                    if (piece) {
-                        const symbol = piece.color === 'w' ? piece.type.toUpperCase() : piece.type.toLowerCase();
-                        squareHTML.innerText = UNICODE_PIECES[symbol] || "";
-                    }
-
-                    squareHTML.onclick = () => handleSquareClick(coord);
-                    boardDiv.appendChild(squareHTML);
-                });
-            });
-        }
-
-        function updateMoveLog() {
-            const moveLog = document.getElementById('move-log-container');
-            const moves = gameLogic.history();
-            moveLog.innerHTML = moves.map((move, idx) => {
-                const pairNum = Math.floor(idx / 2) + 1;
-                const color = idx % 2 === 0 ? 'W' : 'B';
-                return `<div style="margin: 4px 0;"><strong>${color} ${pairNum}.</strong> ${move}</div>`;
-            }).join('');
-            moveLog.scrollTop = moveLog.scrollHeight;
-        }
-
-        function handleSquareClick(coord) {
-            if (gameLogic.turn() !== myColor || currentStatus !== 'playing') return;
-
-            const clickedPiece = gameLogic.get(coord);
-
-            if (selectedSquare === coord) {
-                clearHighlights();
-                return;
-            }
-
-            if (selectedSquare) {
-                const move = gameLogic.move({ from: selectedSquare, to: coord, promotion: 'q' });
-                if (move) {
-                    clearHighlights();
-                    updateMoveLog();
-                    syncMatchState(gameLogic.fen(), gameLogic.history());
-                    return;
-                }
-            }
-
-            if (clickedPiece && clickedPiece.color === myColor) {
-                clearHighlights();
-                selectedSquare = coord;
-                document.querySelector(`[data-coord="${coord}"]`).classList.add('selected');
-                
-                const legalMoves = gameLogic.moves({ square: coord, verbose: true });
-                legalMoves.forEach(m => {
-                    document.querySelector(`[data-coord="${m.to}"]`).classList.add('dot-target');
-                });
-            } else {
-                clearHighlights();
-            }
-        }
-
-        function clearHighlights() {
-            selectedSquare = null;
-            document.querySelectorAll('.square').forEach(sq => {
-                sq.classList.remove('selected', 'dot-target');
-            });
-        }
-
-        async function syncMatchState(fen, historyArray) {
-            let status = 'playing';
-            if (gameLogic.in_checkmate()) {
-                status = gameLogic.turn() === 'w' ? 'black_won' : 'white_won';
-            } else if (gameLogic.in_draw()) {
-                status = 'draw';
-            }
-
-            await supabaseClient.from('gcvm_games').update({
-                fen: fen,
-                moves_list: historyArray,
-                pgn_log: historyArray.join(" "),
-                status: status,
-                white_time: whiteTime,
-                black_time: blackTime
-            }).eq('id', currentGameId);
-
-            if (status !== 'playing') {
-                await completeGame(status);
-            }
-        }
-
-        function calculateEloChange(playerRating, opponentRating, result) {
-            const K = 32;
-            const expectedScore = 1 / (1 + Math.pow(10, (opponentRating - playerRating) / 400));
-            const actualScore = result === 'win' ? 1 : result === 'draw' ? 0.5 : 0;
-            return Math.round(K * (actualScore - expectedScore));
-        }
-
-        async function completeGame(finalStatus) {
-            try {
-                const { data: gameData } = await supabaseClient.from('gcvm_games').select('*').eq('id', currentGameId).single();
-                
-                if (!gameData) return;
-
-                const { data: players } = await supabaseClient.from('gcvm_users').select('*')
-                    .in('username', [gameData.white_player, gameData.black_player]);
-
-                if (!players || players.length < 2) return;
-
-                const whitePlayer = players.find(p => p.username === gameData.white_player);
-                const blackPlayer = players.find(p => p.username === gameData.black_player);
-
-                let whiteRatingChange = 0, blackRatingChange = 0;
-
-                if (finalStatus === 'white_won') {
-                    whiteRatingChange = calculateEloChange(whitePlayer.rating, blackPlayer.rating, 'win');
-                    blackRatingChange = calculateEloChange(blackPlayer.rating, whitePlayer.rating, 'loss');
-                } else if (finalStatus === 'black_won') {
-                    whiteRatingChange = calculateEloChange(whitePlayer.rating, blackPlayer.rating, 'loss');
-                    blackRatingChange = calculateEloChange(blackPlayer.rating, whitePlayer.rating, 'win');
-                } else if (finalStatus === 'draw') {
-                    whiteRatingChange = calculateEloChange(whitePlayer.rating, blackPlayer.rating, 'draw');
-                    blackRatingChange = calculateEloChange(blackPlayer.rating, whitePlayer.rating, 'draw');
-                }
-
-                const newWhiteRating = Math.max(1, whitePlayer.rating + whiteRatingChange);
-                const newBlackRating = Math.max(1, blackPlayer.rating + blackRatingChange);
-
-                // Update game with rating changes
-                await supabaseClient.from('gcvm_games').update({
-                    white_rating: whitePlayer.rating,
-                    black_rating: blackPlayer.rating,
-                    white_rating_change: whiteRatingChange,
-                    black_rating_change: blackRatingChange,
-                    is_rated: true
-                }).eq('id', currentGameId);
-
-                // Update player ratings
-                await supabaseClient.from('gcvm_users').update({ rating: newWhiteRating, rd: Math.max(30, whitePlayer.rd - 5) }).eq('username', whitePlayer.username);
-                await supabaseClient.from('gcvm_users').update({ rating: newBlackRating, rd: Math.max(30, blackPlayer.rd - 5) }).eq('username', blackPlayer.username);
-
-                const resultText = finalStatus === 'white_won' ? 'White won' : finalStatus === 'black_won' ? 'Black won' : 'Draw';
-                alert(`Game Over: ${resultText}`);
-                
-                clearInterval(clockInterval);
-                currentGameId = null;
-                setTimeout(() => location.reload(), 1000);
-
-            } catch (err) {
-                console.error("Error completing game:", err);
-            }
-        }
-
-        async function proposeMatchAction(actionType) {
-            await supabaseClient.from('gcvm_games').update({ status: actionType }).eq('id', currentGameId);
-            sendChatMessageToServer(`[SYSTEM: ${currentUser} proposed: ${actionType.replace('_', ' ')}]`);
-        }
-
-        function checkIncomingRequests(status, gameData) {
-            const panel = document.getElementById('incoming-request-panel');
-            panel.innerHTML = "";
-
-            const isOpponentDraw = status === 'draw_offered' && ((gameData.white_player === currentUser && myColor === 'b') || (gameData.black_player === currentUser && myColor === 'w'));
-            const isOpponentTakeback = status === 'takeback_requested' && ((gameData.white_player === currentUser && myColor === 'b') || (gameData.black_player === currentUser && myColor === 'w'));
-
-            if (isOpponentDraw) {
-                panel.classList.remove('hidden');
-                panel.innerHTML = `
-                    <div class="pop-request-box">
-                        <strong>Draw Offer received</strong><br><br>
-                        <button class="btn success" style="padding:4px 8px; font-size:12px; width:auto; margin-right:5px;" onclick="resolveRequest('draw')">Accept</button>
-                        <button class="btn danger" style="padding:4px 8px; font-size:12px; width:auto;" onclick="resolveRequest('reject')">Decline</button>
-                    </div>`;
-            } else if (isOpponentTakeback) {
-                panel.classList.remove('hidden');
-                panel.innerHTML = `
-                    <div class="pop-request-box">
-                        <strong>Takeback requested</strong><br><br>
-                        <button class="btn success" style="padding:4px 8px; font-size:12px; width:auto; margin-right:5px;" onclick="resolveRequest('takeback')">Allow</button>
-                        <button class="btn danger" style="padding:4px 8px; font-size:12px; width:auto;" onclick="resolveRequest('reject')">Decline</button>
-                    </div>`;
-            } else {
-                panel.classList.add('hidden');
-            }
-        }
-
-        async function resolveRequest(decision) {
-            if (decision === 'draw') {
-                await supabaseClient.from('gcvm_games').update({ status: 'draw' }).eq('id', currentGameId);
-            } else if (decision === 'takeback') {
-                gameLogic.undo();
-                updateMoveLog();
-                await supabaseClient.from('gcvm_games').update({ fen: gameLogic.fen(), moves_list: gameLogic.history(), status: 'playing' }).eq('id', currentGameId);
-            } else {
-                await supabaseClient.from('gcvm_games').update({ status: 'playing' }).eq('id', currentGameId);
-            }
-        }
-
-        async function checkActiveLiveGame() {
-            const { data: games } = await supabaseClient.from('gcvm_games').select('*').or(`white_player.eq.${currentUser},black_player.eq.${currentUser}`).eq('status', 'playing');
-            
-            if (games && games.length > 0) {
-                const game = games[0];
-                currentGameId = game.id;
-                currentStatus = 'playing';
-                myColor = (game.white_player === currentUser) ? 'w' : 'b';
-
-                initialTimeControl = parseTimeControl(game.time_control || '10+0');
-                whiteTime = game.white_time !== null ? game.white_time : initialTimeControl.base;
-                blackTime = game.black_time !== null ? game.black_time : initialTimeControl.base;
-
-                document.getElementById('lobby-empty-state').classList.add('hidden');
-                document.getElementById('create-challenge-box').classList.add('hidden');
-                document.getElementById('challenges-list-box').classList.add('hidden');
-                
-                document.getElementById('board-wrapper').classList.remove('hidden');
-                document.getElementById('game-actions-box').classList.remove('hidden');
-
-                document.getElementById('players-display-info').innerHTML = `White: ${game.white_player} | Black: ${game.black_player}`;
-                
-                gameLogic.load(game.fen && game.fen !== 'start' ? game.fen : 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
-                renderBoardHTML();
-                updateMoveLog();
-                renderChat(game.chat_log);
-                checkIncomingRequests(game.status, game);
-                runLocalClockEngine();
-
-                if (channelSubscription) channelSubscription.unsubscribe();
-                channelSubscription = supabaseClient.channel(`room-${currentGameId}`)
-                    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'gcvm_games', filter: `id=eq.${currentGameId}` }, payload => {
-                        const u = payload.new;
-                        if (u.status === 'white_won' || u.status === 'black_won' || u.status === 'draw') {
-                            currentStatus = u.status;
-                            completeGame(u.status);
-                        } else {
-                            gameLogic.load(u.fen);
-                            whiteTime = u.white_time || whiteTime;
-                            blackTime = u.black_time || blackTime;
-                            renderBoardHTML();
-                            updateMoveLog();
-                            renderChat(u.chat_log);
-                            checkIncomingRequests(u.status, u);
-                        }
-                    }).subscribe();
-            }
-        }
-
-        async function sendChatMessage() {
-            const input = document.getElementById('chat-input');
-            if (!input.value.trim()) return;
-            await sendChatMessageToServer(`${currentUser}: ${input.value.trim()}`);
-            input.value = "";
-        }
-
-        async function sendChatMessageToServer(rawStr) {
-            const { data } = await supabaseClient.from('gcvm_games').select('chat_log').eq('id', currentGameId).single();
-            let arr = Array.isArray(data?.chat_log) ? data.chat_log : [];
-            arr.push(rawStr);
-            await supabaseClient.from('gcvm_games').update({ chat_log: arr }).eq('id', currentGameId);
-        }
-
-        function renderChat(arr) {
-            const box = document.getElementById('chat-box');
-            box.innerHTML = (arr || []).map(m => `<div>${m}</div>`).join('');
-            box.scrollTop = box.scrollHeight;
-        }
-
-        function runLocalClockEngine() {
-            if (clockInterval) clearInterval(clockInterval);
-            clockInterval = setInterval(() => {
-                if (gameLogic.turn() === 'w') {
-                    whiteTime = Math.max(0, whiteTime - 1);
-                    document.getElementById('card-clk-w').classList.add('active-turn');
-                    document.getElementById('card-clk-b').classList.remove('active-turn');
-                    
-                    if (whiteTime === 0) {
-                        clearInterval(clockInterval);
-                        handleTimeout('w');
-                        return;
-                    }
-                } else {
-                    blackTime = Math.max(0, blackTime - 1);
-                    document.getElementById('card-clk-b').classList.add('active-turn');
-                    document.getElementById('card-clk-w').classList.remove('active-turn');
-                    
-                    if (blackTime === 0) {
-                        clearInterval(clockInterval);
-                        handleTimeout('b');
-                        return;
-                    }
-                }
-                
-                const fmt = (t) => `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, '0')}`;
-                document.getElementById('clock-white').innerText = fmt(whiteTime);
-                document.getElementById('clock-black').innerText = fmt(blackTime);
-            }, 1000);
-        }
-
-        async function handleTimeout(timedOutColor) {
-            const result = timedOutColor === 'w' ? 'black_won' : 'white_won';
-            await supabaseClient.from('gcvm_games').update({ status: result }).eq('id', currentGameId);
-            await completeGame(result);
-        }
-
-        async function loadOpenChallenges() {
-            let { data } = await supabaseClient.from('gcvm_games').select('*').eq('status', 'waiting');
-            const container = document.getElementById('challenges-container');
-            container.innerHTML = "";
-            
-            if (!data || data.length === 0) {
-                container.innerHTML = "<p style='font-size:12px;color:#70757a;'>No open challenges</p>";
-                return;
-            }
-
-            data.forEach(c => {
-                const div = document.createElement('div');
-                div.className = "challenge-item";
-                if (c.white_player === currentUser) {
-                    div.innerHTML = `<div>${c.white_player} (${c.time_control})</div><button class="btn danger" style="width:auto;padding:4px 8px;" onclick="cancelChallenge('${c.id}')">Cancel</button>`;
-                } else {
-                    div.innerHTML = `<div>${c.white_player} (${c.time_control})</div><button class="btn" style="width:auto;padding:4px 8px;" onclick="acceptChallenge('${c.id}')">Accept</button>`;
-                }
-                container.appendChild(div);
-            });
-        }
-
-        async function cancelChallenge(id) {
-            await supabaseClient.from('gcvm_games').delete().eq('id', id);
-            loadOpenChallenges();
-        }
-
-        async function acceptChallenge(id) {
-            await supabaseClient.from('gcvm_games').update({ black_player: currentUser, status: 'playing' }).eq('id', id);
-            checkActiveLiveGame();
         }
 
         async function createNewChallenge() {
-            // Delete all old waiting challenges from this user
-            await supabaseClient.from('gcvm_games').delete().eq('white_player', currentUser).eq('status', 'waiting');
-
             const tc = document.getElementById('tc-preset').value;
-            const parsed = parseTimeControl(tc);
-            await supabaseClient.from('gcvm_games').insert([{ 
-                white_player: currentUser, 
-                status: 'waiting', 
-                time_control: tc, 
-                fen: 'start', 
-                moves_list: [], 
-                chat_log: [],
-                white_time: parsed.base,
-                black_time: parsed.base,
-                white_rating: 1500,
-                black_rating: 1500,
-                is_rated: true
-            }]);
-            loadOpenChallenges();
+            const [minutes, increment] = tc.split('+').map(x => parseInt(x) || 0);
+            const timeSeconds = minutes * 60;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('gcvm_challenges')
+                    .insert([{
+                        creator_username: currentUser,
+                        time_control: tc,
+                        status: 'open',
+                        created_at: new Date().toISOString()
+                    }])
+                    .select();
+
+                if (error) throw error;
+                alert("Challenge created! Waiting for opponent...");
+            } catch (err) {
+                alert("Error creating challenge: " + err.message);
+            }
         }
 
-        function listenForLobbyChanges() {
-            supabaseClient.channel('lobby').on('postgres_changes', { event: '*', schema: 'public', table: 'gcvm_games' }, () => {
-                loadOpenChallenges();
-            }).subscribe();
+        async function loadLobbyChallenges() {
+            try {
+                const { data: challenges, error } = await supabaseClient
+                    .from('gcvm_challenges')
+                    .select('*')
+                    .eq('status', 'open')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const container = document.getElementById('challenges-container');
+                if (!challenges || challenges.length === 0) {
+                    container.innerHTML = '<p style="color: #70757a; text-align: center;">No open challenges</p>';
+                    return;
+                }
+
+                let html = '';
+                for (const challenge of challenges) {
+                    if (challenge.creator_username === currentUser) continue;
+                    html += `
+                        <div class="challenge-item">
+                            <div>
+                                <strong>${challenge.creator_username}</strong> - ${challenge.time_control}
+                            </div>
+                            <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="acceptChallenge('${challenge.id}')">Accept</button>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html || '<p style="color: #70757a; text-align: center;">No open challenges</p>';
+            } catch (err) {
+                console.error("Error loading challenges:", err);
+            }
+        }
+
+        async function acceptChallenge(challengeId) {
+            try {
+                const { data: challenge, error: fetchError } = await supabaseClient
+                    .from('gcvm_challenges')
+                    .select('*')
+                    .eq('id', challengeId)
+                    .maybeSingle();
+
+                if (fetchError || !challenge) throw new Error("Challenge not found");
+
+                const [minutes, increment] = challenge.time_control.split('+').map(x => parseInt(x) || 0);
+                whiteTime = minutes * 60;
+                blackTime = minutes * 60;
+
+                myColor = Math.random() > 0.5 ? 'w' : 'b';
+
+                const { data: gameData, error: createError } = await supabaseClient
+                    .from('gcvm_games')
+                    .insert([{
+                        white_player: myColor === 'w' ? currentUser : challenge.creator_username,
+                        black_player: myColor === 'b' ? currentUser : challenge.creator_username,
+                        time_control: challenge.time_control,
+                        status: 'active',
+                        fen: gameLogic.fen(),
+                        white_time: whiteTime,
+                        black_time: blackTime,
+                        increment: increment,
+                        created_at: new Date().toISOString()
+                    }])
+                    .select();
+
+                if (createError) throw createError;
+
+                currentGameId = gameData[0].id;
+
+                await supabaseClient
+                    .from('gcvm_challenges')
+                    .update({ status: 'accepted' })
+                    .eq('id', challengeId);
+
+                startGame();
+            } catch (err) {
+                alert("Error accepting challenge: " + err.message);
+            }
+        }
+
+        function startGame() {
+            document.getElementById('lobby-empty-state').classList.add('hidden');
+            document.getElementById('board-wrapper').classList.remove('hidden');
+            document.getElementById('game-actions-box').classList.remove('hidden');
+            document.getElementById('challenges-list-box').parentElement.classList.add('hidden');
+            document.getElementById('create-challenge-box').classList.add('hidden');
+
+            renderBoard();
+            updatePlayerInfo();
+            startClock();
+            subscribeToGameUpdates();
+        }
+
+        function renderBoard() {
+            const board = document.getElementById('chess-board');
+            board.innerHTML = '';
+            const boardArray = gameLogic.board();
+            const isFlipped = myColor === 'b';
+
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const displayRow = isFlipped ? 7 - row : row;
+                    const displayCol = isFlipped ? 7 - col : col;
+                    const square = boardArray[displayRow][displayCol];
+                    const squareId = String.fromCharCode(97 + displayCol) + (8 - displayRow);
+                    const isLight = (displayRow + displayCol) % 2 === 0;
+                    
+                    const squareEl = document.createElement('div');
+                    squareEl.className = `square ${isLight ? 'light-sq' : 'dark-sq'}`;
+                    squareEl.id = squareId;
+                    
+                    if (square) {
+                        squareEl.innerText = UNICODE_PIECES[square.color + square.type];
+                    }
+                    
+                    squareEl.onclick = () => selectSquare(squareId);
+                    board.appendChild(squareEl);
+                }
+            }
+        }
+
+        function selectSquare(squareId) {
+            if (gameLogic.turn() !== myColor) return;
+
+            const piece = gameLogic.get(squareId);
+            
+            if (selectedSquare) {
+                const move = gameLogic.move({ from: selectedSquare, to: squareId, promotion: 'q' });
+                
+                if (move) {
+                    updateGame();
+                    selectedSquare = null;
+                } else if (piece && piece.color === myColor) {
+                    selectedSquare = squareId;
+                } else {
+                    selectedSquare = null;
+                }
+            } else if (piece && piece.color === myColor) {
+                selectedSquare = squareId;
+            }
+
+            renderBoard();
+        }
+
+        async function updateGame() {
+            try {
+                const { error } = await supabaseClient
+                    .from('gcvm_games')
+                    .update({
+                        fen: gameLogic.fen(),
+                        white_time: gameLogic.turn() === 'w' ? whiteTime : whiteTime,
+                        black_time: gameLogic.turn() === 'b' ? blackTime : blackTime
+                    })
+                    .eq('id', currentGameId);
+
+                if (error) throw error;
+            } catch (err) {
+                console.error("Error updating game:", err);
+            }
+        }
+
+        function startClock() {
+            if (clockInterval) clearInterval(clockInterval);
+            
+            clockInterval = setInterval(async () => {
+                if (gameLogic.turn() === 'w') {
+                    whiteTime--;
+                } else {
+                    blackTime--;
+                }
+
+                updateClockDisplay();
+
+                if (whiteTime <= 0 || blackTime <= 0) {
+                    clearInterval(clockInterval);
+                    finishGame(whiteTime <= 0 ? 'black' : 'white');
+                }
+            }, 1000);
+        }
+
+        function updateClockDisplay() {
+            const formatTime = (seconds) => {
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                return `${m}:${s.toString().padStart(2, '0')}`;
+            };
+
+            document.getElementById('clock-white').innerText = formatTime(Math.max(0, whiteTime));
+            document.getElementById('clock-black').innerText = formatTime(Math.max(0, blackTime));
+
+            const wCard = document.getElementById('card-clk-w');
+            const bCard = document.getElementById('card-clk-b');
+            wCard.classList.toggle('active-turn', gameLogic.turn() === 'w');
+            bCard.classList.toggle('active-turn', gameLogic.turn() === 'b');
+        }
+
+        function updatePlayerInfo() {
+            const white = currentGameId ? (myColor === 'w' ? currentUser : 'Opponent') : 'White';
+            const black = currentGameId ? (myColor === 'b' ? currentUser : 'Opponent') : 'Black';
+            document.getElementById('players-display-info').innerText = `White: ${white} | Black: ${black}`;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (message) {
+                const chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML += `<div><strong>${currentUser}:</strong> ${message}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                input.value = '';
+            }
+        }
+
+        function proposeMatchAction(action) {
+            alert(action + " proposed!");
         }
 
         async function resignMatch() {
-            if(confirm("Confirm resignation?")) {
-                const result = myColor === 'w' ? 'black_won' : 'white_won';
-                await supabaseClient.from('gcvm_games').update({ status: result }).eq('id', currentGameId);
-                await completeGame(result);
+            if (confirm("Are you sure you want to resign?")) {
+                await finishGame(myColor === 'w' ? 'black' : 'white');
             }
+        }
+
+        async function finishGame(winner) {
+            clearInterval(clockInterval);
+            
+            try {
+                const opponentColor = myColor === 'w' ? 'b' : 'w';
+                const resultMap = {
+                    'white': myColor === 'w' ? 'win' : 'loss',
+                    'black': myColor === 'b' ? 'win' : 'loss'
+                };
+                const result = resultMap[winner];
+
+                await supabaseClient
+                    .from('gcvm_games')
+                    .update({ status: 'finished', result: result })
+                    .eq('id', currentGameId);
+
+                await updateRating(result);
+                alert(`Game finished! You ${result}!`);
+                resetToLobby();
+            } catch (err) {
+                console.error("Error finishing game:", err);
+            }
+        }
+
+        async function updateRating(result) {
+            try {
+                const { data: user, error: fetchError } = await supabaseClient
+                    .from('gcvm_users')
+                    .select('rating, rd, games_played')
+                    .eq('username', currentUser)
+                    .maybeSingle();
+
+                if (fetchError) throw fetchError;
+
+                let rating = user.rating || 1500;
+                let rd = user.rd || 350;
+                let gamesPlayed = (user.games_played || 0) + 1;
+
+                const kFactor = rd > 200 ? 32 : 24;
+                const ratingChange = result === 'win' ? kFactor : -kFactor;
+                rating = Math.max(800, Math.min(2800, rating + ratingChange));
+                rd = Math.max(30, rd - 1);
+
+                await supabaseClient
+                    .from('gcvm_users')
+                    .update({ rating, rd, games_played: gamesPlayed })
+                    .eq('username', currentUser);
+            } catch (err) {
+                console.error("Error updating rating:", err);
+            }
+        }
+
+        function subscribeToGameUpdates() {
+            if (channelSubscription) channelSubscription.unsubscribe();
+            
+            channelSubscription = supabaseClient
+                .channel(`game:${currentGameId}`)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'gcvm_games', filter: `id=eq.${currentGameId}` }, (payload) => {
+                    if (payload.new) {
+                        gameLogic.load(payload.new.fen);
+                        whiteTime = payload.new.white_time;
+                        blackTime = payload.new.black_time;
+                        renderBoard();
+                        updateClockDisplay();
+                    }
+                })
+                .subscribe();
+        }
+
+        function resetToLobby() {
+            currentGameId = null;
+            gameLogic = new Chess();
+            document.getElementById('board-wrapper').classList.add('hidden');
+            document.getElementById('game-actions-box').classList.add('hidden');
+            document.getElementById('lobby-empty-state').classList.remove('hidden');
+            document.getElementById('challenges-list-box').parentElement.classList.remove('hidden');
+            document.getElementById('create-challenge-box').classList.remove('hidden');
+            loadLobbyChallenges();
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('gcvm_db_session');
+            localStorage.removeItem('gcvm_db_role');
+            window.location.href = 'index.html';
         }
     </script>
 </body>
